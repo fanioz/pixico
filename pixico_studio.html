@@ -1,0 +1,2681 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixico Studio - Generator Ikon Store Pixel Art</title>
+
+  <meta name="description" content="Pixico Studio - Aplikasi pembuat dan konverter ikon pixel art profesional siap rilis untuk Google Play Store (512x512), Apple App Store (1024x1024), dan Microsoft Store / Windows MSIX.">
+  <meta name="keywords" content="pixel art icon, app store icon generator, google play icon maker, retro icon, msix icon, ico generator">
+  <meta name="author" content="Pixico Studio">
+  <meta name="theme-color" content="#0f172a">
+
+  <!-- OpenGraph / Facebook / WhatsApp Share Preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Pixico Studio - Generator Ikon Store Pixel Art">
+  <meta property="og:description" content="Rancang dan konversi ikon retro pixel-perfect siap submit ke Google Play Store, iOS App Store, dan Windows 11 secara instan.">
+  <meta property="og:image" content="https://placehold.co/1200x630/0f172a/6366f1?text=Pixico+Studio+•+Store-Ready+Pixel+Icons">
+
+  <!-- Twitter / X Card Preview -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Pixico Studio - Generator Ikon Store Pixel Art">
+  <meta name="twitter:description" content="Generator ikon pixel art multi-platform: Google Play, Apple App Store, & Windows. 100% Client-side.">
+  <meta name="twitter:image" content="https://placehold.co/1200x630/0f172a/6366f1?text=Pixico+Studio+•+Store-Ready+Pixel+Icons">
+
+  <!-- Inline Crisp Retro Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%236366f1'/><rect x='25' y='25' width='50' height='50' fill='%23ffffff'/><rect x='40' y='40' width='20' height='20' fill='%236366f1'/></svg>">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- JSZip untuk ekspor paket ZIP multi-ukuran -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- Google Fonts: Inter & Press Start 2P untuk aksen pixel retro -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .font-pixel {
+      font-family: 'Press Start 2P', monospace;
+    }
+    /* Checkerboard pattern for canvas transparency */
+    .bg-checker {
+      background-color: #1e293b;
+      background-image: 
+        linear-gradient(45deg, #0f172a 25%, transparent 25%), 
+        linear-gradient(-45deg, #0f172a 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #0f172a 75%), 
+        linear-gradient(-45deg, transparent 75%, #0f172a 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    }
+    .canvas-crisp {
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -webkit-crisp-edges;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header & Brand Bar -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-40 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-md">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 border border-indigo-400/30">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-base font-bold tracking-tight text-white">Pixico <span class="text-indigo-400 font-pixel text-xs">Studio</span></h1>
+          <span class="text-[10px] font-pixel bg-indigo-950/80 text-indigo-400 border border-indigo-700/50 px-1.5 py-0.5 rounded">STORE READY</span>
+        </div>
+        <p class="text-xs text-slate-400 hidden sm:block">Pixel-Perfect Icons for Google Play, App Store & Microsoft Store</p>
+      </div>
+    </div>
+
+    <!-- Quick Actions & Canvas Dimensions -->
+    <div class="flex items-center flex-wrap gap-2">
+      <!-- Resolution selector -->
+      <div class="flex items-center bg-slate-800 rounded-lg p-1 border border-slate-700">
+        <span class="text-xs text-slate-400 px-2 font-medium">Grid:</span>
+        <button onclick="setGridSize(16)" id="grid-btn-16" class="px-2.5 py-1 text-xs font-semibold rounded-md transition bg-indigo-600 text-white shadow">16x16</button>
+        <button onclick="setGridSize(24)" id="grid-btn-24" class="px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white">24x24</button>
+        <button onclick="setGridSize(32)" id="grid-btn-32" class="px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white">32x32</button>
+        <button onclick="setGridSize(48)" id="grid-btn-48" class="px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white">48x48</button>
+        <button onclick="setGridSize(64)" id="grid-btn-64" class="px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white">64x64</button>
+      </div>
+
+      <!-- Action buttons -->
+      <button onclick="openTemplateModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium rounded-lg text-slate-200 transition">
+        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        Template
+      </button>
+
+      <button onclick="openImageImportModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium rounded-lg text-slate-200 transition">
+        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Pixelize Foto
+      </button>
+
+      <!-- Project Save & Load Actions -->
+      <div class="flex items-center bg-slate-800 rounded-lg p-0.5 border border-slate-700">
+        <button onclick="exportProjectFile()" title="Simpan berkas proyek Pixico (.pixico)" class="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-200 hover:text-white hover:bg-slate-700 rounded transition">
+          <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+          <span class="hidden sm:inline">Simpan</span>
+        </button>
+        <button onclick="document.getElementById('project-file-input').click()" title="Buka berkas proyek (.pixico / .json)" class="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-200 hover:text-white hover:bg-slate-700 rounded transition">
+          <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          <span class="hidden sm:inline">Buka</span>
+        </button>
+        <input type="file" id="project-file-input" accept=".pixico,.json" class="hidden" onchange="loadProjectFile(event)">
+      </div>
+
+      <!-- Autosave Status Badge -->
+      <div id="autosave-badge" title="Tersimpan otomatis di browser lokal" class="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded bg-slate-900 border border-slate-800 text-[10px] text-emerald-400 font-mono transition-opacity">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Autosave</span>
+      </div>
+
+      <div class="h-5 w-px bg-slate-800"></div>
+
+      <!-- Undo / Redo -->
+      <button onclick="undo()" id="undo-btn" title="Undo (Ctrl+Z)" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 disabled:opacity-40 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a5 5 0 015 5v2m0 0l-4-4m4 4l4-4M3 10l4-4m-4 4l4 4"/></svg>
+      </button>
+      <button onclick="redo()" id="redo-btn" title="Redo (Ctrl+Y)" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 disabled:opacity-40 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a5 5 0 00-5 5v2m0 0l4-4m-4 4l-4-4m20-2l-4-4m4 4l-4 4"/></svg>
+      </button>
+      <button onclick="clearCanvas()" title="Kosongkan Kanvas" class="p-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/50 text-rose-300 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Workspace Layout -->
+  <main class="flex-1 max-w-[1600px] w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+    
+    <!-- LEFT PANEL: Tools & Palettes (3 Cols on Desktop) -->
+    <aside class="lg:col-span-3 flex flex-col gap-4 order-2 lg:order-1">
+      
+      <!-- Tools Card -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center justify-between">
+          <span>Alat Gambar</span>
+          <span class="text-[10px] text-slate-500 font-normal">Shortcut (P, E, B, I, L, R)</span>
+        </h2>
+        
+        <div class="grid grid-cols-4 gap-1.5">
+          <!-- Pen -->
+          <button onclick="setTool('pen')" id="tool-pen" title="Pensil (P)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-600 text-white font-medium text-xs transition border border-indigo-400/40">
+            <svg class="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            <span>Pensil</span>
+          </button>
+          
+          <!-- Eraser -->
+          <button onclick="setTool('eraser')" id="tool-eraser" title="Penghapus (E)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
+            <svg class="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            <span>Hapus</span>
+          </button>
+
+          <!-- Bucket / Flood Fill -->
+          <button onclick="setTool('bucket')" id="tool-bucket" title="Ember Cat / Fill (B)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
+            <svg class="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+            <span>Isi</span>
+          </button>
+
+          <!-- Eyedropper -->
+          <button onclick="setTool('picker')" id="tool-picker" title="Pipet Warna (I)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
+            <svg class="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4 4 4 0 014-4h.5l5.5-5.5a2.5 2.5 0 013.536 3.536L11 16.5V17a4 4 0 01-4 4zm0 0v-1.5"/></svg>
+            <span>Pipet</span>
+          </button>
+
+          <!-- Line Tool -->
+          <button onclick="setTool('line')" id="tool-line" title="Garis Lurus (L)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
+            <svg class="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 20L20 4"/></svg>
+            <span>Garis</span>
+          </button>
+
+          <!-- Rectangle Tool -->
+          <button onclick="setTool('rect')" id="tool-rect" title="Kotak / Bingkai (R)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
+            <svg class="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1" stroke-width="2"/></svg>
+            <span>Kotak</span>
+          </button>
+
+          <!-- Shading: Lighten -->
+          <button onclick="setTool('lighten')" id="tool-lighten" title="Efek Terang (+)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
+            <svg class="w-4 h-4 mb-1 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <span>Terang</span>
+          </button>
+
+          <!-- Shading: Darken -->
+          <button onclick="setTool('darken')" id="tool-darken" title="Efek Gelap (-)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
+            <svg class="w-4 h-4 mb-1 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+            <span>Gelap</span>
+          </button>
+        </div>
+
+        <!-- Toggles: Grid & Symmetry -->
+        <div class="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
+          <label class="flex items-center gap-2 cursor-pointer select-none text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-grid" checked onchange="toggleGrid(this.checked)" class="w-4 h-4 rounded text-indigo-600 focus:ring-0 bg-slate-800 border-slate-700">
+            <span>Kisi Garis</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer select-none text-slate-300 hover:text-white" title="Menggambar otomatis simetris kiri-kanan">
+            <input type="checkbox" id="toggle-symmetry" onchange="toggleSymmetry(this.checked)" class="w-4 h-4 rounded text-indigo-600 focus:ring-0 bg-slate-800 border-slate-700">
+            <span class="flex items-center gap-1">
+              <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+              Simetri
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Palette Card -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Palet Warna</h2>
+          <select id="palette-selector" onchange="changePalette(this.value)" class="text-xs bg-slate-800 text-slate-200 border border-slate-700 rounded-md px-2 py-1 focus:outline-none focus:border-indigo-500">
+            <option value="pico8">PICO-8 (Klasik)</option>
+            <option value="storeVibrant">App Store Vibrant</option>
+            <option value="gameboy">Retro Game Boy</option>
+            <option value="cyberpunk">Cyberpunk Neon</option>
+            <option value="sweetie16">Sweetie 16 Pastel</option>
+            <option value="monochrome">Monochrome</option>
+          </select>
+        </div>
+
+        <!-- Current Colors Display & Native Color Picker -->
+        <div class="flex items-center gap-2.5 mb-3 p-2 bg-slate-800/80 rounded-lg border border-slate-700">
+          <div class="relative group">
+            <input type="color" id="native-color-picker" value="#6366f1" onchange="setCurrentColor(this.value)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+            <div id="current-color-preview" class="w-8 h-8 rounded-md shadow border-2 border-white/80 bg-indigo-500 cursor-pointer"></div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-[11px] text-slate-400 font-medium">Warna Aktif:</div>
+            <div id="current-hex-label" class="text-xs font-mono font-bold text-slate-100 uppercase">#6366F1</div>
+          </div>
+          <button onclick="document.getElementById('native-color-picker').click()" class="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 transition">
+            Pilih Hex
+          </button>
+        </div>
+
+        <!-- Palette Swatches Grid -->
+        <div id="palette-swatches" class="grid grid-cols-8 gap-1.5 p-1 bg-slate-950/60 rounded-lg border border-slate-800">
+          <!-- Injected via JavaScript -->
+        </div>
+
+        <!-- Quick Color History -->
+        <div class="mt-3">
+          <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider block mb-1">Riwayat Warna Terpakai</span>
+          <div id="recent-colors" class="flex gap-1.5 overflow-x-auto pb-1">
+            <div class="text-[11px] text-slate-600 italic">Belum ada riwayat</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Tips Card -->
+      <div class="bg-indigo-950/30 border border-indigo-900/50 rounded-xl p-3 text-xs text-indigo-300">
+        <div class="font-bold flex items-center gap-1.5 text-indigo-200 mb-1">
+          <svg class="w-4 h-4 text-indigo-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+          Tips Desain Ikon Pixico:
+        </div>
+        <p class="leading-relaxed text-indigo-300/90 text-[11px]">
+          Fokus pada siluet utama yang kuat dan kontras tinggi. Ikon di smartphone dilihat pada ukuran ~48x48 px, sehingga kurangi detail mikroskopis agar bentuk langsung terbaca.
+        </p>
+      </div>
+
+    </aside>
+
+    <!-- CENTER PANEL: Drawing Canvas (5 Cols on Desktop) -->
+    <section class="lg:col-span-5 flex flex-col items-center justify-center order-1 lg:order-2">
+      <div class="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col items-center shadow-lg">
+        
+        <!-- Canvas Status & Zoom -->
+        <div class="w-full flex items-center justify-between mb-3 text-xs text-slate-400">
+          <div class="flex items-center gap-2">
+            <span id="canvas-dim-indicator" class="font-pixel text-[10px] bg-slate-800 px-2 py-1 rounded text-indigo-300 border border-slate-700">16 x 16</span>
+            <span id="mouse-coords" class="font-mono text-[11px] text-slate-400">X: 0, Y: 0</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="adjustZoom(-1)" title="Perkecil Kanvas" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-bold">-</button>
+            <span id="zoom-level-text" class="text-[11px] font-mono w-10 text-center">100%</span>
+            <button onclick="adjustZoom(1)" title="Perbesar Kanvas" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-bold">+</button>
+            <button onclick="resetZoom()" title="Reset Zoom" class="text-[10px] px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-400">Reset</button>
+          </div>
+        </div>
+
+        <!-- Canvas Container with Checkerboard Background -->
+        <div class="relative overflow-hidden p-2 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center shadow-inner max-w-full">
+          <div id="canvas-wrapper" class="relative bg-checker shadow-2xl rounded cursor-crosshair select-none transition-transform duration-75 origin-center">
+            <!-- Main Drawing Canvas -->
+            <canvas id="pixelCanvas" class="canvas-crisp block"></canvas>
+            <!-- Overlay Canvas for Grid & Previews -->
+            <canvas id="gridCanvas" class="absolute inset-0 pointer-events-none"></canvas>
+          </div>
+        </div>
+
+        <!-- Quick Transform & Shift Controls -->
+        <div class="w-full mt-4 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
+          <span class="text-[11px] text-slate-400 font-medium">Geser Pixel:</span>
+          <div class="flex items-center gap-1">
+            <button onclick="shiftPixels('up')" title="Geser ke Atas" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 border border-slate-700">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+            </button>
+            <button onclick="shiftPixels('down')" title="Geser ke Bawah" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 border border-slate-700">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <button onclick="shiftPixels('left')" title="Geser ke Kiri" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 border border-slate-700">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button onclick="shiftPixels('right')" title="Geser ke Kanan" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 border border-slate-700">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <button onclick="flipHorizontal()" title="Balik Horizontal" class="px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700">Flip X</button>
+            <button onclick="flipVertical()" title="Balik Vertikal" class="px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700">Flip Y</button>
+            <button onclick="rotateCanvas90()" title="Putar 90 Derajat" class="p-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Store Styling, Mockups & Exporters (4 Cols on Desktop) -->
+    <aside class="lg:col-span-4 flex flex-col gap-4 order-3">
+      
+      <!-- Store Styling Options Card -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center justify-between">
+          <span>Pengaturan Latar & Frame Ikon</span>
+          <span class="text-[10px] text-indigo-400 bg-indigo-950/60 px-1.5 py-0.5 rounded border border-indigo-800">Preview Nyata</span>
+        </h2>
+
+        <div class="grid grid-cols-2 gap-2 mb-3">
+          <!-- Background Mode -->
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1 font-medium">Gaya Latar:</label>
+            <select id="bg-style-selector" onchange="updateStorePreviews()" class="w-full text-xs bg-slate-800 text-slate-200 border border-slate-700 rounded-md px-2 py-1.5 focus:outline-none focus:border-indigo-500">
+              <option value="solid">Warna Solid</option>
+              <option value="gradient">Gradasi Retro</option>
+              <option value="dark-slate" selected>Dark Slate Modern</option>
+              <option value="transparent">Transparan (Icon Game)</option>
+            </select>
+          </div>
+
+          <!-- Background Color -->
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1 font-medium">Warna Latar:</label>
+            <div class="flex items-center gap-1.5">
+              <input type="color" id="bg-color-picker" value="#0f172a" onchange="updateStorePreviews()" class="w-7 h-7 rounded cursor-pointer border border-slate-700 bg-slate-800">
+              <span id="bg-hex-label" class="text-xs font-mono text-slate-300 uppercase">#0F172A</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Padding / Icon Scale inside Store container -->
+        <div class="mb-3">
+          <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+            <span>Ukuran Objek dalam Ikon:</span>
+            <span id="icon-padding-val" class="font-mono text-slate-200">80%</span>
+          </div>
+          <input type="range" id="icon-scale-slider" min="50" max="100" value="80" oninput="document.getElementById('icon-padding-val').innerText = this.value + '%'; updateStorePreviews();" class="w-full accent-indigo-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+        </div>
+
+        <!-- Frame Effect -->
+        <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-800">
+          <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+            <input type="checkbox" id="toggle-frame-gloss" checked onchange="updateStorePreviews()" class="w-4 h-4 rounded text-indigo-600 bg-slate-800 border-slate-700">
+            <span>Efek Kilau (iOS Gloss)</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+            <input type="checkbox" id="toggle-pixel-border" checked onchange="updateStorePreviews()" class="w-4 h-4 rounded text-indigo-600 bg-slate-800 border-slate-700">
+            <span>Garis Tepi Pixel</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Live Store Mockups Card -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
+        <!-- Mockup Tab selector -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Pratinjau Store</h2>
+          <div class="flex flex-wrap bg-slate-800 p-0.5 rounded-lg text-xs gap-0.5">
+            <button onclick="switchMockupTab('playstore')" id="tab-playstore" class="px-2 py-1 rounded-md bg-indigo-600 text-white font-medium text-[11px]">Play Store</button>
+            <button onclick="switchMockupTab('appstore')" id="tab-appstore" class="px-2 py-1 rounded-md text-slate-300 hover:text-white font-medium text-[11px]">App Store</button>
+            <button onclick="switchMockupTab('msstore')" id="tab-msstore" class="px-2 py-1 rounded-md text-slate-300 hover:text-white font-medium text-[11px]">MS Store & Win11</button>
+            <button onclick="switchMockupTab('homescreen')" id="tab-homescreen" class="px-2 py-1 rounded-md text-slate-300 hover:text-white font-medium text-[11px]">Home Screen</button>
+          </div>
+        </div>
+
+        <!-- Tab 1: Google Play Store Card Preview -->
+        <div id="mockup-view-playstore" class="space-y-3">
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800/80 flex items-center gap-3">
+            <!-- Google Play squircle icon -->
+            <div class="relative w-16 h-16 rounded-[22%] overflow-hidden shadow-lg border border-white/10 flex-shrink-0 bg-slate-800">
+              <canvas id="preview-playstore-canvas" class="w-full h-full canvas-crisp"></canvas>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-slate-100 truncate">Petualangan Pixel RPG</div>
+              <div class="text-[11px] text-emerald-400 font-medium">Studio Game Indie</div>
+              <div class="flex items-center gap-1 text-[10px] text-slate-400 mt-1">
+                <span class="flex items-center text-amber-400 font-bold">4.9 ★</span>
+                <span>• 500rb+ Unduhan</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-[10px] text-slate-500 text-center">Spesifikasi Google Play: 512 x 512 px, 32-bit PNG (Maks 1024KB)</div>
+        </div>
+
+        <!-- Tab 2: Apple App Store Preview (iOS Squircle) -->
+        <div id="mockup-view-appstore" class="hidden space-y-3">
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800/80 flex items-center gap-3">
+            <!-- iOS Squircle icon with subtle rim -->
+            <div class="relative w-16 h-16 rounded-[22.5%] overflow-hidden shadow-xl border border-white/20 flex-shrink-0 bg-slate-800">
+              <canvas id="preview-appstore-canvas" class="w-full h-full canvas-crisp"></canvas>
+              <div id="ios-gloss-overlay" class="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-black/20 pointer-events-none"></div>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-slate-100 truncate">Pixel Quest Mobile</div>
+              <div class="text-[11px] text-slate-400">Game Peran & Aksi Retro</div>
+              <button class="mt-1.5 px-3 py-0.5 rounded-full bg-indigo-600 text-white font-semibold text-[10px]">DAPATKAN</button>
+            </div>
+          </div>
+          <div class="text-[10px] text-slate-500 text-center">Spesifikasi Apple Store: 1024 x 1024 px, Solid PNG (Tanpa Transparansi)</div>
+        </div>
+
+        <!-- Tab 3: Mobile Home Screen Preview -->
+        <div id="mockup-view-homescreen" class="hidden">
+          <div class="p-3 bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 rounded-xl border border-slate-800 grid grid-cols-4 gap-2 text-center">
+            <!-- App Icon 1 (Yours) -->
+            <div class="flex flex-col items-center">
+              <div class="w-11 h-11 rounded-[22%] overflow-hidden shadow-lg border border-white/10 bg-slate-800 ring-2 ring-indigo-500/50">
+                <canvas id="preview-homescreen-canvas" class="w-full h-full canvas-crisp"></canvas>
+              </div>
+              <span class="text-[9px] text-indigo-300 font-bold mt-1 truncate w-full">App Kamu</span>
+            </div>
+
+            <!-- Mock Neighbor Icons -->
+            <div class="flex flex-col items-center opacity-60">
+              <div class="w-11 h-11 rounded-[22%] bg-emerald-600 flex items-center justify-center shadow text-white font-bold text-sm">💬</div>
+              <span class="text-[9px] text-slate-300 mt-1 truncate w-full">Chat</span>
+            </div>
+            <div class="flex flex-col items-center opacity-60">
+              <div class="w-11 h-11 rounded-[22%] bg-rose-600 flex items-center justify-center shadow text-white font-bold text-sm">🎵</div>
+              <span class="text-[9px] text-slate-300 mt-1 truncate w-full">Musik</span>
+            </div>
+            <div class="flex flex-col items-center opacity-60">
+              <div class="w-11 h-11 rounded-[22%] bg-amber-600 flex items-center justify-center shadow text-white font-bold text-sm">⚙️</div>
+              <span class="text-[9px] text-slate-300 mt-1 truncate w-full">Setelan</span>
+            </div>
+          </div>
+          <div class="text-[10px] text-slate-500 text-center mt-2">Tampilan langsung berdampingan dengan aplikasi lain</div>
+        </div>
+
+        <!-- Tab 4: Microsoft Store & Windows 11 Taskbar Preview -->
+        <div id="mockup-view-msstore" class="hidden space-y-3">
+          <!-- MS Store Listing Card -->
+          <div class="p-3 bg-slate-950/90 rounded-xl border border-sky-900/40 relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-28 h-28 bg-sky-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="flex items-center gap-3">
+              <div class="relative w-16 h-16 rounded-xl overflow-hidden shadow-lg border border-sky-500/30 flex-shrink-0 bg-slate-900">
+                <canvas id="preview-msstore-canvas" class="w-full h-full canvas-crisp"></canvas>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-bold text-slate-100 truncate">Pixico WinApp</span>
+                  <span class="text-[9px] px-1 bg-sky-950 text-sky-400 border border-sky-700/50 rounded font-semibold">MSIX</span>
+                </div>
+                <div class="text-[11px] text-slate-400">Game & Utilitas Windows</div>
+                <div class="flex items-center gap-2 mt-1.5">
+                  <span class="px-2.5 py-0.5 rounded bg-sky-600 hover:bg-sky-500 text-white font-semibold text-[10px] cursor-pointer shadow-sm transition">Dapatkan</span>
+                  <span class="text-[10px] text-slate-400">Gratis</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Windows 11 Taskbar Mockup -->
+          <div class="p-2.5 bg-slate-900/80 backdrop-blur rounded-xl border border-slate-800">
+            <div class="text-[10px] text-slate-400 font-semibold mb-1.5 flex items-center justify-between">
+              <span>Windows 11 Taskbar:</span>
+              <span class="text-[9px] text-sky-400 font-mono">48x48 / 32x32</span>
+            </div>
+            <div class="h-10 bg-slate-950/90 rounded-lg border border-slate-800 flex items-center justify-center gap-2 px-3 shadow-inner">
+              <!-- Windows Start Button -->
+              <div class="w-6 h-6 rounded flex items-center justify-center hover:bg-white/10 transition cursor-pointer" title="Start Windows">
+                <svg class="w-3.5 h-3.5 text-sky-400" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.8"/></svg>
+              </div>
+              <!-- Edge / Explorer placeholder -->
+              <div class="w-6 h-6 rounded bg-sky-700/30 flex items-center justify-center text-[10px]">📁</div>
+              <!-- User App Icon On Taskbar -->
+              <div class="relative w-7 h-7 rounded p-0.5 bg-white/5 border border-sky-400/40 flex items-center justify-center group" title="Aplikasi Anda (Aktif)">
+                <canvas id="preview-wintaskbar-canvas" class="w-5 h-5 canvas-crisp"></canvas>
+                <!-- Windows active indicator bar -->
+                <div class="absolute -bottom-0.5 w-1.5 h-0.5 bg-sky-400 rounded-full"></div>
+              </div>
+              <div class="w-6 h-6 rounded bg-purple-700/30 flex items-center justify-center text-[10px]">⚙️</div>
+            </div>
+          </div>
+          <div class="text-[10px] text-slate-500 text-center">Spesifikasi Windows: 300x300 px (Store), 44x44 (App List), & Multi-size .ICO</div>
+        </div>
+      </div>
+
+      <!-- Export Center Card -->
+      <div class="bg-gradient-to-b from-slate-900 to-indigo-950/40 border border-slate-800 rounded-xl p-3.5 shadow-sm">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2.5 flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Pusat Ekspor Pixico Store
+        </h2>
+
+        <!-- Quick 1-Click Store Buttons -->
+        <div class="space-y-2">
+          <!-- Google Play 512x512 Button -->
+          <button onclick="exportGooglePlayIcon()" class="w-full flex items-center justify-between p-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition shadow shadow-emerald-900/30 group">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-200" fill="currentColor" viewBox="0 0 24 24"><path d="M3.609 1.814L13.792 12 3.61 22.186a2.127 2.127 0 01-.61-1.503V3.317c0-.585.226-1.12.61-1.503zM15.207 13.414l2.457 2.457-11.83 6.654 9.373-9.111zm2.457-5.242L15.207 10.6 5.834 1.475l11.83 6.697zm1.186 1.828l3.654 2.066c.928.525.928 1.465 0 1.99l-3.654 2.067-2.073-2.074 2.073-2.049z"/></svg>
+              <span>Download Google Play (512x512)</span>
+            </div>
+            <span class="text-[10px] bg-emerald-700 px-2 py-0.5 rounded font-mono font-bold group-hover:bg-emerald-800">PNG</span>
+          </button>
+
+          <!-- Apple App Store 1024x1024 Button -->
+          <button onclick="exportAppStoreIcon()" class="w-full flex items-center justify-between p-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition shadow shadow-indigo-900/30 group">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-indigo-200" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.9.04-2.01.62-2.66 1.38-.57.65-1.07 1.73-.97 2.76.99.08 2.01-.52 2.62-1.27z"/></svg>
+              <span>Download Apple Store (1024x1024)</span>
+            </div>
+            <span class="text-[10px] bg-indigo-700 px-2 py-0.5 rounded font-mono font-bold group-hover:bg-indigo-800">PNG</span>
+          </button>
+
+          <!-- Microsoft Store 300x300 Button -->
+          <button onclick="exportMicrosoftStoreIcon()" class="w-full flex items-center justify-between p-2.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs transition shadow shadow-sky-900/30 group">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-sky-200" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.8"/></svg>
+              <span>Download Microsoft Store (300x300)</span>
+            </div>
+            <span class="text-[10px] bg-sky-700 px-2 py-0.5 rounded font-mono font-bold group-hover:bg-sky-800">PNG</span>
+          </button>
+
+          <!-- Windows .ICO Multi-Size Button -->
+          <button onclick="exportWindowsIco()" class="w-full flex items-center justify-between p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs transition group">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              <span>Download Windows Icon (.ICO Multi-Size)</span>
+            </div>
+            <span class="text-[10px] bg-slate-700 px-2 py-0.5 rounded font-mono font-bold text-sky-300">.ICO</span>
+          </button>
+
+          <!-- Complete ZIP Bundle Button -->
+          <button onclick="exportAllZipBundle()" id="btn-export-zip" class="w-full flex items-center justify-center gap-2 p-2.5 rounded-lg bg-indigo-700 hover:bg-indigo-600 text-white font-semibold text-xs transition shadow-lg shadow-indigo-900/40">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+            <span>Ekspor Semua Paket Pixico (Android, iOS & Windows ZIP)</span>
+          </button>
+        </div>
+
+        <!-- Custom Scale Download -->
+        <div class="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+          <span>Ekspor Ukuran Asli:</span>
+          <div class="flex items-center gap-1">
+            <button onclick="exportSingleScale(1)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">1x</button>
+            <button onclick="exportSingleScale(8)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">8x</button>
+            <button onclick="exportSingleScale(16)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">16x</button>
+            <button onclick="exportSingleScale(32)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">32x</button>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- Template Picker Modal -->
+  <div id="template-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h3 class="font-bold text-white text-sm flex items-center gap-2">
+          <span class="text-amber-400">★</span> Pilih Template Ikon Pixico Siap Pakai
+        </h3>
+        <button onclick="closeTemplateModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">✕</button>
+      </div>
+      <p class="text-xs text-slate-400 my-3">Pilih salah satu template di bawah untuk mulai mengedit ikon aplikasimu:</p>
+      
+      <div id="template-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-[360px] overflow-y-auto pr-1">
+        <!-- Templates will be rendered here dynamically -->
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-slate-800 flex justify-end">
+        <button onclick="closeTemplateModal()" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image to Pixel Art Modal (with Interactive Cropping & Focus Tool) -->
+  <div id="import-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-2 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-5xl w-full p-4 sm:p-5 shadow-2xl flex flex-col max-h-[94vh] overflow-hidden">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800 flex-shrink-0">
+        <div>
+          <h3 class="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+            <span class="text-emerald-400">✦</span> Crop & Pixelize Gambar Original
+          </h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Pilih dan fokuskan area tertentu pada foto/logo HD, lalu konversi ke pixel art tanpa blur</p>
+        </div>
+        <button onclick="closeImageImportModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition">✕</button>
+      </div>
+
+      <!-- Modal Scrollable Content -->
+      <div class="overflow-y-auto pr-1 my-3 space-y-3.5 flex-1">
+        <!-- Upload Trigger / Dropzone -->
+        <div id="import-dropzone" class="border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-xl p-3 text-center cursor-pointer transition bg-slate-950/40" onclick="document.getElementById('image-upload-input').click()">
+          <input type="file" id="image-upload-input" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+          <div class="flex items-center justify-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-950/60 border border-indigo-800/60 flex items-center justify-center text-indigo-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="text-left">
+              <div class="text-xs font-semibold text-slate-200" id="upload-status-text">Klik atau seret gambar (PNG / JPG / WEBP) di sini</div>
+              <div class="text-[10px] text-slate-500" id="upload-file-details">Mendukung gambar beresolusi tinggi hingga 4K</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls & Interactive Cropper Workspace -->
+        <div id="import-workspace" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-4 pt-1 items-start">
+          
+          <!-- Column 1: Interactive Crop Canvas (5 Cols) -->
+          <div class="lg:col-span-5 flex flex-col bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+            <div class="flex items-center justify-between mb-2 text-[11px]">
+              <span class="font-bold text-slate-300 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                Pilih Area Fokus (1:1)
+              </span>
+              <span id="crop-coords-label" class="font-mono text-[10px] text-indigo-300">0, 0 (0 x 0)</span>
+            </div>
+
+            <!-- Crop Canvas Container -->
+            <div class="relative w-full h-[250px] sm:h-[280px] bg-slate-900 rounded-lg overflow-hidden border border-slate-700 flex items-center justify-center select-none shadow-inner">
+              <canvas id="crop-canvas" class="max-w-full max-h-full block cursor-crosshair"></canvas>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1.5 text-center">Geser kotak untuk memilih bagian objek, tarik sudut kanan-bawah untuk ubah ukuran.</p>
+
+            <!-- Quick Crop Presets & Size Slider -->
+            <div class="mt-2.5 pt-2.5 border-t border-slate-800 space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-[11px] text-slate-400">Ukuran Area Crop:</span>
+                <span id="crop-size-label" class="font-mono text-[11px] text-slate-200">100%</span>
+              </div>
+              <input type="range" id="crop-size-slider" min="15" max="100" value="100" oninput="handleCropSlider(this.value)" class="w-full accent-indigo-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+
+              <div class="flex items-center justify-between gap-1.5 pt-1">
+                <button type="button" onclick="centerCropBox()" class="flex-1 py-1 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] rounded border border-slate-700 transition">Pusat</button>
+                <button type="button" onclick="presetCropSize(0.5)" class="flex-1 py-1 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] rounded border border-slate-700 transition">Fokus 50%</button>
+                <button type="button" onclick="presetCropSize(1.0)" class="flex-1 py-1 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] rounded border border-slate-700 transition">Maksimal (1:1)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Live Pixel Art Preview (3 Cols) -->
+          <div class="lg:col-span-3 flex flex-col items-center justify-center bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+            <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center justify-between w-full">
+              <span>Hasil Pixel Art</span>
+              <span id="import-stats-label" class="text-indigo-400 font-mono text-[10px]">16x16</span>
+            </div>
+            
+            <div class="relative w-36 h-36 sm:w-40 sm:h-40 rounded-lg overflow-hidden border border-slate-700 bg-checker flex items-center justify-center shadow-inner">
+              <canvas id="modal-pixel-preview-canvas" class="w-full h-full canvas-crisp block"></canvas>
+            </div>
+
+            <!-- Resolution Selector for Import -->
+            <div class="mt-3 flex items-center justify-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs w-full flex-wrap">
+              <span class="text-[10px] text-slate-400 px-1 font-medium">Grid:</span>
+              <button type="button" onclick="setImportGrid(16)" id="import-grid-16" class="px-2 py-0.5 text-[11px] font-semibold rounded bg-indigo-600 text-white">16x</button>
+              <button type="button" onclick="setImportGrid(24)" id="import-grid-24" class="px-2 py-0.5 text-[11px] font-semibold rounded text-slate-300 hover:text-white">24x</button>
+              <button type="button" onclick="setImportGrid(32)" id="import-grid-32" class="px-2 py-0.5 text-[11px] font-semibold rounded text-slate-300 hover:text-white">32x</button>
+              <button type="button" onclick="setImportGrid(48)" id="import-grid-48" class="px-2 py-0.5 text-[11px] font-semibold rounded text-slate-300 hover:text-white">48x</button>
+              <button type="button" onclick="setImportGrid(64)" id="import-grid-64" class="px-2 py-0.5 text-[11px] font-semibold rounded text-slate-300 hover:text-white">64x</button>
+              <input type="hidden" id="import-grid-size" value="16">
+            </div>
+
+            <div class="text-[10px] text-slate-500 mt-2 text-center">Otomatis di-*scale* sesuai grid yang dipilih.</div>
+          </div>
+
+          <!-- Column 3: Processing Adjustments (4 Cols) -->
+          <div class="lg:col-span-4 space-y-2.5 text-xs bg-slate-950/50 p-3 rounded-xl border border-slate-800">
+            <!-- Color Mode -->
+            <div>
+              <label class="text-[11px] font-medium text-slate-300 block mb-1">Gaya Warna & Kuantisasi:</label>
+              <select id="import-color-mode" onchange="processPixelizeImage()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                <option value="palette" selected>Cocokkan ke Palet Toko Aktif</option>
+                <option value="quantize16">Kuantisasi 16 Warna (Retro)</option>
+                <option value="quantize8">Kuantisasi 8 Warna (Flat)</option>
+                <option value="vibrant">Warna Asli Super Kontras</option>
+              </select>
+            </div>
+
+            <!-- Dithering -->
+            <div>
+              <label class="text-[11px] font-medium text-slate-300 block mb-1">Dithering (Tekstur Piksel):</label>
+              <select id="import-dither" onchange="processPixelizeImage()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                <option value="none" selected>Tanpa Dither (Blok Solid)</option>
+                <option value="floyd">Floyd-Steinberg</option>
+                <option value="bayer">Bayer Matrix (4x4)</option>
+              </select>
+            </div>
+
+            <!-- Contrast Boost Slider -->
+            <div>
+              <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+                <span>Penguat Kontras Siluet:</span>
+                <span id="contrast-val-label" class="font-mono text-slate-200">145%</span>
+              </div>
+              <input type="range" id="import-contrast" min="100" max="240" value="145" oninput="document.getElementById('contrast-val-label').innerText = this.value + '%'; processPixelizeImage();" class="w-full accent-indigo-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            </div>
+
+            <!-- Saturation Boost Slider -->
+            <div>
+              <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+                <span>Kepekatan Warna (Saturasi):</span>
+                <span id="saturate-val-label" class="font-mono text-slate-200">130%</span>
+              </div>
+              <input type="range" id="import-saturate" min="80" max="220" value="130" oninput="document.getElementById('saturate-val-label').innerText = this.value + '%'; processPixelizeImage();" class="w-full accent-indigo-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            </div>
+
+            <!-- Background Cleanup Toggles -->
+            <div class="pt-2 border-t border-slate-800 space-y-1.5">
+              <label class="flex items-center gap-2 cursor-pointer text-slate-300 text-xs">
+                <input type="checkbox" id="import-remove-white" checked onchange="processPixelizeImage()" class="w-4 h-4 rounded text-indigo-600 bg-slate-800 border-slate-700">
+                <span>Hapus Background Putih/Terang</span>
+              </label>
+              <div class="flex items-center gap-2 pl-6">
+                <span class="text-[10px] text-slate-500 whitespace-nowrap">Sensitivitas:</span>
+                <input type="range" id="import-white-threshold" min="200" max="254" value="230" oninput="processPixelizeImage()" class="w-full accent-indigo-500 h-1 bg-slate-800 rounded cursor-pointer">
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800 flex-shrink-0">
+        <span class="text-[11px] text-slate-500 hidden sm:inline">Tips: Geser kotak crop untuk menonjolkan simbol utama aplikasimu.</span>
+        <div class="flex items-center gap-2 ml-auto">
+          <button onclick="closeImageImportModal()" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">Batal</button>
+          <button onclick="applyPixelizedImage()" id="btn-apply-pixelize" disabled class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white text-xs font-medium transition shadow-md shadow-indigo-900/30 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span>Terapkan ke Kanvas</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <script>
+    // State variables
+    let gridSize = 16;
+    let canvasPixels = []; // 2D array: grid[y][x] = hexColor or null
+    let currentColor = '#6366f1';
+    let currentTool = 'pen'; // 'pen', 'eraser', 'bucket', 'picker', 'line', 'rect', 'lighten', 'darken'
+    let isDrawing = false;
+    let symmetry = false;
+    let showGrid = true;
+    let zoomLevel = 1.0;
+    let dragStartPos = null;
+    let lastDrawCoord = null;
+
+    // Undo / Redo History
+    let historyStack = [];
+    let historyStep = -1;
+    const MAX_HISTORY = 40;
+
+    // Palettes
+    const PALETTES = {
+      pico8: ['#000000', '#1D2B53', '#7E2553', '#008751', '#AB5236', '#5F574F', '#C2C3C7', '#FFF1E8', '#FF004D', '#FFA300', '#FFEC27', '#00E436', '#29ADFF', '#83769C', '#FF77A8', '#FFCCAA'],
+      storeVibrant: ['#6366F1', '#4F46E5', '#3B82F6', '#06B6D4', '#10B981', '#84CC16', '#EAB308', '#F97316', '#EF4444', '#EC4899', '#A855F7', '#F8FAFC', '#94A3B8', '#475569', '#1E293B', '#0F172A'],
+      gameboy: ['#0F380F', '#306230', '#8BAC0F', '#9BBC0F'],
+      cyberpunk: ['#050505', '#1a0826', '#711c91', '#ea00d9', '#0abdc6', '#133e7c', '#091833', '#fcee0a', '#ff003c', '#ffffff'],
+      sweetie16: ['#1a1c2c', '#5d275d', '#b13e53', '#ef7d57', '#ffcd75', '#a7f070', '#38b764', '#257179', '#29366f', '#3b5dc9', '#41a6f6', '#73eff7', '#f4f4f4', '#94b0c2', '#566c86', '#333c57'],
+      monochrome: ['#FFFFFF', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B', '#475569', '#334155', '#1E293B', '#0F172A', '#000000']
+    };
+
+    let recentColors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#ffffff', '#0f172a'];
+
+    // Canvas elements & contexts
+    const mainCanvas = document.getElementById('pixelCanvas');
+    const mainCtx = mainCanvas.getContext('2d');
+    const gridCanvas = document.getElementById('gridCanvas');
+    const gridCtx = gridCanvas.getContext('2d');
+    const canvasWrapper = document.getElementById('canvas-wrapper');
+
+    // Display scale multiplier on screen
+    const SCREEN_CANVAS_SIZE = 384; // 384x384 px wrapper
+
+    function initPalette(paletteKey = 'pico8') {
+      const container = document.getElementById('palette-swatches');
+      container.innerHTML = '';
+      const colors = PALETTES[paletteKey] || PALETTES.pico8;
+
+      colors.forEach(hex => {
+        const swatch = document.createElement('button');
+        swatch.className = 'w-6 h-6 rounded shadow-sm border border-black/40 hover:scale-110 active:scale-95 transition-transform flex-shrink-0';
+        swatch.style.backgroundColor = hex;
+        swatch.title = hex;
+        swatch.onclick = () => setCurrentColor(hex);
+        container.appendChild(swatch);
+      });
+    }
+
+    function changePalette(paletteKey) {
+      initPalette(paletteKey);
+    }
+
+    function setCurrentColor(hex) {
+      currentColor = hex.toUpperCase();
+      document.getElementById('current-color-preview').style.backgroundColor = currentColor;
+      document.getElementById('current-hex-label').innerText = currentColor;
+      document.getElementById('native-color-picker').value = currentColor;
+
+      // Add to recent if not already first
+      if (!recentColors.includes(currentColor)) {
+        recentColors.unshift(currentColor);
+        if (recentColors.length > 8) recentColors.pop();
+        renderRecentColors();
+      }
+    }
+
+    function renderRecentColors() {
+      const container = document.getElementById('recent-colors');
+      container.innerHTML = '';
+      recentColors.forEach(c => {
+        const dot = document.createElement('button');
+        dot.className = 'w-5 h-5 rounded-full border border-slate-700 hover:scale-110 transition-transform flex-shrink-0';
+        dot.style.backgroundColor = c;
+        dot.title = c;
+        dot.onclick = () => setCurrentColor(c);
+        container.appendChild(dot);
+      });
+    }
+
+    function hexToRgb(hex) {
+      let c = hex.replace('#', '');
+      if (c.length === 3) c = c.split('').map(x => x + x).join('');
+      const num = parseInt(c, 16);
+      return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+    }
+
+    function rgbToHex(r, g, b) {
+      return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+    }
+
+    function adjustBrightness(hex, percent) {
+      const rgb = hexToRgb(hex);
+      const r = Math.min(255, Math.max(0, Math.round(rgb.r + (255 * (percent / 100)))));
+      const g = Math.min(255, Math.max(0, Math.round(rgb.g + (255 * (percent / 100)))));
+      const b = Math.min(255, Math.max(0, Math.round(rgb.b + (255 * (percent / 100)))));
+      return rgbToHex(r, g, b);
+    }
+
+    function setGridSize(size) {
+      gridSize = size;
+      [16, 24, 32, 48, 64].forEach(s => {
+        const btn = document.getElementById(`grid-btn-${s}`);
+        if (!btn) return;
+        if (s === size) {
+          btn.className = "px-2.5 py-1 text-xs font-semibold rounded-md transition bg-indigo-600 text-white shadow";
+        } else {
+          btn.className = "px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white";
+        }
+      });
+
+      document.getElementById('canvas-dim-indicator').innerText = `${size} x ${size}`;
+
+      // Resize visual elements
+      mainCanvas.width = size;
+      mainCanvas.height = size;
+      gridCanvas.width = SCREEN_CANVAS_SIZE;
+      gridCanvas.height = SCREEN_CANVAS_SIZE;
+
+      canvasWrapper.style.width = `${SCREEN_CANVAS_SIZE}px`;
+      canvasWrapper.style.height = `${SCREEN_CANVAS_SIZE}px`;
+      mainCanvas.style.width = `${SCREEN_CANVAS_SIZE}px`;
+      mainCanvas.style.height = `${SCREEN_CANVAS_SIZE}px`;
+
+      // Initialize empty matrix
+      canvasPixels = Array.from({ length: size }, () => Array(size).fill(null));
+
+      // Reset history
+      historyStack = [];
+      historyStep = -1;
+      pushHistory();
+
+      redrawMainCanvas();
+      drawGrid();
+      updateStorePreviews();
+      showToast(`Ukuran grid Pixico diubah ke ${size}x${size}`);
+    }
+
+    function drawGrid() {
+      gridCtx.clearRect(0, 0, SCREEN_CANVAS_SIZE, SCREEN_CANVAS_SIZE);
+      if (!showGrid) return;
+
+      const cellSize = SCREEN_CANVAS_SIZE / gridSize;
+      gridCtx.beginPath();
+      gridCtx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      gridCtx.lineWidth = 1;
+
+      for (let i = 0; i <= gridSize; i++) {
+        const p = Math.floor(i * cellSize) + 0.5;
+        // Vertical lines
+        gridCtx.moveTo(p, 0);
+        gridCtx.lineTo(p, SCREEN_CANVAS_SIZE);
+        // Horizontal lines
+        gridCtx.moveTo(0, p);
+        gridCtx.lineTo(SCREEN_CANVAS_SIZE, p);
+      }
+      gridCtx.stroke();
+
+      // If symmetry active, draw center axis highlight
+      if (symmetry) {
+        gridCtx.beginPath();
+        gridCtx.strokeStyle = 'rgba(168, 85, 247, 0.6)';
+        gridCtx.lineWidth = 2;
+        const mid = (gridSize / 2) * cellSize;
+        gridCtx.moveTo(mid, 0);
+        gridCtx.lineTo(mid, SCREEN_CANVAS_SIZE);
+        gridCtx.stroke();
+      }
+    }
+
+    function toggleGrid(enabled) {
+      showGrid = enabled;
+      drawGrid();
+    }
+
+    function toggleSymmetry(enabled) {
+      symmetry = enabled;
+      drawGrid();
+      if (symmetry) showToast("Mode Simetri Cermin aktif");
+    }
+
+    function redrawMainCanvas() {
+      mainCtx.clearRect(0, 0, gridSize, gridSize);
+      for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+          const color = canvasPixels[y][x];
+          if (color) {
+            mainCtx.fillStyle = color;
+            mainCtx.fillRect(x, y, 1, 1);
+          }
+        }
+      }
+    }
+
+    function setPixel(x, y, color) {
+      if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) return;
+      canvasPixels[y][x] = color;
+
+      if (color) {
+        mainCtx.fillStyle = color;
+        mainCtx.fillRect(x, y, 1, 1);
+      } else {
+        mainCtx.clearRect(x, y, 1, 1);
+      }
+
+      // Handle vertical symmetry
+      if (symmetry) {
+        const mirrorX = (gridSize - 1) - x;
+        canvasPixels[y][mirrorX] = color;
+        if (color) {
+          mainCtx.fillStyle = color;
+          mainCtx.fillRect(mirrorX, y, 1, 1);
+        } else {
+          mainCtx.clearRect(mirrorX, y, 1, 1);
+        }
+      }
+    }
+
+    function setTool(toolName) {
+      currentTool = toolName;
+      document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-400/40');
+        btn.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700');
+      });
+      const activeBtn = document.getElementById(`tool-${toolName}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700');
+        activeBtn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-400/40');
+      }
+    }
+
+    function floodFill(startX, startY, targetColor, replacementColor) {
+      if (targetColor === replacementColor) return;
+      if (startX < 0 || startX >= gridSize || startY < 0 || startY >= gridSize) return;
+
+      const stack = [[startX, startY]];
+      const visited = new Uint8Array(gridSize * gridSize);
+
+      while (stack.length > 0) {
+        const [x, y] = stack.pop();
+        const idx = y * gridSize + x;
+        if (visited[idx]) continue;
+        visited[idx] = 1;
+
+        const currentVal = canvasPixels[y][x];
+        if (currentVal === targetColor) {
+          setPixel(x, y, replacementColor);
+
+          if (x + 1 < gridSize) stack.push([x + 1, y]);
+          if (x - 1 >= 0) stack.push([x - 1, y]);
+          if (y + 1 < gridSize) stack.push([x, y + 1]);
+          if (y - 1 >= 0) stack.push([x, y - 1]);
+        }
+      }
+    }
+
+    // Bresenham's Line Algorithm
+    function drawLine(x0, y0, x1, y1, color) {
+      const dx = Math.abs(x1 - x0);
+      const dy = Math.abs(y1 - y0);
+      const sx = (x0 < x1) ? 1 : -1;
+      const sy = (y0 < y1) ? 1 : -1;
+      let err = dx - dy;
+
+      while (true) {
+        setPixel(x0, y0, color);
+        if (x0 === x1 && y0 === y1) break;
+        const e2 = 2 * err;
+        if (e2 > -dy) { err -= dy; x0 += sx; }
+        if (e2 < dx) { err += dx; y0 += sy; }
+      }
+    }
+
+    // Rectangle Outline
+    function drawRectOutline(x0, y0, x1, y1, color) {
+      const minX = Math.min(x0, x1);
+      const maxX = Math.max(x0, x1);
+      const minY = Math.min(y0, y1);
+      const maxY = Math.max(y0, y1);
+
+      for (let x = minX; x <= maxX; x++) {
+        setPixel(x, minY, color);
+        setPixel(x, maxY, color);
+      }
+      for (let y = minY; y <= maxY; y++) {
+        setPixel(minX, y, color);
+        setPixel(maxX, y, color);
+      }
+    }
+
+    function getGridCoordinates(e) {
+      const rect = mainCanvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      const px = Math.floor(((clientX - rect.left) / rect.width) * gridSize);
+      const py = Math.floor(((clientY - rect.top) / rect.height) * gridSize);
+
+      return {
+        x: Math.max(0, Math.min(gridSize - 1, px)),
+        y: Math.max(0, Math.min(gridSize - 1, py))
+      };
+    }
+
+    function applyToolAction(x, y) {
+      if (currentTool === 'pen') {
+        setPixel(x, y, currentColor);
+      } else if (currentTool === 'eraser') {
+        setPixel(x, y, null);
+      } else if (currentTool === 'bucket') {
+        const targetColor = canvasPixels[y][x];
+        floodFill(x, y, targetColor, currentColor);
+      } else if (currentTool === 'picker') {
+        const picked = canvasPixels[y][x];
+        if (picked) setCurrentColor(picked);
+      } else if (currentTool === 'lighten') {
+        const c = canvasPixels[y][x];
+        if (c) setPixel(x, y, adjustBrightness(c, 18));
+      } else if (currentTool === 'darken') {
+        const c = canvasPixels[y][x];
+        if (c) setPixel(x, y, adjustBrightness(c, -18));
+      }
+    }
+
+    // Canvas Mouse Listeners
+    canvasWrapper.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      const { x, y } = getGridCoordinates(e);
+      isDrawing = true;
+      dragStartPos = { x, y };
+      lastDrawCoord = { x, y };
+
+      if (['pen', 'eraser', 'bucket', 'picker', 'lighten', 'darken'].includes(currentTool)) {
+        applyToolAction(x, y);
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      const { x, y } = getGridCoordinates(e);
+      document.getElementById('mouse-coords').innerText = `X: ${x}, Y: ${y}`;
+
+      if (!isDrawing) return;
+
+      if (currentTool === 'pen') {
+        if (lastDrawCoord) {
+          drawLine(lastDrawCoord.x, lastDrawCoord.y, x, y, currentColor);
+        } else {
+          setPixel(x, y, currentColor);
+        }
+        lastDrawCoord = { x, y };
+      } else if (currentTool === 'eraser') {
+        if (lastDrawCoord) {
+          drawLine(lastDrawCoord.x, lastDrawCoord.y, x, y, null);
+        } else {
+          setPixel(x, y, null);
+        }
+        lastDrawCoord = { x, y };
+      } else if (['lighten', 'darken'].includes(currentTool)) {
+        applyToolAction(x, y);
+        lastDrawCoord = { x, y };
+      }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (!isDrawing) return;
+      isDrawing = false;
+      lastDrawCoord = null;
+
+      if (dragStartPos && (currentTool === 'line' || currentTool === 'rect')) {
+        const { x, y } = getGridCoordinates(e);
+        if (currentTool === 'line') {
+          drawLine(dragStartPos.x, dragStartPos.y, x, y, currentColor);
+        } else if (currentTool === 'rect') {
+          drawRectOutline(dragStartPos.x, dragStartPos.y, x, y, currentColor);
+        }
+      }
+
+      dragStartPos = null;
+      pushHistory();
+      updateStorePreviews();
+    });
+
+    // Touch Support for mobile / tablets
+    canvasWrapper.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const { x, y } = getGridCoordinates(e);
+      isDrawing = true;
+      dragStartPos = { x, y };
+      lastDrawCoord = { x, y };
+      applyToolAction(x, y);
+    }, { passive: false });
+
+    canvasWrapper.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (!isDrawing) return;
+      const { x, y } = getGridCoordinates(e);
+      document.getElementById('mouse-coords').innerText = `X: ${x}, Y: ${y}`;
+
+      if (currentTool === 'pen') {
+        if (lastDrawCoord) {
+          drawLine(lastDrawCoord.x, lastDrawCoord.y, x, y, currentColor);
+        } else {
+          setPixel(x, y, currentColor);
+        }
+        lastDrawCoord = { x, y };
+      } else if (currentTool === 'eraser') {
+        if (lastDrawCoord) {
+          drawLine(lastDrawCoord.x, lastDrawCoord.y, x, y, null);
+        } else {
+          setPixel(x, y, null);
+        }
+        lastDrawCoord = { x, y };
+      } else if (['lighten', 'darken'].includes(currentTool)) {
+        applyToolAction(x, y);
+        lastDrawCoord = { x, y };
+      }
+    }, { passive: false });
+
+    canvasWrapper.addEventListener('touchend', (e) => {
+      if (!isDrawing) return;
+      isDrawing = false;
+      lastDrawCoord = null;
+      pushHistory();
+      updateStorePreviews();
+    });
+
+    function pushHistory() {
+      historyStack = historyStack.slice(0, historyStep + 1);
+      const snapshot = canvasPixels.map(row => [...row]);
+      historyStack.push(snapshot);
+
+      if (historyStack.length > MAX_HISTORY) {
+        historyStack.shift();
+      } else {
+        historyStep++;
+      }
+      updateHistoryButtons();
+      saveToLocalStorage();
+    }
+
+    const AUTOSAVE_STORAGE_KEY = 'pixico_studio_autosave_v1';
+
+    function saveToLocalStorage() {
+      try {
+        const projectPayload = {
+          version: '1.0',
+          appName: 'Pixico Studio',
+          lastModified: new Date().toISOString(),
+          gridSize: gridSize,
+          canvasPixels: canvasPixels,
+          currentColor: currentColor,
+          recentColors: recentColors,
+          palette: document.getElementById('palette-selector')?.value || 'pico8',
+          storeSettings: {
+            bgStyle: document.getElementById('bg-style-selector')?.value || 'dark-slate',
+            bgColor: document.getElementById('bg-color-picker')?.value || '#0f172a',
+            iconScale: document.getElementById('icon-scale-slider')?.value || '80',
+            frameGloss: document.getElementById('toggle-frame-gloss')?.checked ?? true,
+            pixelBorder: document.getElementById('toggle-pixel-border')?.checked ?? true
+          }
+        };
+        localStorage.setItem(AUTOSAVE_STORAGE_KEY, JSON.stringify(projectPayload));
+
+        const badge = document.getElementById('autosave-badge');
+        if (badge) {
+          badge.classList.remove('opacity-40');
+          badge.classList.add('opacity-100');
+        }
+      } catch (err) {
+        console.warn('Gagal menyimpan otomatis ke localStorage:', err);
+      }
+    }
+
+    function exportProjectFile() {
+      const projectPayload = {
+        appName: 'Pixico Studio Project',
+        format: 'pixico',
+        version: '1.0',
+        exportedAt: new Date().toISOString(),
+        gridSize: gridSize,
+        canvasPixels: canvasPixels,
+        currentColor: currentColor,
+        recentColors: recentColors,
+        palette: document.getElementById('palette-selector')?.value || 'pico8',
+        storeSettings: {
+          bgStyle: document.getElementById('bg-style-selector')?.value || 'dark-slate',
+          bgColor: document.getElementById('bg-color-picker')?.value || '#0f172a',
+          iconScale: document.getElementById('icon-scale-slider')?.value || '80',
+          frameGloss: document.getElementById('toggle-frame-gloss')?.checked ?? true,
+          pixelBorder: document.getElementById('toggle-pixel-border')?.checked ?? true
+        }
+      };
+
+      const jsonStr = JSON.stringify(projectPayload, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      downloadBlob(blob, `proyek-pixico-${gridSize}x${gridSize}.pixico`);
+      showToast('File proyek .pixico berhasil diunduh!');
+    }
+
+    function loadProjectFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (!parsed.gridSize || !Array.isArray(parsed.canvasPixels)) {
+            showToast('Format berkas proyek tidak valid', 'error');
+            return;
+          }
+          applyProjectData(parsed);
+          showToast(`Proyek "${file.name}" berhasil dibuka!`);
+        } catch (err) {
+          console.error(err);
+          showToast('Gagal mengimpor file proyek', 'error');
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function applyProjectData(data) {
+      if (data.gridSize) {
+        gridSize = data.gridSize;
+        [16, 24, 32, 48, 64].forEach(s => {
+          const btn = document.getElementById(`grid-btn-${s}`);
+          if (!btn) return;
+          btn.className = (s === gridSize) 
+            ? "px-2.5 py-1 text-xs font-semibold rounded-md transition bg-indigo-600 text-white shadow"
+            : "px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white";
+        });
+        document.getElementById('canvas-dim-indicator').innerText = `${gridSize} x ${gridSize}`;
+        mainCanvas.width = gridSize;
+        mainCanvas.height = gridSize;
+      }
+
+      if (data.canvasPixels) {
+        canvasPixels = data.canvasPixels.map(row => [...row]);
+        redrawMainCanvas();
+        drawGrid();
+      }
+
+      if (data.currentColor) {
+        setCurrentColor(data.currentColor);
+      }
+
+      if (Array.isArray(data.recentColors)) {
+        recentColors = data.recentColors;
+        renderRecentColors();
+      }
+
+      if (data.palette) {
+        const palSel = document.getElementById('palette-selector');
+        if (palSel) {
+          palSel.value = data.palette;
+          changePalette(data.palette);
+        }
+      }
+
+      if (data.storeSettings) {
+        const s = data.storeSettings;
+        if (s.bgStyle) document.getElementById('bg-style-selector').value = s.bgStyle;
+        if (s.bgColor) document.getElementById('bg-color-picker').value = s.bgColor;
+        if (s.iconScale) {
+          document.getElementById('icon-scale-slider').value = s.iconScale;
+          document.getElementById('icon-padding-val').innerText = s.iconScale + '%';
+        }
+        if (s.frameGloss !== undefined) document.getElementById('toggle-frame-gloss').checked = s.frameGloss;
+        if (s.pixelBorder !== undefined) document.getElementById('toggle-pixel-border').checked = s.pixelBorder;
+      }
+
+      // Reset and push state
+      historyStack = [];
+      historyStep = -1;
+      pushHistory();
+      updateStorePreviews();
+    }
+
+    function undo() {
+      if (historyStep > 0) {
+        historyStep--;
+        canvasPixels = historyStack[historyStep].map(row => [...row]);
+        redrawMainCanvas();
+        updateStorePreviews();
+        updateHistoryButtons();
+      }
+    }
+
+    function redo() {
+      if (historyStep < historyStack.length - 1) {
+        historyStep++;
+        canvasPixels = historyStack[historyStep].map(row => [...row]);
+        redrawMainCanvas();
+        updateStorePreviews();
+        updateHistoryButtons();
+      }
+    }
+
+    function updateHistoryButtons() {
+      document.getElementById('undo-btn').disabled = historyStep <= 0;
+      document.getElementById('redo-btn').disabled = historyStep >= historyStack.length - 1;
+    }
+
+    function clearCanvas() {
+      canvasPixels = Array.from({ length: gridSize }, () => Array(gridSize).fill(null));
+      redrawMainCanvas();
+      pushHistory();
+      updateStorePreviews();
+      showToast("Kanvas Pixico telah dibersihkan");
+    }
+
+    // Transformations: Shift, Flip, Rotate
+    function shiftPixels(dir) {
+      const newGrid = Array.from({ length: gridSize }, () => Array(gridSize).fill(null));
+      for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+          let ny = y, nx = x;
+          if (dir === 'up') ny = (y - 1 + gridSize) % gridSize;
+          if (dir === 'down') ny = (y + 1) % gridSize;
+          if (dir === 'left') nx = (x - 1 + gridSize) % gridSize;
+          if (dir === 'right') nx = (x + 1) % gridSize;
+          newGrid[ny][nx] = canvasPixels[y][x];
+        }
+      }
+      canvasPixels = newGrid;
+      redrawMainCanvas();
+      pushHistory();
+      updateStorePreviews();
+    }
+
+    function flipHorizontal() {
+      canvasPixels = canvasPixels.map(row => [...row].reverse());
+      redrawMainCanvas();
+      pushHistory();
+      updateStorePreviews();
+    }
+
+    function flipVertical() {
+      canvasPixels = [...canvasPixels].reverse();
+      redrawMainCanvas();
+      pushHistory();
+      updateStorePreviews();
+    }
+
+    function rotateCanvas90() {
+      const newGrid = Array.from({ length: gridSize }, () => Array(gridSize).fill(null));
+      for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+          newGrid[x][gridSize - 1 - y] = canvasPixels[y][x];
+        }
+      }
+      canvasPixels = newGrid;
+      redrawMainCanvas();
+      pushHistory();
+      updateStorePreviews();
+    }
+
+    // Zooming
+    function adjustZoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(2.5, zoomLevel + (delta * 0.2)));
+      applyZoom();
+    }
+
+    function resetZoom() {
+      zoomLevel = 1.0;
+      applyZoom();
+    }
+
+    function applyZoom() {
+      canvasWrapper.style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoom-level-text').innerText = `${Math.round(zoomLevel * 100)}%`;
+    }
+
+    function switchMockupTab(tab) {
+      ['playstore', 'appstore', 'homescreen', 'msstore'].forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        const view = document.getElementById(`mockup-view-${t}`);
+        if (!btn || !view) return;
+        if (t === tab) {
+          btn.className = "px-2 py-1 rounded-md bg-indigo-600 text-white font-medium text-[11px]";
+          view.classList.remove('hidden');
+        } else {
+          btn.className = "px-2 py-1 rounded-md text-slate-300 hover:text-white font-medium text-[11px]";
+          view.classList.add('hidden');
+        }
+      });
+      updateStorePreviews();
+    }
+
+    function getStoreRenderCanvas(targetSize = 512, forceSolidBg = false) {
+      const offscreen = document.createElement('canvas');
+      offscreen.width = targetSize;
+      offscreen.height = targetSize;
+      const ctx = offscreen.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+
+      const bgStyle = document.getElementById('bg-style-selector').value;
+      const bgColor = document.getElementById('bg-color-picker').value;
+      const scalePercent = parseInt(document.getElementById('icon-scale-slider').value, 10) / 100;
+      const hasPixelBorder = document.getElementById('toggle-pixel-border').checked;
+
+      // 1. Draw Background
+      if (bgStyle === 'solid' || (forceSolidBg && bgStyle === 'transparent')) {
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, targetSize, targetSize);
+      } else if (bgStyle === 'gradient') {
+        const grad = ctx.createLinearGradient(0, 0, targetSize, targetSize);
+        grad.addColorStop(0, bgColor);
+        grad.addColorStop(1, adjustBrightness(bgColor, -35));
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, targetSize, targetSize);
+      } else if (bgStyle === 'dark-slate') {
+        const grad = ctx.createRadialGradient(targetSize / 2, targetSize / 2, 40, targetSize / 2, targetSize / 2, targetSize * 0.7);
+        grad.addColorStop(0, '#1e293b');
+        grad.addColorStop(1, '#090d16');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, targetSize, targetSize);
+      }
+
+      // 2. Compute inner pixel size and centering
+      const contentSize = targetSize * scalePercent;
+      const offset = (targetSize - contentSize) / 2;
+      const pixelSize = contentSize / gridSize;
+
+      // 3. Draw Border if enabled
+      if (hasPixelBorder) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+        ctx.lineWidth = Math.max(2, Math.floor(targetSize * 0.015));
+        ctx.strokeRect(offset - 4, offset - 4, contentSize + 8, contentSize + 8);
+        ctx.restore();
+      }
+
+      // 4. Draw Scaled Pixels
+      for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+          const color = canvasPixels[y][x];
+          if (color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(
+              Math.floor(offset + x * pixelSize),
+              Math.floor(offset + y * pixelSize),
+              Math.ceil(pixelSize),
+              Math.ceil(pixelSize)
+            );
+          }
+        }
+      }
+
+      return offscreen;
+    }
+
+    function updateStorePreviews() {
+      document.getElementById('bg-hex-label').innerText = document.getElementById('bg-color-picker').value.toUpperCase();
+
+      // Render Google Play preview (128px internal)
+      const playCanvas = document.getElementById('preview-playstore-canvas');
+      playCanvas.width = 128;
+      playCanvas.height = 128;
+      const playCtx = playCanvas.getContext('2d');
+      playCtx.imageSmoothingEnabled = false;
+      const playSource = getStoreRenderCanvas(128, false);
+      playCtx.drawImage(playSource, 0, 0);
+
+      // Render App Store preview (128px)
+      const appleCanvas = document.getElementById('preview-appstore-canvas');
+      appleCanvas.width = 128;
+      appleCanvas.height = 128;
+      const appleCtx = appleCanvas.getContext('2d');
+      appleCtx.imageSmoothingEnabled = false;
+      const appleSource = getStoreRenderCanvas(128, true); // App Store requires solid BG
+      appleCtx.drawImage(appleSource, 0, 0);
+
+      // Toggle gloss overlay
+      const showGloss = document.getElementById('toggle-frame-gloss').checked;
+      const glossOverlay = document.getElementById('ios-gloss-overlay');
+      if (glossOverlay) glossOverlay.style.display = showGloss ? 'block' : 'none';
+
+      // Render Home Screen preview
+      const homeCanvas = document.getElementById('preview-homescreen-canvas');
+      homeCanvas.width = 96;
+      homeCanvas.height = 96;
+      const homeCtx = homeCanvas.getContext('2d');
+      homeCtx.imageSmoothingEnabled = false;
+      homeCtx.drawImage(playSource, 0, 0, 96, 96);
+
+      // Render Microsoft Store preview (128px canvas)
+      const msCanvas = document.getElementById('preview-msstore-canvas');
+      if (msCanvas) {
+        msCanvas.width = 128;
+        msCanvas.height = 128;
+        const msCtx = msCanvas.getContext('2d');
+        msCtx.imageSmoothingEnabled = false;
+        const msSource = getStoreRenderCanvas(128, false);
+        msCtx.drawImage(msSource, 0, 0);
+      }
+
+      // Render Windows Taskbar preview (48px canvas)
+      const winCanvas = document.getElementById('preview-wintaskbar-canvas');
+      if (winCanvas) {
+        winCanvas.width = 48;
+        winCanvas.height = 48;
+        const winCtx = winCanvas.getContext('2d');
+        winCtx.imageSmoothingEnabled = false;
+        const winSource = getStoreRenderCanvas(48, false);
+        winCtx.drawImage(winSource, 0, 0);
+      }
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function exportGooglePlayIcon() {
+      // Official Google Play: 512x512, 32-bit PNG
+      const exportCanvas = getStoreRenderCanvas(512, false);
+      exportCanvas.toBlob((blob) => {
+        if (blob) {
+          downloadBlob(blob, 'google-play-icon-512x512.png');
+          showToast('Ikon Google Play 512x512 berhasil diunduh!');
+        }
+      }, 'image/png');
+    }
+
+    function exportAppStoreIcon() {
+      // Apple App Store: 1024x1024, Solid background mandatory
+      const exportCanvas = getStoreRenderCanvas(1024, true);
+      exportCanvas.toBlob((blob) => {
+        if (blob) {
+          downloadBlob(blob, 'app-store-icon-1024x1024.png');
+          showToast('Ikon Apple App Store 1024x1024 berhasil diunduh!');
+        }
+      }, 'image/png');
+    }
+
+    function exportMicrosoftStoreIcon() {
+      // Official Microsoft Store Listing icon: 300x300 PNG
+      const exportCanvas = getStoreRenderCanvas(300, false);
+      exportCanvas.toBlob((blob) => {
+        if (blob) {
+          downloadBlob(blob, 'microsoft-store-logo-300x300.png');
+          showToast('Ikon Microsoft Store 300x300 berhasil diunduh!');
+        }
+      }, 'image/png');
+    }
+
+    // Binary generator for multi-resolution Windows ICO containing PNG streams (16, 32, 48, 256)
+    async function createIcoFromPngBlobs(pngEntries) {
+      const buffers = await Promise.all(pngEntries.map(e => e.blob.arrayBuffer()));
+      const numImages = pngEntries.length;
+      const headerLen = 6 + (16 * numImages);
+      let totalLen = headerLen;
+      for (const b of buffers) totalLen += b.byteLength;
+
+      const icoBuf = new Uint8Array(totalLen);
+      const view = new DataView(icoBuf.buffer);
+
+      // Icon Directory Header
+      view.setUint16(0, 0, true);
+      view.setUint16(2, 1, true); // Type 1 = .ICO
+      view.setUint16(4, numImages, true); // Image count
+
+      let currentOffset = headerLen;
+      for (let i = 0; i < numImages; i++) {
+        const sizeVal = pngEntries[i].size >= 256 ? 0 : pngEntries[i].size;
+        const entryOffset = 6 + (i * 16);
+        view.setUint8(entryOffset, sizeVal);
+        view.setUint8(entryOffset + 1, sizeVal);
+        view.setUint8(entryOffset + 2, 0);
+        view.setUint8(entryOffset + 3, 0);
+        view.setUint16(entryOffset + 4, 1, true);
+        view.setUint16(entryOffset + 6, 32, true);
+        view.setUint32(entryOffset + 8, buffers[i].byteLength, true);
+        view.setUint32(entryOffset + 12, currentOffset, true);
+
+        icoBuf.set(new Uint8Array(buffers[i]), currentOffset);
+        currentOffset += buffers[i].byteLength;
+      }
+      return new Blob([icoBuf], { type: 'image/x-icon' });
+    }
+
+    async function exportWindowsIco() {
+      try {
+        const icoSizes = [16, 32, 48, 256];
+        const entries = [];
+        for (const sz of icoSizes) {
+          const blob = await new Promise(res => getStoreRenderCanvas(sz, false).toBlob(res, 'image/png'));
+          entries.push({ size: sz, blob });
+        }
+        const icoBlob = await createIcoFromPngBlobs(entries);
+        downloadBlob(icoBlob, 'app.ico');
+        showToast('File Windows Icon (app.ico multi-ukuran) berhasil diunduh!');
+      } catch (err) {
+        console.error(err);
+        showToast('Gagal membuat file .ico', 'error');
+      }
+    }
+
+    function exportSingleScale(scale) {
+      const size = gridSize * scale;
+      const offscreen = document.createElement('canvas');
+      offscreen.width = size;
+      offscreen.height = size;
+      const ctx = offscreen.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+
+      for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+          const c = canvasPixels[y][x];
+          if (c) {
+            ctx.fillStyle = c;
+            ctx.fillRect(x * scale, y * scale, scale, scale);
+          }
+        }
+      }
+
+      offscreen.toBlob((blob) => {
+        if (blob) {
+          downloadBlob(blob, `pixico-${size}x${size}.png`);
+          showToast(`Ukuran ${size}x${size} berhasil diunduh!`);
+        }
+      });
+    }
+
+    async function exportAllZipBundle() {
+      const zipBtn = document.getElementById('btn-export-zip');
+      const originalText = zipBtn.innerHTML;
+      zipBtn.innerHTML = `
+        <svg class="animate-spin w-4 h-4 text-amber-400 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <span>Mengompres Paket Pixico...</span>
+      `;
+
+      try {
+        const zip = new JSZip();
+
+        // 1. Google Play & App Store primary assets
+        const playBlob = await new Promise(res => getStoreRenderCanvas(512, false).toBlob(res, 'image/png'));
+        zip.file("Store_Listing/GooglePlay_512x512.png", playBlob);
+
+        const appleBlob = await new Promise(res => getStoreRenderCanvas(1024, true).toBlob(res, 'image/png'));
+        zip.file("Store_Listing/AppStore_1024x1024.png", appleBlob);
+
+        // 2. Android Mipmap Sizes (res/mipmap-*)
+        const androidSizes = [
+          { name: "mipmap-mdpi/ic_launcher.png", size: 48 },
+          { name: "mipmap-hdpi/ic_launcher.png", size: 72 },
+          { name: "mipmap-xhdpi/ic_launcher.png", size: 96 },
+          { name: "mipmap-xxhdpi/ic_launcher.png", size: 144 },
+          { name: "mipmap-xxxhdpi/ic_launcher.png", size: 192 }
+        ];
+
+        for (const item of androidSizes) {
+          const blob = await new Promise(res => getStoreRenderCanvas(item.size, false).toBlob(res, 'image/png'));
+          zip.file(`Android_Res/${item.name}`, blob);
+        }
+
+        // 3. iOS Sizes (AppIcon.appiconset)
+        const iosSizes = [
+          { name: "AppIcon-20@2x.png", size: 40 },
+          { name: "AppIcon-20@3x.png", size: 60 },
+          { name: "AppIcon-29@2x.png", size: 58 },
+          { name: "AppIcon-29@3x.png", size: 87 },
+          { name: "AppIcon-40@2x.png", size: 80 },
+          { name: "AppIcon-40@3x.png", size: 120 },
+          { name: "AppIcon-60@2x.png", size: 120 },
+          { name: "AppIcon-60@3x.png", size: 180 }
+        ];
+
+        for (const item of iosSizes) {
+          const blob = await new Promise(res => getStoreRenderCanvas(item.size, true).toBlob(res, 'image/png'));
+          zip.file(`iOS_AppIcon/${item.name}`, blob);
+        }
+
+        // 4. Windows / Microsoft Store (MSIX / UWP / WinUI Package Assets)
+        const msStoreBlob = await new Promise(res => getStoreRenderCanvas(300, false).toBlob(res, 'image/png'));
+        zip.file("Windows_MSIX_Assets/MicrosoftStore_300x300.png", msStoreBlob);
+
+        const winSizes = [
+          { name: "StoreLogo.scale-100.png", size: 50 },
+          { name: "StoreLogo.scale-200.png", size: 100 },
+          { name: "StoreLogo.scale-400.png", size: 200 },
+          { name: "Square44x44Logo.scale-100.png", size: 44 },
+          { name: "Square44x44Logo.scale-200.png", size: 88 },
+          { name: "Square44x44Logo.scale-400.png", size: 176 },
+          { name: "Square44x44Logo.targetsize-16.png", size: 16 },
+          { name: "Square44x44Logo.targetsize-24.png", size: 24 },
+          { name: "Square44x44Logo.targetsize-32.png", size: 32 },
+          { name: "Square44x44Logo.targetsize-48.png", size: 48 },
+          { name: "Square44x44Logo.targetsize-256.png", size: 256 },
+          { name: "Square150x150Logo.scale-100.png", size: 150 },
+          { name: "Square150x150Logo.scale-200.png", size: 300 },
+          { name: "Square71x71Logo.scale-100.png", size: 71 },
+          { name: "Square310x310Logo.scale-100.png", size: 310 }
+        ];
+
+        for (const item of winSizes) {
+          const blob = await new Promise(res => getStoreRenderCanvas(item.size, false).toBlob(res, 'image/png'));
+          zip.file(`Windows_MSIX_Assets/${item.name}`, blob);
+        }
+
+        // Generate multi-size app.ico and include inside ZIP
+        const icoEntries = [];
+        for (const sz of [16, 32, 48, 256]) {
+          const blob = await new Promise(res => getStoreRenderCanvas(sz, false).toBlob(res, 'image/png'));
+          icoEntries.push({ size: sz, blob });
+        }
+        const icoBlob = await createIcoFromPngBlobs(icoEntries);
+        zip.file("Windows_MSIX_Assets/app.ico", icoBlob);
+
+        // 5. Web Favicons
+        const fav32 = await new Promise(res => getStoreRenderCanvas(32, false).toBlob(res, 'image/png'));
+        zip.file("Web/favicon-32x32.png", fav32);
+        const fav16 = await new Promise(res => getStoreRenderCanvas(16, false).toBlob(res, 'image/png'));
+        zip.file("Web/favicon-16x16.png", fav16);
+
+        // Generate and download
+        const content = await zip.generateAsync({ type: "blob" });
+        downloadBlob(content, "Pixico_Store_Icon_Package.zip");
+        showToast("Paket Lengkap Pixico (Android, iOS & Windows ZIP) berhasil diekspor!");
+      } catch (err) {
+        console.error(err);
+        showToast("Gagal membuat paket ZIP", "error");
+      } finally {
+        zipBtn.innerHTML = originalText;
+      }
+    }
+
+    const TEMPLATES = [
+      {
+        id: 'controller',
+        name: 'Game Controller',
+        category: 'Game',
+        data16: [
+          "0000000000000000",
+          "0000000000000000",
+          "0011111111111100",
+          "0100000000000010",
+          "1000000000000001",
+          "1002000000304001",
+          "1022200005000601",
+          "1002000000708001",
+          "1000009900000001",
+          "1100099990000011",
+          "0110090090000110",
+          "0011000000001100",
+          "0001100000011000",
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        paletteMap: {
+          '1': '#6366F1', '0': null, '2': '#F8FAFC', '3': '#EF4444',
+          '4': '#EAB308', '5': '#3B82F6', '6': '#10B981', '7': '#8B5CF6',
+          '8': '#EC4899', '9': '#312E81'
+        }
+      },
+      {
+        id: 'potion',
+        name: 'Potion / Ramuan',
+        category: 'RPG',
+        data16: [
+          "0000001111000000",
+          "0000002222000000",
+          "0000000220000000",
+          "0000011221100000",
+          "0000133333310000",
+          "0001334433331000",
+          "0013344443333100",
+          "0133334433333310",
+          "0133333333553310",
+          "1333553335555331",
+          "1335555335555331",
+          "1335555333553331",
+          "1333553333333331",
+          "0133333333333310",
+          "0011111111111100",
+          "0000000000000000"
+        ],
+        paletteMap: {
+          '0': null, '1': '#312E81', '2': '#D97706', '3': '#EC4899',
+          '4': '#FFFFFF', '5': '#BE185D'
+        }
+      },
+      {
+        id: 'sword',
+        name: 'Pedang Legendaris',
+        category: 'Action',
+        data16: [
+          "0000000000000011",
+          "0000000000000121",
+          "0000000000001231",
+          "0000000000012310",
+          "0000000000123100",
+          "0000000001231000",
+          "0000000012310000",
+          "0000000123100000",
+          "0001001231000000",
+          "0014112310000000",
+          "0014413100100000",
+          "0001441001410000",
+          "0000145114410000",
+          "0000015514100000",
+          "0000001101000000",
+          "0000000000000000"
+        ],
+        paletteMap: {
+          '0': null, '1': '#0F172A', '2': '#FFFFFF', '3': '#38BDF8',
+          '4': '#F59E0B', '5': '#78350F'
+        }
+      },
+      {
+        id: 'rocket',
+        name: 'Roket Startup',
+        category: 'Utility',
+        data16: [
+          "0000000000110000",
+          "0000000001221000",
+          "0000000012222100",
+          "0000000123322100",
+          "0000001234432210",
+          "0000012234432210",
+          "0000122233322210",
+          "0001222222222210",
+          "0011222222222110",
+          "0151122222211510",
+          "1551011111101551",
+          "1510001661000151",
+          "1100016776100011",
+          "0000016776100000",
+          "0000001771000000",
+          "0000000110000000"
+        ],
+        paletteMap: {
+          '0': null, '1': '#0F172A', '2': '#F8FAFC', '3': '#0284C7',
+          '4': '#38BDF8', '5': '#EF4444', '6': '#F97316', '7': '#FDE047'
+        }
+      },
+      {
+        id: 'coin',
+        name: 'Koin Finansial',
+        category: 'Finance',
+        data16: [
+          "0000011111100000",
+          "0001122222211000",
+          "0012233333322100",
+          "0122333333332210",
+          "1223334444333221",
+          "1233344333333321",
+          "1233344444333321",
+          "1233333334433321",
+          "1233344444333321",
+          "1233333333333321",
+          "122333333333221",
+          "0122333333332210",
+          "0012233333322100",
+          "0001122222211000",
+          "0000011111100000",
+          "0000000000000000"
+        ],
+        paletteMap: {
+          '0': null, '1': '#78350F', '2': '#F59E0B', '3': '#FCD34D', '4': '#FFFFFF'
+        }
+      },
+      {
+        id: 'heart',
+        name: 'Hati / Social',
+        category: 'Social',
+        data16: [
+          "0000000000000000",
+          "0001110000111000",
+          "0012221001222100",
+          "0123322112222210",
+          "1233322222222221",
+          "1233222222222221",
+          "1222222222222221",
+          "1222222222222221",
+          "0122222222222210",
+          "0012222222222100",
+          "0001222222221000",
+          "0000122222210000",
+          "0000012222100000",
+          "0000001221000000",
+          "0000000110000000",
+          "0000000000000000"
+        ],
+        paletteMap: {
+          '0': null, '1': '#881337', '2': '#F43F5E', '3': '#FFE4E6'
+        }
+      }
+    ];
+
+    function openTemplateModal() {
+      const container = document.getElementById('template-grid');
+      container.innerHTML = '';
+
+      TEMPLATES.forEach(tpl => {
+        const item = document.createElement('div');
+        item.className = 'p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700/80 border border-slate-700 cursor-pointer flex flex-col items-center gap-2 group transition';
+        item.onclick = () => loadTemplate(tpl);
+
+        // Render preview canvas
+        const preview = document.createElement('canvas');
+        preview.width = 16;
+        preview.height = 16;
+        preview.className = 'w-12 h-12 canvas-crisp rounded bg-slate-900 border border-slate-700 group-hover:scale-105 transition-transform';
+        const pCtx = preview.getContext('2d');
+
+        tpl.data16.forEach((row, y) => {
+          for (let x = 0; x < 16; x++) {
+            const char = row[x];
+            const color = tpl.paletteMap[char];
+            if (color) {
+              pCtx.fillStyle = color;
+              pCtx.fillRect(x, y, 1, 1);
+            }
+          }
+        });
+
+        item.appendChild(preview);
+        const label = document.createElement('span');
+        label.className = 'text-xs font-semibold text-slate-200 group-hover:text-indigo-400 text-center';
+        label.innerText = tpl.name;
+        item.appendChild(label);
+
+        container.appendChild(item);
+      });
+
+      document.getElementById('template-modal').classList.remove('hidden');
+      document.getElementById('template-modal').classList.add('flex');
+    }
+
+    function closeTemplateModal() {
+      document.getElementById('template-modal').classList.add('hidden');
+      document.getElementById('template-modal').classList.remove('flex');
+    }
+
+    function loadTemplate(tpl) {
+      setGridSize(16);
+      canvasPixels = Array.from({ length: 16 }, () => Array(16).fill(null));
+
+      tpl.data16.forEach((row, y) => {
+        for (let x = 0; x < 16; x++) {
+          const char = row[x];
+          const color = tpl.paletteMap[char];
+          canvasPixels[y][x] = color || null;
+        }
+      });
+
+      redrawMainCanvas();
+      pushHistory();
+      updateStorePreviews();
+      closeTemplateModal();
+      showToast(`Template "${tpl.name}" berhasil dimuat!`);
+    }
+
+    let uploadedImageElement = null;
+    let pixelizedResultGrid = null;
+
+    // Crop box coordinates in natural image space
+    let cropBox = { x: 0, y: 0, size: 100 };
+    let cropDisplay = { scale: 1, offsetX: 0, offsetY: 0, canvasW: 400, canvasH: 300 };
+    let isCropping = false;
+    let cropDragMode = null; // 'move', 'resize'
+    let cropDragStart = { x: 0, y: 0, boxX: 0, boxY: 0, boxSize: 0 };
+    let cropCanvasEl = null;
+    let cropCtx = null;
+
+    function openImageImportModal() {
+      setImportGrid(gridSize);
+      document.getElementById('import-modal').classList.remove('hidden');
+      document.getElementById('import-modal').classList.add('flex');
+
+      if (!cropCanvasEl) {
+        cropCanvasEl = document.getElementById('crop-canvas');
+        cropCtx = cropCanvasEl.getContext('2d');
+        setupCropEventListeners();
+      }
+
+      if (uploadedImageElement) {
+        drawCropCanvas();
+        processPixelizeImage();
+      }
+    }
+
+    function closeImageImportModal() {
+      document.getElementById('import-modal').classList.add('hidden');
+      document.getElementById('import-modal').classList.remove('flex');
+    }
+
+    function setImportGrid(size) {
+      document.getElementById('import-grid-size').value = size;
+      [16, 24, 32, 48, 64].forEach(s => {
+        const btn = document.getElementById(`import-grid-${s}`);
+        if (btn) {
+          if (s === size) {
+            btn.className = "px-2 py-0.5 text-[11px] font-semibold rounded bg-indigo-600 text-white";
+          } else {
+            btn.className = "px-2 py-0.5 text-[11px] font-semibold rounded text-slate-300 hover:text-white";
+          }
+        }
+      });
+      if (uploadedImageElement) {
+        processPixelizeImage();
+      }
+    }
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          uploadedImageElement = img;
+          document.getElementById('upload-status-text').innerText = file.name;
+          document.getElementById('upload-file-details').innerText = `Resolusi Asli: ${img.width} x ${img.height} px`;
+          document.getElementById('import-workspace').classList.remove('hidden');
+          document.getElementById('btn-apply-pixelize').disabled = false;
+
+          if (!cropCanvasEl) {
+            cropCanvasEl = document.getElementById('crop-canvas');
+            cropCtx = cropCanvasEl.getContext('2d');
+            setupCropEventListeners();
+          }
+
+          // Initialize crop box to square centered on the image
+          initCropBox();
+          drawCropCanvas();
+          processPixelizeImage();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function initCropBox() {
+      if (!uploadedImageElement) return;
+      const w = uploadedImageElement.naturalWidth || uploadedImageElement.width;
+      const h = uploadedImageElement.naturalHeight || uploadedImageElement.height;
+      const initialSize = Math.min(w, h);
+      cropBox = {
+        x: Math.round((w - initialSize) / 2),
+        y: Math.round((h - initialSize) / 2),
+        size: Math.round(initialSize)
+      };
+      document.getElementById('crop-size-slider').value = 100;
+      document.getElementById('crop-size-label').innerText = '100%';
+    }
+
+    function centerCropBox() {
+      if (!uploadedImageElement) return;
+      const w = uploadedImageElement.naturalWidth || uploadedImageElement.width;
+      const h = uploadedImageElement.naturalHeight || uploadedImageElement.height;
+      cropBox.x = Math.max(0, Math.min(w - cropBox.size, Math.round((w - cropBox.size) / 2)));
+      cropBox.y = Math.max(0, Math.min(h - cropBox.size, Math.round((h - cropBox.size) / 2)));
+      drawCropCanvas();
+      processPixelizeImage();
+    }
+
+    function presetCropSize(ratio) {
+      if (!uploadedImageElement) return;
+      const w = uploadedImageElement.naturalWidth || uploadedImageElement.width;
+      const h = uploadedImageElement.naturalHeight || uploadedImageElement.height;
+      const maxSide = Math.min(w, h);
+      const newSize = Math.max(16, Math.round(maxSide * ratio));
+      
+      const centerX = cropBox.x + cropBox.size / 2;
+      const centerY = cropBox.y + cropBox.size / 2;
+
+      cropBox.size = newSize;
+      cropBox.x = Math.max(0, Math.min(w - newSize, Math.round(centerX - newSize / 2)));
+      cropBox.y = Math.max(0, Math.min(h - newSize, Math.round(centerY - newSize / 2)));
+
+      const percent = Math.round(ratio * 100);
+      document.getElementById('crop-size-slider').value = percent;
+      document.getElementById('crop-size-label').innerText = `${percent}%`;
+
+      drawCropCanvas();
+      processPixelizeImage();
+    }
+
+    function handleCropSlider(val) {
+      presetCropSize(parseInt(val, 10) / 100);
+    }
+
+    function drawCropCanvas() {
+      if (!uploadedImageElement || !cropCanvasEl) return;
+
+      const container = cropCanvasEl.parentElement;
+      const containerW = container.clientWidth || 360;
+      const containerH = container.clientHeight || 260;
+
+      cropCanvasEl.width = containerW;
+      cropCanvasEl.height = containerH;
+      cropDisplay.canvasW = containerW;
+      cropDisplay.canvasH = containerH;
+
+      const imgW = uploadedImageElement.naturalWidth || uploadedImageElement.width;
+      const imgH = uploadedImageElement.naturalHeight || uploadedImageElement.height;
+
+      const scale = Math.min(containerW / imgW, containerH / imgH) * 0.94;
+      const drawW = imgW * scale;
+      const drawH = imgH * scale;
+      const offsetX = (containerW - drawW) / 2;
+      const offsetY = (containerH - drawH) / 2;
+
+      cropDisplay.scale = scale;
+      cropDisplay.offsetX = offsetX;
+      cropDisplay.offsetY = offsetY;
+
+      cropCtx.clearRect(0, 0, containerW, containerH);
+
+      // Draw faint background grid
+      cropCtx.fillStyle = '#0b0f19';
+      cropCtx.fillRect(0, 0, containerW, containerH);
+
+      // Draw original image
+      cropCtx.drawImage(uploadedImageElement, offsetX, offsetY, drawW, drawH);
+
+      // Darken outside image bounds
+      cropCtx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+      cropCtx.fillRect(offsetX, offsetY, drawW, drawH);
+
+      // Calculate crop box on screen
+      const screenX = offsetX + cropBox.x * scale;
+      const screenY = offsetY + cropBox.y * scale;
+      const screenSize = cropBox.size * scale;
+
+      // Draw clear focused image inside crop square
+      cropCtx.save();
+      cropCtx.beginPath();
+      cropCtx.rect(screenX, screenY, screenSize, screenSize);
+      cropCtx.clip();
+      cropCtx.drawImage(uploadedImageElement, offsetX, offsetY, drawW, drawH);
+
+      // Rule of thirds subtle grid inside crop
+      cropCtx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+      cropCtx.lineWidth = 1;
+      cropCtx.beginPath();
+      const third = screenSize / 3;
+      cropCtx.moveTo(screenX + third, screenY);
+      cropCtx.lineTo(screenX + third, screenY + screenSize);
+      cropCtx.moveTo(screenX + 2 * third, screenY);
+      cropCtx.lineTo(screenX + 2 * third, screenY + screenSize);
+      cropCtx.moveTo(screenX, screenY + third);
+      cropCtx.lineTo(screenX + screenSize, screenY + third);
+      cropCtx.moveTo(screenX, screenY + 2 * third);
+      cropCtx.lineTo(screenX + screenSize, screenY + 2 * third);
+      cropCtx.stroke();
+      cropCtx.restore();
+
+      // Draw border of crop box
+      cropCtx.strokeStyle = '#6366f1';
+      cropCtx.lineWidth = 2;
+      cropCtx.strokeRect(screenX, screenY, screenSize, screenSize);
+
+      // Corner handles
+      const handleSize = 8;
+      cropCtx.fillStyle = '#ffffff';
+      cropCtx.strokeStyle = '#312e81';
+      cropCtx.lineWidth = 1.5;
+
+      // Draw bottom-right resize handle
+      const brX = screenX + screenSize;
+      const brY = screenY + screenSize;
+      cropCtx.fillRect(brX - handleSize, brY - handleSize, handleSize * 1.5, handleSize * 1.5);
+      cropCtx.strokeRect(brX - handleSize, brY - handleSize, handleSize * 1.5, handleSize * 1.5);
+
+      // Draw center move crosshair symbol
+      const midX = screenX + screenSize / 2;
+      const midY = screenY + screenSize / 2;
+      cropCtx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+      cropCtx.lineWidth = 2;
+      cropCtx.beginPath();
+      cropCtx.moveTo(midX - 7, midY);
+      cropCtx.lineTo(midX + 7, midY);
+      cropCtx.moveTo(midX, midY - 7);
+      cropCtx.lineTo(midX + 7, midY);
+      cropCtx.stroke();
+
+      // Update coordinates display
+      const coordLabel = document.getElementById('crop-coords-label');
+      if (coordLabel) {
+        coordLabel.innerText = `X:${Math.round(cropBox.x)}, Y:${Math.round(cropBox.y)} (${Math.round(cropBox.size)} x ${Math.round(cropBox.size)} px)`;
+      }
+    }
+
+    function setupCropEventListeners() {
+      if (!cropCanvasEl) return;
+
+      function getCropCanvasPos(e) {
+        const rect = cropCanvasEl.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: clientX - rect.left,
+          y: clientY - rect.top
+        };
+      }
+
+      function handleCropDown(e) {
+        if (!uploadedImageElement) return;
+        const pos = getCropCanvasPos(e);
+        const { scale, offsetX, offsetY } = cropDisplay;
+
+        const screenX = offsetX + cropBox.x * scale;
+        const screenY = offsetY + cropBox.y * scale;
+        const screenSize = cropBox.size * scale;
+
+        const brX = screenX + screenSize;
+        const brY = screenY + screenSize;
+
+        const distToHandle = Math.hypot(pos.x - brX, pos.y - brY);
+        if (distToHandle <= 18) {
+          isCropping = true;
+          cropDragMode = 'resize';
+          cropDragStart = { x: pos.x, y: pos.y, boxX: cropBox.x, boxY: cropBox.y, boxSize: cropBox.size };
+          return;
+        }
+
+        if (pos.x >= screenX && pos.x <= screenX + screenSize && pos.y >= screenY && pos.y <= screenY + screenSize) {
+          isCropping = true;
+          cropDragMode = 'move';
+          cropDragStart = { x: pos.x, y: pos.y, boxX: cropBox.x, boxY: cropBox.y, boxSize: cropBox.size };
+          return;
+        }
+
+        const imgW = uploadedImageElement.naturalWidth || uploadedImageElement.width;
+        const imgH = uploadedImageElement.naturalHeight || uploadedImageElement.height;
+        const targetImgX = (pos.x - offsetX) / scale;
+        const targetImgY = (pos.y - offsetY) / scale;
+
+        cropBox.x = Math.max(0, Math.min(imgW - cropBox.size, Math.round(targetImgX - cropBox.size / 2)));
+        cropBox.y = Math.max(0, Math.min(imgH - cropBox.size, Math.round(targetImgY - cropBox.size / 2)));
+
+        isCropping = true;
+        cropDragMode = 'move';
+        cropDragStart = { x: pos.x, y: pos.y, boxX: cropBox.x, boxY: cropBox.y, boxSize: cropBox.size };
+        drawCropCanvas();
+        processPixelizeImage();
+      }
+
+      function handleCropMove(e) {
+        if (!uploadedImageElement) return;
+        const pos = getCropCanvasPos(e);
+        const { scale, offsetX, offsetY } = cropDisplay;
+
+        if (!isCropping) {
+          const screenX = offsetX + cropBox.x * scale;
+          const screenY = offsetY + cropBox.y * scale;
+          const screenSize = cropBox.size * scale;
+          const distToHandle = Math.hypot(pos.x - (screenX + screenSize), pos.y - (screenY + screenSize));
+
+          if (distToHandle <= 16) {
+            cropCanvasEl.style.cursor = 'nwse-resize';
+          } else if (pos.x >= screenX && pos.x <= screenX + screenSize && pos.y >= screenY && pos.y <= screenY + screenSize) {
+            cropCanvasEl.style.cursor = 'move';
+          } else {
+            cropCanvasEl.style.cursor = 'crosshair';
+          }
+          return;
+        }
+
+        const imgW = uploadedImageElement.naturalWidth || uploadedImageElement.width;
+        const imgH = uploadedImageElement.naturalHeight || uploadedImageElement.height;
+
+        const dx = (pos.x - cropDragStart.x) / scale;
+        const dy = (pos.y - cropDragStart.y) / scale;
+
+        if (cropDragMode === 'move') {
+          cropBox.x = Math.max(0, Math.min(imgW - cropBox.size, Math.round(cropDragStart.boxX + dx)));
+          cropBox.y = Math.max(0, Math.min(imgH - cropBox.size, Math.round(cropDragStart.boxY + dy)));
+        } else if (cropDragMode === 'resize') {
+          const delta = Math.max(dx, dy);
+          const maxAllowed = Math.min(imgW - cropBox.x, imgH - cropBox.y);
+          const newSize = Math.max(16, Math.min(maxAllowed, Math.round(cropDragStart.boxSize + delta)));
+          cropBox.size = newSize;
+
+          const ratioPercent = Math.min(100, Math.round((newSize / Math.min(imgW, imgH)) * 100));
+          document.getElementById('crop-size-slider').value = ratioPercent;
+          document.getElementById('crop-size-label').innerText = `${ratioPercent}%`;
+        }
+
+        drawCropCanvas();
+        processPixelizeImage();
+      }
+
+      function handleCropUp() {
+        if (isCropping) {
+          isCropping = false;
+          cropDragMode = null;
+        }
+      }
+
+      cropCanvasEl.addEventListener('mousedown', handleCropDown);
+      window.addEventListener('mousemove', handleCropMove);
+      window.addEventListener('mouseup', handleCropUp);
+
+      cropCanvasEl.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        handleCropDown(e);
+      }, { passive: false });
+
+      cropCanvasEl.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        handleCropMove(e);
+      }, { passive: false });
+
+      cropCanvasEl.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        handleCropUp();
+      }, { passive: false });
+    }
+
+    function processPixelizeImage() {
+      if (!uploadedImageElement) return;
+
+      const targetGrid = parseInt(document.getElementById('import-grid-size').value, 10);
+      const colorMode = document.getElementById('import-color-mode').value;
+      const contrastVal = parseInt(document.getElementById('import-contrast').value, 10);
+      const saturateVal = parseInt(document.getElementById('import-saturate').value, 10);
+      const removeWhite = document.getElementById('import-remove-white').checked;
+      const whiteThreshold = parseInt(document.getElementById('import-white-threshold').value, 10);
+      const ditherMode = document.getElementById('import-dither').value;
+
+      // Stage 1: High-quality intermediate rendering strictly from cropBox coordinates
+      const intermediateCanvas = document.createElement('canvas');
+      intermediateCanvas.width = 256;
+      intermediateCanvas.height = 256;
+      const iCtx = intermediateCanvas.getContext('2d');
+      iCtx.imageSmoothingEnabled = true;
+      iCtx.imageSmoothingQuality = 'high';
+      iCtx.filter = `contrast(${contrastVal}%) saturate(${saturateVal}%)`;
+
+      iCtx.drawImage(
+        uploadedImageElement,
+        cropBox.x, cropBox.y, cropBox.size, cropBox.size,
+        0, 0, 256, 256
+      );
+
+      // Stage 2: Downsample to target grid size
+      const sampleCanvas = document.createElement('canvas');
+      sampleCanvas.width = targetGrid;
+      sampleCanvas.height = targetGrid;
+      const sCtx = sampleCanvas.getContext('2d');
+      sCtx.imageSmoothingEnabled = true;
+      sCtx.imageSmoothingQuality = 'high';
+      sCtx.drawImage(intermediateCanvas, 0, 0, targetGrid, targetGrid);
+
+      const imgData = sCtx.getImageData(0, 0, targetGrid, targetGrid);
+      const data = imgData.data;
+
+      // Active palette RGB values for perceptual matching
+      const activePalKey = document.getElementById('palette-selector').value;
+      const activePalHexes = PALETTES[activePalKey] || PALETTES.pico8;
+      const activePalRgb = activePalHexes.map(h => hexToRgb(h));
+
+      pixelizedResultGrid = Array.from({ length: targetGrid }, () => Array(targetGrid).fill(null));
+
+      const floatBuffer = new Float32Array(targetGrid * targetGrid * 4);
+      for (let i = 0; i < data.length; i++) {
+        floatBuffer[i] = data[i];
+      }
+
+      const bayer4x4 = [
+        [ 0,  8,  2, 10],
+        [12,  4, 14,  6],
+        [ 3, 11,  1,  9],
+        [15,  7, 13,  5]
+      ];
+
+      const usedColors = new Set();
+
+      for (let y = 0; y < targetGrid; y++) {
+        for (let x = 0; x < targetGrid; x++) {
+          const idx = (y * targetGrid + x) * 4;
+          let r = floatBuffer[idx];
+          let g = floatBuffer[idx + 1];
+          let b = floatBuffer[idx + 2];
+          const a = floatBuffer[idx + 3];
+
+          if (a < 64) {
+            pixelizedResultGrid[y][x] = null;
+            continue;
+          }
+
+          if (removeWhite) {
+            if (r >= whiteThreshold && g >= whiteThreshold && b >= whiteThreshold) {
+              pixelizedResultGrid[y][x] = null;
+              continue;
+            }
+          }
+
+          if (ditherMode === 'bayer') {
+            const bVal = (bayer4x4[y % 4][x % 4] / 16 - 0.5) * 42;
+            r = Math.min(255, Math.max(0, r + bVal));
+            g = Math.min(255, Math.max(0, g + bVal));
+            b = Math.min(255, Math.max(0, b + bVal));
+          }
+
+          let finalHex = null;
+
+          if (colorMode === 'palette') {
+            let bestDist = Infinity;
+            let bestRgb = activePalRgb[0];
+            for (let i = 0; i < activePalRgb.length; i++) {
+              const pr = activePalRgb[i].r;
+              const pg = activePalRgb[i].g;
+              const pb = activePalRgb[i].b;
+              const dr = r - pr;
+              const dg = g - pg;
+              const db = b - pb;
+              const dist = 0.299 * dr * dr + 0.587 * dg * dg + 0.114 * db * db;
+              if (dist < bestDist) {
+                bestDist = dist;
+                bestRgb = activePalRgb[i];
+              }
+            }
+            finalHex = rgbToHex(bestRgb.r, bestRgb.g, bestRgb.b);
+
+            if (ditherMode === 'floyd') {
+              const er = r - bestRgb.r;
+              const eg = g - bestRgb.g;
+              const eb = b - bestRgb.b;
+              diffuseDitherError(floatBuffer, targetGrid, x, y, er, eg, eb);
+            }
+          } else if (colorMode === 'quantize16' || colorMode === 'quantize8') {
+            const step = colorMode === 'quantize8' ? 48 : 24;
+            const qr = Math.min(255, Math.max(0, Math.round(r / step) * step));
+            const qg = Math.min(255, Math.max(0, Math.round(g / step) * step));
+            const qb = Math.min(255, Math.max(0, Math.round(b / step) * step));
+            finalHex = rgbToHex(qr, qg, qb);
+
+            if (ditherMode === 'floyd') {
+              diffuseDitherError(floatBuffer, targetGrid, x, y, r - qr, g - qg, b - qb);
+            }
+          } else {
+            finalHex = rgbToHex(
+              Math.min(255, Math.max(0, Math.round(r))),
+              Math.min(255, Math.max(0, Math.round(g))),
+              Math.min(255, Math.max(0, Math.round(b)))
+            );
+          }
+
+          pixelizedResultGrid[y][x] = finalHex;
+          if (finalHex) usedColors.add(finalHex);
+        }
+      }
+
+      renderModalPreview(targetGrid, usedColors.size);
+    }
+
+    function diffuseDitherError(buffer, size, x, y, er, eg, eb) {
+      function add(tx, ty, weight) {
+        if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
+          const i = (ty * size + tx) * 4;
+          buffer[i] += er * weight;
+          buffer[i + 1] += eg * weight;
+          buffer[i + 2] += eb * weight;
+        }
+      }
+      add(x + 1, y, 7 / 16);
+      add(x - 1, y + 1, 3 / 16);
+      add(x, y + 1, 5 / 16);
+      add(x + 1, y + 1, 1 / 16);
+    }
+
+    function renderModalPreview(targetGrid, colorCount) {
+      const pCanvas = document.getElementById('modal-pixel-preview-canvas');
+      if (!pCanvas) return;
+      pCanvas.width = 160;
+      pCanvas.height = 160;
+      const pCtx = pCanvas.getContext('2d');
+      pCtx.imageSmoothingEnabled = false;
+      pCtx.clearRect(0, 0, 160, 160);
+
+      const cellSize = 160 / targetGrid;
+
+      for (let y = 0; y < targetGrid; y++) {
+        for (let x = 0; x < targetGrid; x++) {
+          const col = pixelizedResultGrid[y][x];
+          if (col) {
+            pCtx.fillStyle = col;
+            pCtx.fillRect(
+              Math.floor(x * cellSize),
+              Math.floor(y * cellSize),
+              Math.ceil(cellSize),
+              Math.ceil(cellSize)
+            );
+          }
+        }
+      }
+
+      const statLabel = document.getElementById('import-stats-label');
+      if (statLabel) {
+        statLabel.innerText = `${targetGrid}x${targetGrid} • ${colorCount} warna`;
+      }
+    }
+
+    function applyPixelizedImage() {
+      if (!uploadedImageElement || !pixelizedResultGrid) return;
+
+      const targetGrid = parseInt(document.getElementById('import-grid-size').value, 10);
+      if (gridSize !== targetGrid) {
+        setGridSize(targetGrid);
+      }
+
+      canvasPixels = pixelizedResultGrid.map(row => [...row]);
+      redrawMainCanvas();
+      pushHistory();
+      updateStorePreviews();
+      closeImageImportModal();
+      showToast(`Gambar HD berhasil dikonversi ke pixel art (${targetGrid}x${targetGrid})!`);
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `px-3.5 py-2 rounded-xl border shadow-xl flex items-center gap-2 text-xs font-medium transition-all duration-300 transform translate-y-2 opacity-0 ${
+        type === 'error' 
+          ? 'bg-rose-950 text-rose-200 border-rose-800' 
+          : 'bg-slate-900/95 text-slate-100 border-indigo-500/50 backdrop-blur'
+      }`;
+      
+      const icon = type === 'error' ? '⚠️' : '✨';
+      toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        undo();
+      } else if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+        e.preventDefault();
+        redo();
+      } else if (e.key.toLowerCase() === 'p') {
+        setTool('pen');
+      } else if (e.key.toLowerCase() === 'e') {
+        setTool('eraser');
+      } else if (e.key.toLowerCase() === 'b') {
+        setTool('bucket');
+      } else if (e.key.toLowerCase() === 'i') {
+        setTool('picker');
+      } else if (e.key.toLowerCase() === 'l') {
+        setTool('line');
+      } else if (e.key.toLowerCase() === 'r') {
+        setTool('rect');
+      }
+    });
+
+    window.onload = function() {
+      initPalette('pico8');
+      renderRecentColors();
+
+      const savedProject = localStorage.getItem(AUTOSAVE_STORAGE_KEY);
+      if (savedProject) {
+        try {
+          const parsed = JSON.parse(savedProject);
+          applyProjectData(parsed);
+          showToast('Proyek sebelumnya berhasil dipulihkan otomatis!');
+          return;
+        } catch (e) {
+          console.warn('Gagal memulihkan autosave:', e);
+        }
+      }
+
+      setGridSize(16);
+      // Load initial template (Game Controller)
+      loadTemplate(TEMPLATES[0]);
+    };
+  </script>
+</body>
+</html>
