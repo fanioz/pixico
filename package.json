@@ -1,0 +1,11 @@
+{
+  "name": "pixico-studio-desktop",
+  "private": true,
+  "PROTOTYPE": "branch prototype/desktop-wrap — tiket wayfinder #4",
+  "scripts": {
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

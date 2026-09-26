@@ -1,0 +1,11 @@
+[package]
+name = "pixico-studio"
+version = "0.1.0"
+edition = "2021"
+description = "Pixico Studio - Generator Ikon Store Pixel Art"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
