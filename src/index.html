@@ -13,6 +13,9 @@
       const saved = localStorage.getItem('pixico-theme');
       const theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       document.documentElement.dataset.theme = theme;
+      const savedLang = localStorage.getItem('pixico-lang');
+      const sysLang = (navigator.language || 'en').toLowerCase().startsWith('id') ? 'id' : 'en';
+      document.documentElement.lang = savedLang || sysLang;
     })();
   </script>
 
@@ -330,7 +333,7 @@
       </div>
       <div>
         <h1>Pixico</h1>
-        <div class="sub">Ikon pixel siap rilis: Google Play, App Store &amp; Microsoft Store</div>
+        <div class="sub" data-i18n="brand.sub">Store-ready pixel icons: Google Play, App Store &amp; Microsoft Store</div>
       </div>
     </div>
 
@@ -344,22 +347,26 @@
         <button onclick="setGridSize(64)" id="grid-btn-64" class="seg-off">64</button>
       </div>
 
-      <button onclick="openTemplateModal()" class="btn">Template</button>
-      <button onclick="openImageImportModal()" class="btn">Pixelize Foto</button>
+      <button onclick="openTemplateModal()" class="btn" data-i18n="hdr.templates">Templates</button>
+      <button onclick="openImageImportModal()" class="btn" data-i18n="hdr.pixelize">Pixelize photo</button>
 
       <div class="seg" role="group" aria-label="Berkas proyek">
-        <button onclick="exportProjectFile()" title="Simpan berkas proyek Pixico (.pixico)" class="seg-off">Simpan</button>
-        <button onclick="document.getElementById('project-file-input').click()" title="Buka berkas proyek (.pixico / .json)" class="seg-off">Buka</button>
+        <button onclick="exportProjectFile()" class="seg-off" data-i18n="hdr.save" data-i18n-title="hdr.saveTip">Save</button>
+        <button onclick="document.getElementById('project-file-input').click()" class="seg-off" data-i18n="hdr.open" data-i18n-title="hdr.openTip">Open</button>
         <input type="file" id="project-file-input" accept=".pixico,.json" class="hidden" onchange="loadProjectFile(event)">
       </div>
 
-      <div id="autosave-badge" class="badge-autosave" title="Tersimpan otomatis di browser lokal">
-        <span class="dot"></span><span>Autosave</span>
+      <div id="autosave-badge" class="badge-autosave" data-i18n-title="hdr.autosaveTip">
+        <span class="dot"></span><span data-i18n="hdr.autosave">Autosave</span>
       </div>
 
-      <div class="seg" role="group" aria-label="Tema" title="Tema terang / gelap">
-        <button id="theme-light" onclick="applyTheme('light')" class="seg-off">Terang</button>
-        <button id="theme-dark" onclick="applyTheme('dark')" class="seg-off">Gelap</button>
+      <div class="seg" role="group" data-i18n-title="hdr.theme">
+        <button id="theme-light" onclick="applyTheme('light')" class="seg-off" data-i18n-title="hdr.theme">Terang</button>
+        <button id="theme-dark" onclick="applyTheme('dark')" class="seg-off" data-i18n-title="hdr.theme">Gelap</button>
+      </div>
+      <div class="seg" role="group" aria-label="Bahasa" title="Language / Bahasa">
+        <button id="lang-en" onclick="setLang('en')" class="seg-on">EN</button>
+        <button id="lang-id" onclick="setLang('id')" class="seg-off">ID</button>
       </div>
       <button onclick="undo()" id="undo-btn" title="Undo (Ctrl+Z)" class="btn btn-icon" aria-label="Undo">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a5 5 0 015 5v2m0 0l-4-4m4 4l4-4M3 10l4-4m-4 4l4 4"/></svg>
@@ -367,7 +374,7 @@
       <button onclick="redo()" id="redo-btn" title="Redo (Ctrl+Y)" class="btn btn-icon" aria-label="Redo">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a5 5 0 00-5 5v2m0 0l4-4m-4 4l-4-4m20-2l-4-4m4 4l-4 4"/></svg>
       </button>
-      <button onclick="clearCanvas()" title="Kosongkan Kanvas" class="btn btn-icon btn-danger" aria-label="Kosongkan kanvas">
+      <button onclick="clearCanvas()" data-i18n-title="hdr.clear" class="btn btn-icon btn-danger" data-i18n-aria="hdr.clearAria">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
       </button>
     </div>
@@ -379,61 +386,61 @@
     <aside class="col-left">
       <div class="card">
         <h2 class="card-label" style="display:flex; justify-content:space-between; align-items:center;">
-          <span>Alat Gambar</span>
+          <span data-i18n="tools.title">Draw tools</span>
           <span style="font-weight:400; text-transform:none; letter-spacing:0;">P, E, B, I, L, R</span>
         </h2>
         <div class="tools-grid">
-          <button onclick="setTool('pen')" id="tool-pen" title="Pensil (P)" class="tool-btn seg-on">
+          <button onclick="setTool('pen')" id="tool-pen" data-i18n-title="tool.penTip" class="tool-btn seg-on">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-            <span>Pensil</span>
+            <span data-i18n="tool.pen">Pen</span>
           </button>
-          <button onclick="setTool('eraser')" id="tool-eraser" title="Penghapus (E)" class="tool-btn">
+          <button onclick="setTool('eraser')" id="tool-eraser" data-i18n-title="tool.eraserTip" class="tool-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            <span>Hapus</span>
+            <span data-i18n="tool.eraser">Erase</span>
           </button>
-          <button onclick="setTool('bucket')" id="tool-bucket" title="Ember Cat / Fill (B)" class="tool-btn">
+          <button onclick="setTool('bucket')" id="tool-bucket" data-i18n-title="tool.fillTip" class="tool-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-            <span>Isi</span>
+            <span data-i18n="tool.fill">Fill</span>
           </button>
-          <button onclick="setTool('picker')" id="tool-picker" title="Pipet Warna (I)" class="tool-btn">
+          <button onclick="setTool('picker')" id="tool-picker" data-i18n-title="tool.pickerTip" class="tool-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4 4 4 0 014-4h.5l5.5-5.5a2.5 2.5 0 013.536 3.536L11 16.5V17a4 4 0 01-4 4zm0 0v-1.5"/></svg>
-            <span>Pipet</span>
+            <span data-i18n="tool.picker">Picker</span>
           </button>
-          <button onclick="setTool('line')" id="tool-line" title="Garis Lurus (L)" class="tool-btn">
+          <button onclick="setTool('line')" id="tool-line" data-i18n-title="tool.lineTip" class="tool-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 20L20 4"/></svg>
-            <span>Garis</span>
+            <span data-i18n="tool.line">Line</span>
           </button>
-          <button onclick="setTool('rect')" id="tool-rect" title="Kotak / Bingkai (R)" class="tool-btn">
+          <button onclick="setTool('rect')" id="tool-rect" data-i18n-title="tool.rectTip" class="tool-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1" stroke-width="2"/></svg>
-            <span>Kotak</span>
+            <span data-i18n="tool.rect">Rect</span>
           </button>
-          <button onclick="setTool('lighten')" id="tool-lighten" title="Efek Terang (+)" class="tool-btn">
+          <button onclick="setTool('lighten')" id="tool-lighten" data-i18n-title="tool.lightenTip" class="tool-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-            <span>Terang</span>
+            <span data-i18n="tool.lighten">Lighten</span>
           </button>
-          <button onclick="setTool('darken')" id="tool-darken" title="Efek Gelap (-)" class="tool-btn">
+          <button onclick="setTool('darken')" id="tool-darken" data-i18n-title="tool.darkenTip" class="tool-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-            <span>Gelap</span>
+            <span data-i18n="tool.darken">Darken</span>
           </button>
         </div>
 
         <div class="toggles-row">
-          <label class="check" title="Tampilkan garis kisi pixel">
+          <label class="check" data-i18n-title="tools.gridTip">
             <input type="checkbox" id="toggle-grid" checked onchange="toggleGrid(this.checked)">
-            <span>Kisi Garis</span>
+            <span data-i18n="tools.gridLines">Grid lines</span>
           </label>
-          <label class="check" title="Menggambar otomatis simetris kiri-kanan">
+          <label class="check" data-i18n-title="tools.mirrorTip">
             <input type="checkbox" id="toggle-symmetry" onchange="toggleSymmetry(this.checked)">
-            <span>Simetri</span>
+            <span data-i18n="tools.mirror">Mirror</span>
           </label>
         </div>
       </div>
 
       <div class="card">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-          <h2 class="card-label" style="margin:0;">Palet Warna</h2>
+          <h2 class="card-label" style="margin:0;" data-i18n="palette.title">Palette</h2>
           <select id="palette-selector" onchange="changePalette(this.value)">
-            <option value="pico8">PICO-8 (Klasik)</option>
+            <option value="pico8" data-i18n="palette.pico8">PICO-8 (classic)</option>
             <option value="storeVibrant">App Store Vibrant</option>
             <option value="gameboy">Retro Game Boy</option>
             <option value="cyberpunk">Cyberpunk Neon</option>
@@ -448,10 +455,10 @@
             <div id="current-color-preview" class="current-color-preview" style="background:#ff9ecf;"></div>
           </div>
           <div style="flex:1; min-width:0;">
-            <div style="font-size:11px; color:var(--muted);">Warna Aktif</div>
+            <div style="font-size:11px; color:var(--muted);" data-i18n="palette.active">Active color</div>
             <div id="current-hex-label" style="font-family:'SF Mono',ui-monospace,monospace; font-size:12px; font-weight:700;">#FF9ECF</div>
           </div>
-          <button onclick="document.getElementById('native-color-picker').click()" class="btn" style="font-size:11px; padding:4px 8px;">Pilih Hex</button>
+          <button onclick="document.getElementById('native-color-picker').click()" class="btn" style="font-size:11px; padding:4px 8px;"data-i18n="palette.pick">Pick hex</button>
         </div>
 
         <div id="palette-swatches" style="display:grid; grid-template-columns:repeat(8,1fr); gap:6px; padding:6px; background:var(--surface); border:1px solid var(--border-soft); border-radius:10px;">
@@ -459,15 +466,15 @@
         </div>
 
         <div style="margin-top:10px;">
-          <span class="hint" style="display:block; margin-bottom:4px;">Riwayat Warna Terpakai</span>
+          <span class="hint" style="display:block; margin-bottom:4px;" data-i18n="palette.recent">Recent colors</span>
           <div id="recent-colors" style="display:flex; gap:6px; overflow-x:auto; padding-bottom:2px;">
-            <div class="recent-empty">Belum ada riwayat</div>
+            <div class="recent-empty" data-i18n="palette.recentEmpty">Nothing yet</div>
           </div>
         </div>
       </div>
 
       <div class="card" style="background:var(--surface-warm);">
-        <p class="hint" style="margin:0;"><strong style="color:var(--fg);">Tips:</strong> fokus pada siluet kuat dan kontras tinggi. Ikon dilihat pada ukuran ±48 px, jadi kurangi detail mikroskopis agar bentuk langsung terbaca.</p>
+        <p class="hint" style="margin:0;" data-i18n="tip.body">Tip: focus on a strong silhouette and high contrast. Icons are viewed at roughly 48 px, so skip microscopic detail.</p>
       </div>
     </aside>
 
@@ -481,10 +488,10 @@
             <span id="mouse-coords" style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px;">X: 0, Y: 0</span>
           </div>
           <div style="display:flex; align-items:center; gap:4px;">
-            <button onclick="adjustZoom(-1)" title="Perkecil" class="mini-btn" aria-label="Perkecil kanvas">-</button>
+            <button onclick="adjustZoom(-1)" class="mini-btn" data-i18n-title="canvas.zoomOut" data-i18n-aria="canvas.zoomOut">-</button>
             <span id="zoom-level-text" style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px; width:42px; text-align:center;">100%</span>
-            <button onclick="adjustZoom(1)" title="Perbesar" class="mini-btn" aria-label="Perbesar kanvas">+</button>
-            <button onclick="resetZoom()" title="Reset Zoom" class="mini-btn">Reset</button>
+            <button onclick="adjustZoom(1)" class="mini-btn" data-i18n-title="canvas.zoomIn" data-i18n-aria="canvas.zoomIn">+</button>
+            <button onclick="resetZoom()" class="mini-btn" data-i18n-title="canvas.reset" data-i18n="canvas.reset">Reset</button>
           </div>
         </div>
 
@@ -496,17 +503,17 @@
         </div>
 
         <div class="transform-row">
-          <span>Geser Pixel:</span>
+          <span data-i18n="canvas.shift">Shift pixels:</span>
           <div style="display:flex; gap:4px;">
-            <button onclick="shiftPixels('up')" title="Geser ke Atas" class="btn btn-icon" aria-label="Geser atas"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button>
-            <button onclick="shiftPixels('down')" title="Geser ke Bawah" class="btn btn-icon" aria-label="Geser bawah"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
-            <button onclick="shiftPixels('left')" title="Geser ke Kiri" class="btn btn-icon" aria-label="Geser kiri"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
-            <button onclick="shiftPixels('right')" title="Geser ke Kanan" class="btn btn-icon" aria-label="Geser kanan"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+            <button onclick="shiftPixels('up')" class="btn btn-icon" data-i18n-title="canvas.up" data-i18n-aria="canvas.up"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button>
+            <button onclick="shiftPixels('down')" class="btn btn-icon" data-i18n-title="canvas.down" data-i18n-aria="canvas.down"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+            <button onclick="shiftPixels('left')" class="btn btn-icon" data-i18n-title="canvas.left" data-i18n-aria="canvas.left"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+            <button onclick="shiftPixels('right')" class="btn btn-icon" data-i18n-title="canvas.right" data-i18n-aria="canvas.right"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
           </div>
           <div style="display:flex; gap:4px;">
-            <button onclick="flipHorizontal()" title="Balik Horizontal" class="mini-btn">Flip X</button>
-            <button onclick="flipVertical()" title="Balik Vertikal" class="mini-btn">Flip Y</button>
-            <button onclick="rotateCanvas90()" title="Putar 90 Derajat" class="btn btn-icon" aria-label="Putar 90 derajat">
+            <button onclick="flipHorizontal()" class="mini-btn" data-i18n-title="canvas.flipX" data-i18n="canvas.flipX">Flip X</button>
+            <button onclick="flipVertical()" class="mini-btn" data-i18n-title="canvas.flipY" data-i18n="canvas.flipY">Flip Y</button>
+            <button onclick="rotateCanvas90()" class="btn btn-icon" data-i18n-title="canvas.rotate" data-i18n-aria="canvas.rotate">
               <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             </button>
           </div>
@@ -519,19 +526,19 @@
     <aside class="col-right">
 
       <div class="card">
-        <h2 class="card-label">Latar &amp; Frame Ikon</h2>
+        <h2 class="card-label" data-i18n="bg.title">Background &amp; frame</h2>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
           <div>
-            <label class="hint" style="display:block; margin-bottom:4px;">Gaya Latar:</label>
+            <label class="hint" style="display:block; margin-bottom:4px;" data-i18n="bg.style">Background style:</label>
             <select id="bg-style-selector" onchange="updateStorePreviews()" style="width:100%;">
-              <option value="solid">Warna Solid</option>
-              <option value="gradient">Gradasi Retro</option>
-              <option value="dark-slate" selected>Dark Slate Modern</option>
-              <option value="transparent">Transparan (Icon Game)</option>
+              <option value="solid" data-i18n="bg.solid">Solid color</option>
+              <option value="gradient" data-i18n="bg.gradient">Retro gradient</option>
+              <option value="dark-slate" selected data-i18n="bg.darkslate">Dark slate</option>
+              <option value="transparent" data-i18n="bg.transparent">Transparent (game icon)</option>
             </select>
           </div>
           <div>
-            <label class="hint" style="display:block; margin-bottom:4px;">Warna Latar:</label>
+            <label class="hint" style="display:block; margin-bottom:4px;" data-i18n="bg.color">Background color:</label>
             <div style="display:flex; align-items:center; gap:6px;">
               <input type="color" id="bg-color-picker" value="#0f172a" onchange="updateStorePreviews()" style="width:30px; height:30px; padding:0; border:1px solid var(--border); border-radius:7px; background:var(--bg); cursor:pointer;">
               <span id="bg-hex-label" style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px;">#0F172A</span>
@@ -541,7 +548,7 @@
 
         <div style="margin-bottom:10px;">
           <div style="display:flex; justify-content:space-between;" class="hint">
-            <span>Ukuran Objek dalam Ikon:</span>
+            <span data-i18n="bg.scale">Icon object scale:</span>
             <span id="icon-padding-val" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--fg);">80%</span>
           </div>
           <input type="range" id="icon-scale-slider" min="50" max="100" value="80" oninput="document.getElementById('icon-padding-val').innerText = this.value + '%'; updateStorePreviews();">
@@ -550,18 +557,18 @@
         <div style="display:flex; justify-content:space-between; padding-top:10px; border-top:1px solid var(--border-soft); font-size:12px;">
           <label class="check">
             <input type="checkbox" id="toggle-frame-gloss" checked onchange="updateStorePreviews()">
-            <span>Efek Kilau (iOS Gloss)</span>
+            <span data-i18n="bg.gloss">iOS gloss</span>
           </label>
           <label class="check">
             <input type="checkbox" id="toggle-pixel-border" checked onchange="updateStorePreviews()">
-            <span>Garis Tepi Pixel</span>
+            <span data-i18n="bg.pixelBorder">Pixel border</span>
           </label>
         </div>
       </div>
 
       <div class="card">
         <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border-soft); padding-bottom:8px; margin-bottom:10px; gap:8px;">
-          <h2 class="card-label" style="margin:0;">Pratinjau Store</h2>
+          <h2 class="card-label" style="margin:0;" data-i18n="preview.title">Store preview</h2>
           <div class="mock-tabs" role="tablist">
             <button onclick="switchMockupTab('playstore')" id="tab-playstore" class="seg-on">Play</button>
             <button onclick="switchMockupTab('appstore')" id="tab-appstore" class="seg-off">App Store</button>
@@ -577,16 +584,16 @@
               <canvas id="preview-playstore-canvas" class="canvas-crisp" style="width:100%; height:100%;"></canvas>
             </div>
             <div style="min-width:0;">
-              <div style="font-size:12px; font-weight:700;">Petualangan Pixel RPG</div>
-              <div style="font-size:11px; color:var(--muted);">Studio Game Indie</div>
+              <div style="font-size:12px; font-weight:700;" data-i18n="sample.playName">Pixel Quest RPG</div>
+              <div style="font-size:11px; color:var(--muted);" data-i18n="sample.playDev">Indie game studio</div>
               <div style="display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-top:3px; font-size:10px; color:var(--muted);">
                 <span style="color:#b8860b; font-weight:700;">4.9 ★</span>
-                <span>• 500rb+ unduhan</span>
-                <span class="sample-tag">contoh</span>
+                <span data-i18n="sample.downloads">• 500K+ downloads</span>
+                <span class="sample-tag" data-i18n="sample.tag">sample</span>
               </div>
             </div>
           </div>
-          <p class="mock-spec">Google Play: 512 × 512 px, 32-bit PNG (maks 1024KB)</p>
+          <p class="mock-spec"data-i18n="spec.play">Google Play: 512 × 512 px, 32-bit PNG (max 1MB)</p>
         </div>
 
         <div id="mockup-view-appstore" class="hidden">
@@ -596,12 +603,12 @@
               <div id="ios-gloss-overlay" style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(255,255,255,0.2), transparent 40%, rgba(0,0,0,0.2)); pointer-events:none;"></div>
             </div>
             <div style="min-width:0;">
-              <div style="font-size:12px; font-weight:700;">Pixel Quest Mobile</div>
-              <div style="font-size:11px; color:var(--muted);">Game Peran &amp; Aksi Retro</div>
-              <span class="store-pill" style="margin-top:6px;">Dapatkan</span>
+              <div style="font-size:12px; font-weight:700;" data-i18n="sample.appName">Pixel Quest Mobile</div>
+              <div style="font-size:11px; color:var(--muted);" data-i18n="sample.appDev">Retro RPG &amp; action</div>
+              <span class="store-pill" style="margin-top:6px;" data-i18n="sample.get">Get</span>
             </div>
           </div>
-          <p class="mock-spec">App Store: 1024 × 1024 px, PNG solid (tanpa transparansi)</p>
+          <p class="mock-spec"data-i18n="spec.app">App Store: 1024 × 1024 px, solid PNG (no transparency)</p>
         </div>
 
         <div id="mockup-view-homescreen" class="hidden">
@@ -610,28 +617,28 @@
               <div style="width:44px; height:44px; border-radius:22%; overflow:hidden; border:2px solid var(--accent); margin:0 auto;">
                 <canvas id="preview-homescreen-canvas" class="canvas-crisp" style="width:100%; height:100%;"></canvas>
               </div>
-              <div class="hs-label" style="color:#0b63c5; font-weight:600;">App Kamu</div>
+              <div class="hs-label" style="color:#0b63c5; font-weight:600;" data-i18n="hs.yours">Your app</div>
             </div>
             <div style="opacity:0.75;">
               <div class="hs-icon" style="background:#34c759;">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h8m-8 4h5M21 12a9 9 0 11-4-7.5L21 3l-1 4.5A8.96 8.96 0 0121 12z"/></svg>
               </div>
-              <div class="hs-label">Chat</div>
+              <div class="hs-label" data-i18n="hs.chat">Chat</div>
             </div>
             <div style="opacity:0.75;">
               <div class="hs-icon" style="background:#ff375f;">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19a3 3 0 11-2-2.83V6l10-2v9m0 3a3 3 0 11-2-2.83V8"/></svg>
               </div>
-              <div class="hs-label">Musik</div>
+              <div class="hs-label" data-i18n="hs.music">Music</div>
             </div>
             <div style="opacity:0.75;">
               <div class="hs-icon" style="background:#ff9f0a;">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
               </div>
-              <div class="hs-label">Setelan</div>
+              <div class="hs-label" data-i18n="hs.settings">Settings</div>
             </div>
           </div>
-          <p class="mock-spec">Tampilan berdampingan dengan aplikasi lain</p>
+          <p class="mock-spec"data-i18n="spec.home">Side by side with other apps</p>
         </div>
 
         <div id="mockup-view-msstore" class="hidden">
@@ -641,13 +648,13 @@
             </div>
             <div style="min-width:0; flex:1;">
               <div style="display:flex; align-items:center; gap:6px;">
-                <span style="font-size:12px; font-weight:700;">Pixico WinApp</span>
+                <span style="font-size:12px; font-weight:700;" data-i18n="ms.name">Pixico WinApp</span>
                 <span class="sample-tag">MSIX</span>
               </div>
-              <div style="font-size:11px; color:var(--muted);">Game &amp; Utilitas Windows</div>
+              <div style="font-size:11px; color:var(--muted);" data-i18n="ms.dev">Windows games &amp; utilities</div>
               <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
-                <span style="background:var(--accent); color:#fff; font-size:10px; font-weight:600; border-radius:6px; padding:3px 10px;">Dapatkan</span>
-                <span style="font-size:10px; color:var(--muted);">Gratis</span>
+                <span style="background:var(--accent); color:#fff; font-size:10px; font-weight:600; border-radius:6px; padding:3px 10px;" data-i18n="ms.get">Get</span>
+                <span style="font-size:10px; color:var(--muted);" data-i18n="ms.free">Free</span>
               </div>
             </div>
           </div>
@@ -673,19 +680,19 @@
               </div>
             </div>
           </div>
-          <p class="mock-spec">Windows: 300×300 (Store), 44×44 (App List), multi-size .ICO</p>
+          <p class="mock-spec"data-i18n="spec.ms">Windows: 300×300 (Store), 44×44 (app list), multi-size .ICO</p>
         </div>
       </div>
 
       <div class="card">
-        <h2 class="card-label">Pusat Ekspor</h2>
+        <h2 class="card-label" data-i18n="export.title">Export center</h2>
 
         <button onclick="exportGooglePlayIcon()" class="export-btn">
           <span style="display:flex; align-items:center; gap:8px;">
             <span class="export-chip" style="background:#16a34a; color:#fff;">
               <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M3.609 1.814L13.792 12 3.61 22.186a2.127 2.127 0 01-.61-1.503V3.317c0-.585.226-1.12.61-1.503zM15.207 13.414l2.457 2.457-11.83 6.654 9.373-9.111zm2.457-5.242L15.207 10.6 5.834 1.475l11.83 6.697zm1.186 1.828l3.654 2.066c.928.525.928 1.465 0 1.99l-3.654 2.067-2.073-2.074 2.073-2.049z"/></svg>
             </span>
-            <span>Google Play (512×512)</span>
+            <span data-i18n="export.play">Google Play (512×512)</span>
           </span>
           <span class="export-fmt">PNG</span>
         </button>
@@ -695,7 +702,7 @@
             <span class="export-chip" style="background:var(--fg); color:var(--bg);">
               <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.9.04-2.01.62-2.66 1.38-.57.65-1.07 1.73-.97 2.76.99.08 2.01-.52 2.62-1.27z"/></svg>
             </span>
-            <span>Apple App Store (1024×1024)</span>
+            <span data-i18n="export.app">Apple App Store (1024×1024)</span>
           </span>
           <span class="export-fmt">PNG</span>
         </button>
@@ -705,7 +712,7 @@
             <span class="export-chip" style="background:#0b63c5; color:#fff;">
               <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.8"/></svg>
             </span>
-            <span>Microsoft Store (300×300)</span>
+            <span data-i18n="export.ms">Microsoft Store (300×300)</span>
           </span>
           <span class="export-fmt">PNG</span>
         </button>
@@ -715,18 +722,18 @@
             <span class="export-chip" style="background:var(--muted); color:var(--bg);">
               <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </span>
-            <span>Windows Icon (multi-size)</span>
+            <span data-i18n="export.ico">Windows icon (multi-size)</span>
           </span>
           <span class="export-fmt">.ICO</span>
         </button>
 
         <button onclick="exportAllZipBundle()" id="btn-export-zip" class="btn btn-primary" style="width:100%; justify-content:center; padding:10px; font-size:12px;">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-          <span>Ekspor Semua Paket (ZIP)</span>
+          <span data-i18n="export.zip">Export all packages (ZIP)</span>
         </button>
 
         <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border-soft); display:flex; align-items:center; justify-content:space-between; font-size:12px;" class="hint">
-          <span>Ukuran asli:</span>
+          <span data-i18n="export.native">Native size:</span>
           <div style="display:flex; gap:4px;">
             <button onclick="exportSingleScale(1)" class="mini-btn">1x</button>
             <button onclick="exportSingleScale(8)" class="mini-btn">8x</button>
@@ -744,17 +751,17 @@
   <div id="template-modal" class="modal-overlay">
     <div class="modal-box" style="max-width:520px;">
       <div style="display:flex; align-items:center; justify-content:center; position:relative; padding-bottom:10px; border-bottom:1px solid var(--border-soft);">
-        <h3 style="margin:0; font-size:14px;">Pilih Template Ikon Siap Pakai</h3>
+        <h3 style="margin:0; font-size:14px;" data-i18n="tpl.title">Pick a starter icon</h3>
         <button onclick="closeTemplateModal()" class="btn btn-ghost btn-icon" style="position:absolute; right:-6px; top:-6px;" aria-label="Tutup">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
-      <p class="hint" style="margin:10px 0;">Pilih template untuk mulai mengedit ikon aplikasimu:</p>
+      <p class="hint" style="margin:10px 0;" data-i18n="tpl.sub">Load a starter, make it yours:</p>
       <div id="template-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; max-height:360px; overflow-y:auto; padding-right:4px;">
         <!-- Template dirender oleh JavaScript -->
       </div>
       <div style="margin-top:14px; padding-top:10px; border-top:1px solid var(--border-soft); display:flex; justify-content:flex-end;">
-        <button onclick="closeTemplateModal()" class="btn">Tutup</button>
+        <button onclick="closeTemplateModal()" class="btn" data-i18n="tpl.close">Close</button>
       </div>
     </div>
   </div>
@@ -764,8 +771,8 @@
     <div class="modal-box" style="max-width:1000px; max-height:94vh; overflow:hidden; display:flex; flex-direction:column; padding:16px;">
       <div style="display:flex; align-items:flex-start; justify-content:space-between; padding-bottom:10px; border-bottom:1px solid var(--border-soft); flex-shrink:0;">
         <div>
-          <h3 style="margin:0; font-size:15px;">Crop &amp; Pixelize Gambar</h3>
-          <p class="hint" style="margin:3px 0 0;">Pilih area fokus pada foto/logo HD, lalu konversi ke pixel art tanpa blur</p>
+          <h3 style="margin:0; font-size:15px;" data-i18n="imp.title">Crop &amp; pixelize an image</h3>
+          <p class="hint" style="margin:3px 0 0;" data-i18n="imp.sub">Pick the focus area on a HD photo/logo, then convert to blur-free pixel art</p>
         </div>
         <button onclick="closeImageImportModal()" class="btn btn-ghost btn-icon" aria-label="Tutup">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -780,8 +787,8 @@
               <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </div>
             <div style="text-align:left;">
-              <div style="font-size:12px; font-weight:600;" id="upload-status-text">Klik atau seret gambar (PNG / JPG / WEBP) di sini</div>
-              <div class="hint" id="upload-file-details">Mendukung gambar beresolusi tinggi hingga 4K</div>
+              <div style="font-size:12px; font-weight:600;" id="upload-status-text" data-i18n="imp.drop">Click or drop an image (PNG / JPG / WEBP)</div>
+              <div class="hint" id="upload-file-details" data-i18n="imp.dropSub">Supports high-res images up to 4K</div>
             </div>
           </div>
         </div>
@@ -789,7 +796,7 @@
         <div id="import-workspace" class="hidden" style="display:grid; grid-template-columns:1fr; gap:14px; padding-top:10px; align-items:start;">
           <div style="display:flex; flex-direction:column; background:var(--surface-warm); padding:12px; border-radius:12px; border:1px solid var(--border-soft);">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-size:11px;">
-              <span style="font-weight:700;">Pilih Area Fokus (1:1)</span>
+              <span style="font-weight:700;" data-i18n="imp.focus">Focus area (1:1)</span>
               <span id="crop-coords-label" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--accent);">0, 0 (0 x 0)</span>
             </div>
             <div class="crop-stage">
@@ -799,21 +806,21 @@
 
             <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border-soft);">
               <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;" class="hint">
-                <span>Ukuran Area Crop:</span>
+                <span data-i18n="imp.cropSize">Crop size:</span>
                 <span id="crop-size-label" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--fg);">100%</span>
               </div>
               <input type="range" id="crop-size-slider" min="15" max="100" value="100" oninput="handleCropSlider(this.value)">
               <div style="display:flex; gap:6px; padding-top:6px;">
-                <button type="button" onclick="centerCropBox()" class="btn" style="flex:1; justify-content:center; font-size:11px;">Pusat</button>
-                <button type="button" onclick="presetCropSize(0.5)" class="btn" style="flex:1; justify-content:center; font-size:11px;">Fokus 50%</button>
-                <button type="button" onclick="presetCropSize(1.0)" class="btn" style="flex:1; justify-content:center; font-size:11px;">Maksimal</button>
+                <button type="button" onclick="centerCropBox()" class="btn" style="flex:1; justify-content:center; font-size:11px;" data-i18n="imp.center">Center</button>
+                <button type="button" onclick="presetCropSize(0.5)" class="btn" style="flex:1; justify-content:center; font-size:11px;" data-i18n="imp.focus50">Focus 50%</button>
+                <button type="button" onclick="presetCropSize(1.0)" class="btn" style="flex:1; justify-content:center; font-size:11px;" data-i18n="imp.max">Max (1:1)</button>
               </div>
             </div>
           </div>
 
           <div style="display:flex; flex-direction:column; align-items:center; background:var(--surface-warm); padding:12px; border-radius:12px; border:1px solid var(--border-soft);">
             <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <span class="card-label" style="margin:0;">Hasil Pixel Art</span>
+              <span class="card-label" style="margin:0;" data-i18n="imp.result">Pixel result</span>
               <span id="import-stats-label" style="font-family:'SF Mono',ui-monospace,monospace; font-size:10px; color:var(--accent);">16x16</span>
             </div>
             <div style="position:relative; width:150px; height:150px; border-radius:10px; overflow:hidden; border:1px solid var(--border);" class="bg-checker">
@@ -828,37 +835,37 @@
               <button type="button" onclick="setImportGrid(64)" id="import-grid-64" class="seg-off">64x</button>
               <input type="hidden" id="import-grid-size" value="16">
             </div>
-            <div class="hint" style="margin-top:8px; text-align:center;">Otomatis diskalakan sesuai grid.</div>
+            <div class="hint" style="margin-top:8px; text-align:center;" data-i18n="imp.scaled">Auto-scaled to the chosen grid.</div>
           </div>
 
           <div style="display:flex; flex-direction:column; gap:10px; font-size:12px; background:var(--surface-warm); padding:12px; border-radius:12px; border:1px solid var(--border-soft);">
             <div>
-              <label class="hint" style="display:block; margin-bottom:4px;">Gaya Warna &amp; Kuantisasi:</label>
+              <label class="hint" style="display:block; margin-bottom:4px;" data-i18n="imp.colorMode">Color mode &amp; quantization:</label>
               <select id="import-color-mode" onchange="processPixelizeImage()" style="width:100%;">
-                <option value="palette" selected>Cocokkan ke Palet Aktif</option>
-                <option value="quantize16">Kuantisasi 16 Warna (Retro)</option>
-                <option value="quantize8">Kuantisasi 8 Warna (Flat)</option>
-                <option value="vibrant">Warna Asli Super Kontras</option>
+                <option value="palette" selected data-i18n="imp.palette">Match active palette</option>
+                <option value="quantize16" data-i18n="imp.q16">16-color quantize (retro)</option>
+                <option value="quantize8" data-i18n="imp.q8">8-color quantize (flat)</option>
+                <option value="vibrant" data-i18n="imp.vibrant">Super-contrast original</option>
               </select>
             </div>
             <div>
               <label class="hint" style="display:block; margin-bottom:4px;">Dithering:</label>
               <select id="import-dither" onchange="processPixelizeImage()" style="width:100%;">
-                <option value="none" selected>Tanpa Dither (Blok Solid)</option>
+                <option value="none" selected data-i18n="imp.ditherNone">No dither (solid blocks)</option>
                 <option value="floyd">Floyd-Steinberg</option>
                 <option value="bayer">Bayer Matrix (4x4)</option>
               </select>
             </div>
             <div>
               <div style="display:flex; justify-content:space-between; margin-bottom:2px;" class="hint">
-                <span>Penguat Kontras Siluet:</span>
+                <span data-i18n="imp.contrast">Silhouette contrast:</span>
                 <span id="contrast-val-label" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--fg);">145%</span>
               </div>
               <input type="range" id="import-contrast" min="100" max="240" value="145" oninput="document.getElementById('contrast-val-label').innerText = this.value + '%'; processPixelizeImage();">
             </div>
             <div>
               <div style="display:flex; justify-content:space-between; margin-bottom:2px;" class="hint">
-                <span>Kepekatan Warna:</span>
+                <span data-i18n="imp.saturation">Saturation:</span>
                 <span id="saturate-val-label" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--fg);">130%</span>
               </div>
               <input type="range" id="import-saturate" min="80" max="220" value="130" oninput="document.getElementById('saturate-val-label').innerText = this.value + '%'; processPixelizeImage();">
@@ -866,10 +873,10 @@
             <div style="padding-top:8px; border-top:1px solid var(--border-soft);">
               <label class="check">
                 <input type="checkbox" id="import-remove-white" checked onchange="processPixelizeImage()">
-                <span>Hapus Background Putih/Terang</span>
+                <span data-i18n="imp.removeWhite">Remove white/light background</span>
               </label>
               <div style="display:flex; align-items:center; gap:8px; padding-left:22px; margin-top:6px;" class="hint">
-                <span style="white-space:nowrap;">Sensitivitas:</span>
+                <span style="white-space:nowrap;" data-i18n="imp.sensitivity">Sensitivity:</span>
                 <input type="range" id="import-white-threshold" min="200" max="254" value="230" oninput="processPixelizeImage()">
               </div>
             </div>
@@ -878,12 +885,12 @@
       </div>
 
       <div style="display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px solid var(--border-soft); flex-shrink:0;">
-        <span class="hint">Tips: geser kotak crop untuk menonjolkan simbol utama.</span>
+        <span class="hint" data-i18n="imp.tip">Tip: drag the crop box to feature the main symbol.</span>
         <div style="display:flex; gap:8px; margin-left:auto;">
-          <button onclick="closeImageImportModal()" class="btn">Batal</button>
+          <button onclick="closeImageImportModal()" class="btn" data-i18n="imp.cancel">Cancel</button>
           <button onclick="applyPixelizedImage()" id="btn-apply-pixelize" disabled class="btn btn-primary">
             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            <span>Terapkan ke Kanvas</span>
+            <span data-i18n="imp.apply">Apply to canvas</span>
           </button>
         </div>
       </div>
@@ -893,6 +900,168 @@
   <div id="toast-container"></div>
 
   <script>
+    // ===== i18n: EN utama (keputusan tiket dvabahasa), ID tersedia =====
+    const I18N = {
+      en: {
+        'app.title': 'Pixico - Store-ready pixel icons',
+        'brand.sub': 'Store-ready pixel icons: Google Play, App Store & Microsoft Store',
+        'hdr.grid': 'Grid', 'hdr.templates': 'Templates', 'hdr.pixelize': 'Pixelize photo',
+        'hdr.save': 'Save', 'hdr.open': 'Open', 'hdr.autosave': 'Autosave',
+        'hdr.saveTip': 'Save a Pixico project file (.pixico)', 'hdr.openTip': 'Open a project file (.pixico / .json)',
+        'hdr.undo': 'Undo (Ctrl+Z)', 'hdr.redo': 'Redo (Ctrl+Y)', 'hdr.clear': 'Clear canvas',
+        'hdr.clearAria': 'Clear canvas', 'hdr.theme': 'Theme', 'hdr.lang': 'Language',
+        'hdr.autosaveTip': 'Saved automatically to local storage',
+        'hdr.themeLight': 'Light',
+        'hdr.themeDark': 'Dark',
+        'palette.pico8': 'PICO-8 (classic)',
+        'tools.title': 'Draw tools', 'tools.shortcuts': 'P, E, B, I, L, R',
+        'tool.pen': 'Pen', 'tool.eraser': 'Erase', 'tool.fill': 'Fill', 'tool.picker': 'Picker',
+        'tool.line': 'Line', 'tool.rect': 'Rect', 'tool.lighten': 'Lighten', 'tool.darken': 'Darken',
+        'tool.penTip': 'Pen (P)', 'tool.eraserTip': 'Eraser (E)', 'tool.fillTip': 'Fill (B)', 'tool.pickerTip': 'Picker (I)',
+        'tool.lineTip': 'Line (L)', 'tool.rectTip': 'Rect (R)', 'tool.lightenTip': 'Lighten (+)', 'tool.darkenTip': 'Darken (-)',
+        'tools.gridLines': 'Grid lines', 'tools.gridTip': 'Show pixel grid lines', 'tools.mirror': 'Mirror', 'tools.mirrorTip': 'Mirror drawing left-right automatically',
+        'palette.title': 'Palette', 'palette.active': 'Active color', 'palette.pick': 'Pick hex',
+        'palette.recent': 'Recent colors', 'palette.recentEmpty': 'Nothing yet',
+        'tip.body': 'Tip: focus on a strong silhouette and high contrast. Icons are viewed at roughly 48 px, so skip microscopic detail.',
+        'canvas.zoomOut': 'Zoom out', 'canvas.zoomIn': 'Zoom in', 'canvas.reset': 'Reset zoom',
+        'canvas.shift': 'Shift pixels:', 'canvas.up': 'Shift up', 'canvas.down': 'Shift down', 'canvas.left': 'Shift left', 'canvas.right': 'Shift right',
+        'canvas.flipX': 'Flip X', 'canvas.flipY': 'Flip Y', 'canvas.rotate': 'Rotate 90 degrees',
+        'bg.title': 'Background & frame', 'bg.style': 'Background style:',
+        'bg.solid': 'Solid color', 'bg.gradient': 'Retro gradient', 'bg.darkslate': 'Dark slate', 'bg.transparent': 'Transparent (game icon)',
+        'bg.color': 'Background color:', 'bg.scale': 'Icon object scale:', 'bg.gloss': 'iOS gloss', 'bg.pixelBorder': 'Pixel border',
+        'preview.title': 'Store preview',
+        'sample.playName': 'Pixel Quest RPG', 'sample.playDev': 'Indie game studio', 'sample.downloads': '500K+ downloads', 'sample.tag': 'sample',
+        'sample.appName': 'Pixel Quest Mobile', 'sample.appDev': 'Retro RPG & action', 'sample.get': 'Get',
+        'hs.yours': 'Your app', 'hs.chat': 'Chat', 'hs.music': 'Music', 'hs.settings': 'Settings',
+        'ms.name': 'Pixico WinApp', 'ms.dev': 'Windows games & utilities', 'ms.get': 'Get', 'ms.free': 'Free',
+        'spec.play': 'Google Play: 512 \u00d7 512 px, 32-bit PNG (max 1MB)',
+        'spec.app': 'App Store: 1024 \u00d7 1024 px, solid PNG (no transparency)',
+        'spec.home': 'Side by side with other apps',
+        'spec.ms': 'Windows: 300\u00d7300 (Store), 44\u00d744 (app list), multi-size .ICO',
+        'export.title': 'Export center', 'export.play': 'Google Play (512\u00d7512)', 'export.app': 'Apple App Store (1024\u00d71024)',
+        'export.ms': 'Microsoft Store (300\u00d7300)', 'export.ico': 'Windows icon (multi-size)', 'export.zip': 'Export all packages (ZIP)',
+        'export.native': 'Native size:',
+        'tpl.title': 'Pick a starter icon', 'tpl.sub': 'Load a starter, make it yours:', 'tpl.close': 'Close',
+        'imp.title': 'Crop & pixelize an image', 'imp.sub': 'Pick the focus area on a HD photo/logo, then convert to blur-free pixel art',
+        'imp.drop': 'Click or drop an image (PNG / JPG / WEBP)', 'imp.dropSub': 'Supports high-res images up to 4K',
+        'imp.focus': 'Focus area (1:1)', 'imp.result': 'Pixel result', 'imp.scaled': 'Auto-scaled to the chosen grid.',
+        'imp.cropSize': 'Crop size:', 'imp.center': 'Center', 'imp.focus50': 'Focus 50%', 'imp.max': 'Max (1:1)',
+        'imp.colorMode': 'Color mode & quantization:', 'imp.palette': 'Match active palette', 'imp.q16': '16-color quantize (retro)',
+        'imp.q8': '8-color quantize (flat)', 'imp.vibrant': 'Super-contrast original',
+        'imp.dither': 'Dithering:', 'imp.ditherNone': 'No dither (solid blocks)', 'imp.floyd': 'Floyd-Steinberg', 'imp.bayer': 'Bayer Matrix (4x4)',
+        'imp.contrast': 'Silhouette contrast:', 'imp.saturation': 'Saturation:', 'imp.removeWhite': 'Remove white/light background', 'imp.sensitivity': 'Sensitivity:',
+        'imp.tip': 'Tip: drag the crop box to feature the main symbol.', 'imp.cancel': 'Cancel', 'imp.apply': 'Apply to canvas',
+        'toast.gridChanged': 'Grid changed to {s}\u00d7{s}',
+        'toast.projectSaved': 'Project file (.pixico) downloaded!',
+        'toast.projectInvalid': 'Invalid project file format',
+        'toast.projectOpenFail': 'Failed to import project file',
+        'toast.projectOpened': 'Project "{name}" opened!',
+        'toast.playExported': 'Google Play icon 512\u00d7512 downloaded!',
+        'toast.appExported': 'App Store icon 1024\u00d71024 downloaded!',
+        'toast.msExported': 'Microsoft Store icon 300\u00d7300 downloaded!',
+        'toast.icoExported': 'Windows icon (multi-size .ico) downloaded!',
+        'toast.icoFail': 'Failed to build .ico',
+        'toast.scaleExported': '{s}\u00d7{s} downloaded!',
+        'toast.zipWorking': 'Compressing Pixico package...',
+        'toast.zipExported': 'Full Pixico package (Android, iOS & Windows ZIP) exported!',
+        'toast.zipFail': 'Failed to build ZIP',
+        'toast.restored': 'Previous project restored automatically!',
+        'toast.symmetryOn': 'Mirror symmetry on',
+        'toast.cleared': 'Canvas cleared',
+        'toast.pixelized': 'HD image converted to pixel art ({s}\u00d7{s})!',
+      },
+      id: {
+        'app.title': 'Pixico - Generator Ikon Store Pixel Art',
+        'brand.sub': 'Ikon pixel siap rilis: Google Play, App Store & Microsoft Store',
+        'hdr.grid': 'Grid', 'hdr.templates': 'Template', 'hdr.pixelize': 'Pixelize Foto',
+        'hdr.save': 'Simpan', 'hdr.open': 'Buka', 'hdr.autosave': 'Autosave',
+        'hdr.saveTip': 'Simpan berkas proyek Pixico (.pixico)', 'hdr.openTip': 'Buka berkas proyek (.pixico / .json)',
+        'hdr.undo': 'Undo (Ctrl+Z)', 'hdr.redo': 'Redo (Ctrl+Y)', 'hdr.clear': 'Kosongkan Kanvas',
+        'hdr.clearAria': 'Kosongkan kanvas', 'hdr.theme': 'Tema', 'hdr.lang': 'Bahasa',
+        'hdr.autosaveTip': 'Tersimpan otomatis di browser lokal',
+        'hdr.themeLight': 'Terang',
+        'hdr.themeDark': 'Gelap',
+        'palette.pico8': 'PICO-8 (Klasik)',
+        'tools.title': 'Alat Gambar', 'tools.shortcuts': 'P, E, B, I, L, R',
+        'tool.pen': 'Pensil', 'tool.eraser': 'Hapus', 'tool.fill': 'Isi', 'tool.picker': 'Pipet',
+        'tool.line': 'Garis', 'tool.rect': 'Kotak', 'tool.lighten': 'Terang', 'tool.darken': 'Gelap',
+        'tool.penTip': 'Pensil (P)', 'tool.eraserTip': 'Penghapus (E)', 'tool.fillTip': 'Ember Cat / Fill (B)', 'tool.pickerTip': 'Pipet Warna (I)',
+        'tool.lineTip': 'Garis Lurus (L)', 'tool.rectTip': 'Kotak / Bingkai (R)', 'tool.lightenTip': 'Efek Terang (+)', 'tool.darkenTip': 'Efek Gelap (-)',
+        'tools.gridLines': 'Kisi Garis', 'tools.gridTip': 'Tampilkan garis kisi pixel', 'tools.mirror': 'Simetri', 'tools.mirrorTip': 'Menggambar otomatis simetris kiri-kanan',
+        'palette.title': 'Palet Warna', 'palette.active': 'Warna Aktif', 'palette.pick': 'Pilih Hex',
+        'palette.recent': 'Riwayat Warna Terpakai', 'palette.recentEmpty': 'Belum ada riwayat',
+        'tip.body': 'Tips: fokus pada siluet kuat dan kontras tinggi. Ikon dilihat pada ukuran \u00b148 px, jadi kurangi detail mikroskopis agar bentuk langsung terbaca.',
+        'canvas.zoomOut': 'Perkecil Kanvas', 'canvas.zoomIn': 'Perbesar Kanvas', 'canvas.reset': 'Reset Zoom',
+        'canvas.shift': 'Geser Pixel:', 'canvas.up': 'Geser ke Atas', 'canvas.down': 'Geser ke Bawah', 'canvas.left': 'Geser ke Kiri', 'canvas.right': 'Geser ke Kanan',
+        'canvas.flipX': 'Flip X', 'canvas.flipY': 'Flip Y', 'canvas.rotate': 'Putar 90 Derajat',
+        'bg.title': 'Latar & Frame Ikon', 'bg.style': 'Gaya Latar:',
+        'bg.solid': 'Warna Solid', 'bg.gradient': 'Gradasi Retro', 'bg.darkslate': 'Dark Slate Modern', 'bg.transparent': 'Transparan (Icon Game)',
+        'bg.color': 'Warna Latar:', 'bg.scale': 'Ukuran Objek dalam Ikon:', 'bg.gloss': 'Efek Kilau (iOS Gloss)', 'bg.pixelBorder': 'Garis Tepi Pixel',
+        'preview.title': 'Pratinjau Store',
+        'sample.playName': 'Petualangan Pixel RPG', 'sample.playDev': 'Studio Game Indie', 'sample.downloads': '500rb+ unduhan', 'sample.tag': 'contoh',
+        'sample.appName': 'Pixel Quest Mobile', 'sample.appDev': 'Game Peran & Aksi Retro', 'sample.get': 'Dapatkan',
+        'hs.yours': 'App Kamu', 'hs.chat': 'Chat', 'hs.music': 'Musik', 'hs.settings': 'Setelan',
+        'ms.name': 'Pixico WinApp', 'ms.dev': 'Game & Utilitas Windows', 'ms.get': 'Dapatkan', 'ms.free': 'Gratis',
+        'spec.play': 'Google Play: 512 \u00d7 512 px, 32-bit PNG (maks 1024KB)',
+        'spec.app': 'App Store: 1024 \u00d7 1024 px, PNG solid (tanpa transparansi)',
+        'spec.home': 'Tampilan berdampingan dengan aplikasi lain',
+        'spec.ms': 'Windows: 300\u00d7300 (Store), 44\u00d744 (App List), multi-size .ICO',
+        'export.title': 'Pusat Ekspor', 'export.play': 'Google Play (512\u00d7512)', 'export.app': 'Apple App Store (1024\u00d71024)',
+        'export.ms': 'Microsoft Store (300\u00d7300)', 'export.ico': 'Windows icon (multi-size)', 'export.zip': 'Ekspor Semua Paket (ZIP)',
+        'export.native': 'Ukuran asli:',
+        'tpl.title': 'Pilih Template Ikon Siap Pakai', 'tpl.sub': 'Pilih template untuk mulai mengedit ikon aplikasimu:', 'tpl.close': 'Tutup',
+        'imp.title': 'Crop & Pixelize Gambar', 'imp.sub': 'Pilih area fokus pada foto/logo HD, lalu konversi ke pixel art tanpa blur',
+        'imp.drop': 'Klik atau seret gambar (PNG / JPG / WEBP) di sini', 'imp.dropSub': 'Mendukung gambar beresolusi tinggi hingga 4K',
+        'imp.focus': 'Pilih Area Fokus (1:1)', 'imp.result': 'Hasil Pixel Art', 'imp.scaled': 'Otomatis diskalakan sesuai grid.',
+        'imp.cropSize': 'Ukuran Area Crop:', 'imp.center': 'Pusat', 'imp.focus50': 'Fokus 50%', 'imp.max': 'Maksimal',
+        'imp.colorMode': 'Gaya Warna & Kuantisasi:', 'imp.palette': 'Cocokkan ke Palet Aktif', 'imp.q16': 'Kuantisasi 16 Warna (Retro)',
+        'imp.q8': 'Kuantisasi 8 Warna (Flat)', 'imp.vibrant': 'Warna Asli Super Kontras',
+        'imp.dither': 'Dithering:', 'imp.ditherNone': 'Tanpa Dither (Blok Solid)', 'imp.floyd': 'Floyd-Steinberg', 'imp.bayer': 'Bayer Matrix (4x4)',
+        'imp.contrast': 'Penguat Kontras Siluet:', 'imp.saturation': 'Kepekatan Warna:', 'imp.removeWhite': 'Hapus Background Putih/Terang', 'imp.sensitivity': 'Sensitivitas:',
+        'imp.tip': 'Tips: geser kotak crop untuk menonjolkan simbol utama.', 'imp.cancel': 'Batal', 'imp.apply': 'Terapkan ke Kanvas',
+        'toast.gridChanged': 'Ukuran grid Pixico diubah ke {s}x{s}',
+        'toast.projectSaved': 'File proyek .pixico berhasil diunduh!',
+        'toast.projectInvalid': 'Format berkas proyek tidak valid',
+        'toast.projectOpenFail': 'Gagal mengimpor file proyek',
+        'toast.projectOpened': 'Proyek "{name}" berhasil dibuka!',
+        'toast.playExported': 'Ikon Google Play 512x512 berhasil diunduh!',
+        'toast.appExported': 'Ikon Apple App Store 1024x1024 berhasil diunduh!',
+        'toast.msExported': 'Ikon Microsoft Store 300x300 berhasil diunduh!',
+        'toast.icoExported': 'File Windows Icon (app.ico multi-ukuran) berhasil diunduh!',
+        'toast.icoFail': 'Gagal membuat file .ico',
+        'toast.scaleExported': 'Ukuran {s}x{s} berhasil diunduh!',
+        'toast.zipWorking': 'Mengompres Paket Pixico...',
+        'toast.zipExported': 'Paket Lengkap Pixico (Android, iOS & Windows ZIP) berhasil diekspor!',
+        'toast.zipFail': 'Gagal membuat paket ZIP',
+        'toast.restored': 'Proyek sebelumnya berhasil dipulihkan otomatis!',
+        'toast.symmetryOn': 'Mode Simetri Cermin aktif',
+        'toast.cleared': 'Kanvas Pixico telah dibersihkan',
+        'toast.pixelized': 'Gambar HD berhasil dikonversi ke pixel art ({s}x{s})!',
+      }
+    };
+    let currentLang = 'en';
+    function t(key, vars) {
+      let s = (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key;
+      if (vars) for (const k in vars) s = s.split('{' + k + '}').join(vars[k]);
+      return s;
+    }
+    function applyLang(lang) {
+      currentLang = I18N[lang] ? lang : 'en';
+      document.documentElement.lang = currentLang;
+      localStorage.setItem('pixico-lang', currentLang);
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+      document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
+      document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+      document.title = t('app.title');
+      const en = document.getElementById('lang-en'), id = document.getElementById('lang-id');
+      if (en && id) {
+        en.className = currentLang === 'en' ? 'seg-on' : 'seg-off';
+        id.className = currentLang === 'id' ? 'seg-on' : 'seg-off';
+      }
+    }
+    function setLang(lang) { applyLang(lang); }
+    applyLang(document.documentElement.lang || 'en');
+
     // State variables
     let gridSize = 16;
     let canvasPixels = []; // 2D array: grid[y][x] = hexColor or null
@@ -1033,7 +1202,7 @@
       redrawMainCanvas();
       drawGrid();
       updateStorePreviews();
-      showToast(`Ukuran grid Pixico diubah ke ${size}x${size}`);
+      showToast(t('toast.gridChanged', { s: size }));
     }
 
     function drawGrid() {
@@ -1076,7 +1245,7 @@
     function toggleSymmetry(enabled) {
       symmetry = enabled;
       drawGrid();
-      if (symmetry) showToast("Mode Simetri Cermin aktif");
+      if (symmetry) showToast(t('toast.symmetryOn'));
     }
 
     function redrawMainCanvas() {
@@ -1388,7 +1557,7 @@
       const jsonStr = JSON.stringify(projectPayload, null, 2);
       const blob = new Blob([jsonStr], { type: 'application/json' });
       downloadBlob(blob, `proyek-pixico-${gridSize}x${gridSize}.pixico`);
-      showToast('File proyek .pixico berhasil diunduh!');
+      showToast(t('toast.projectSaved'));
     }
 
     function loadProjectFile(event) {
@@ -1400,14 +1569,14 @@
         try {
           const parsed = JSON.parse(e.target.result);
           if (!parsed.gridSize || !Array.isArray(parsed.canvasPixels)) {
-            showToast('Format berkas proyek tidak valid', 'error');
+            showToast(t('toast.projectInvalid'), 'error');
             return;
           }
           applyProjectData(parsed);
-          showToast(`Proyek "${file.name}" berhasil dibuka!`);
+          showToast(t('toast.projectOpened', { name: file.name }));
         } catch (err) {
           console.error(err);
-          showToast('Gagal mengimpor file proyek', 'error');
+          showToast(t('toast.projectOpenFail'), 'error');
         } finally {
           event.target.value = '';
         }
@@ -1502,7 +1671,7 @@
       redrawMainCanvas();
       pushHistory();
       updateStorePreviews();
-      showToast("Kanvas Pixico telah dibersihkan");
+      showToast(t('toast.cleared'));
     }
 
     // Transformations: Shift, Flip, Rotate
@@ -1720,7 +1889,7 @@
       exportCanvas.toBlob((blob) => {
         if (blob) {
           downloadBlob(blob, 'google-play-icon-512x512.png');
-          showToast('Ikon Google Play 512x512 berhasil diunduh!');
+          showToast(t('toast.playExported'));
         }
       }, 'image/png');
     }
@@ -1731,7 +1900,7 @@
       exportCanvas.toBlob((blob) => {
         if (blob) {
           downloadBlob(blob, 'app-store-icon-1024x1024.png');
-          showToast('Ikon Apple App Store 1024x1024 berhasil diunduh!');
+          showToast(t('toast.appExported'));
         }
       }, 'image/png');
     }
@@ -1742,7 +1911,7 @@
       exportCanvas.toBlob((blob) => {
         if (blob) {
           downloadBlob(blob, 'microsoft-store-logo-300x300.png');
-          showToast('Ikon Microsoft Store 300x300 berhasil diunduh!');
+          showToast(t('toast.msExported'));
         }
       }, 'image/png');
     }
@@ -1792,10 +1961,10 @@
         }
         const icoBlob = await createIcoFromPngBlobs(entries);
         downloadBlob(icoBlob, 'app.ico');
-        showToast('File Windows Icon (app.ico multi-ukuran) berhasil diunduh!');
+        showToast(t('toast.icoExported'));
       } catch (err) {
         console.error(err);
-        showToast('Gagal membuat file .ico', 'error');
+        showToast(t('toast.icoFail'), 'error');
       }
     }
 
@@ -1820,7 +1989,7 @@
       offscreen.toBlob((blob) => {
         if (blob) {
           downloadBlob(blob, `pixico-${size}x${size}.png`);
-          showToast(`Ukuran ${size}x${size} berhasil diunduh!`);
+          showToast(t('toast.scaleExported', { s: size }));
         }
       });
     }
@@ -1830,7 +1999,7 @@
       const originalText = zipBtn.innerHTML;
       zipBtn.innerHTML = `
         <svg class="zip-spin" style="width:14px;height:14px;color:inherit;margin-right:6px;" fill="none" viewBox="0 0 24 24"><circle style="opacity:.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path style="opacity:.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-        <span>Mengompres Paket Pixico...</span>
+        <span>${t('toast.zipWorking')}</span>
       `;
 
       try {
@@ -1919,10 +2088,10 @@
         // Generate and download
         const content = await zip.generateAsync({ type: "blob" });
         downloadBlob(content, "Pixico_Store_Icon_Package.zip");
-        showToast("Paket Lengkap Pixico (Android, iOS & Windows ZIP) berhasil diekspor!");
+        showToast(t('toast.zipExported'));
       } catch (err) {
         console.error(err);
-        showToast("Gagal membuat paket ZIP", "error");
+        showToast(t('toast.zipFail'), 'error');
       } finally {
         zipBtn.innerHTML = originalText;
       }
@@ -2714,7 +2883,7 @@
       pushHistory();
       updateStorePreviews();
       closeImageImportModal();
-      showToast(`Gambar HD berhasil dikonversi ke pixel art (${targetGrid}x${targetGrid})!`);
+      showToast(t('toast.pixelized', { s: targetGrid }));
     }
 
     function showToast(message, type = 'success') {
@@ -2800,7 +2969,7 @@
           redrawMainCanvas();
           drawGrid();
           updateStorePreviews();
-          showToast('Proyek sebelumnya berhasil dipulihkan otomatis!');
+          showToast(t('toast.restored'));
           return;
         } catch (e) {
           console.warn('Gagal memulihkan autosave:', e);
