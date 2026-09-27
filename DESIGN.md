@@ -115,3 +115,7 @@ Centered 600px: H2 “Make an icon worth tapping.”, lead “Free to doodle. Ex
 - Breakpoints: 920px grids stack, 760px nav links hide, 640px log-rows stack. Canvas `width:min(100%,440px)` scales; previews 3→1 col via grid-1col fallback.
 - Touch: pointer events + `setPointerCapture`, 44px+ primary CTAs, tool buttons ~56px tall.
 - Gaps to close next pass: wire localStorage autosave, add photo→pixel uploader (copy promises it), add 1024/ICO export targets, honor 16-grid for bow loader, add range/brush-size control (CSS exists, input missing).
+
+## 10. Dark variant (approved by owner, 2026-09-27)
+
+Tema gelap sebagai varian resmi (toggle di header, tersimpan di `pixico-theme`, first-run mengikuti `prefers-color-scheme`). Token dark: `--bg #1d1d1f`, `--surface #2c2c2e`, `--surface-warm #242426`, `--fg #f5f5f7`, `--muted #a1a1a6`, `--border #3a3a3c`, `--border-soft #323234`, `--accent #0a84ff` (padanan Apple dark), `--stage #000000`. Komponen ink-on-white (`seg-on`, brand-mark, toast) terbalik di dark. Mockup store/home-screen tetap mensimulasikan tampilan channel aslinya di kedua tema. Kedua mode wajib lolos kontras (R-34).

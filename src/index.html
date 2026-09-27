@@ -7,6 +7,14 @@
 
   <meta name="description" content="Pixico - Aplikasi pembuat dan konverter ikon pixel art profesional siap rilis untuk Google Play Store (512x512), Apple App Store (1024x1024), dan Microsoft Store / Windows MSIX.">
   <meta name="author" content="Pixico">
+  <script>
+    // Tema: preferensi tersimpan > preferensi sistem > light (identitas DESIGN.md)
+    (function () {
+      const saved = localStorage.getItem('pixico-theme');
+      const theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
 
   <!-- JSZip untuk ekspor paket ZIP multi-ukuran -->
   <script src="vendor/jszip.min.js"></script>
@@ -37,6 +45,31 @@
     }
 
     * { box-sizing: border-box; }
+
+    :root { color-scheme: light; }
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #1d1d1f;
+      --surface: #2c2c2e;
+      --surface-warm: #242426;
+      --fg: #f5f5f7;
+      --muted: #a1a1a6;          /* 6.4:1 di atas #1d1d1f */
+      --border: #3a3a3c;
+      --border-soft: #323234;
+      --accent: #0a84ff;         /* accent Apple dark: 4.6:1 di atas #1d1d1f */
+      --accent-hover: #409cff;
+      --accent-active: #0060df;
+      --stage: #000000;
+      --shadow-raised: 0 12px 32px rgba(0, 0, 0, 0.5);
+    }
+    /* Komponen yang memakai ink+putih terbalik di dark (R-34: kedua mode berfungsi) */
+    [data-theme="dark"] .seg-on { background: #f5f5f7; color: #1d1d1f; }
+    [data-theme="dark"] .brand-mark { background: #f5f5f7; color: #1d1d1f; }
+    [data-theme="dark"] .toast { background: #f5f5f7; color: #1d1d1f; border-color: #f5f5f7; }
+    [data-theme="dark"] .toast.toast-error { background: #ff453a; color: #fff; border-color: #ff453a; }
+    [data-theme="dark"] .btn-danger { color: #ff453a; }
+    [data-theme="dark"] #theme-toggle .icon-moon { display: none; }
+    :root:not([data-theme="dark"]) #theme-toggle .icon-sun { display: none; }
 
     body {
       margin: 0;
@@ -74,7 +107,7 @@
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand-mark {
       width: 36px; height: 36px; border-radius: 9px;
-      background: var(--fg);                  /* alasan: logo solid ink, tanpa gradient (audit #5) */
+      background: var(--fg); color: var(--bg);   /* alasan: logo solid (audit #5); warna ikut token agar dark mode benar */
       display: grid; place-items: center; flex-shrink: 0;
     }
     .brand h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
@@ -291,7 +324,7 @@
   <header class="topnav">
     <div class="brand">
       <div class="brand-mark" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 16 16" shape-rendering="crispEdges" fill="#ffffff">
+        <svg width="20" height="20" viewBox="0 0 16 16" shape-rendering="crispEdges" fill="currentColor">
           <rect x="4" y="2" width="8" height="2"/><rect x="4" y="4" width="2" height="2"/><rect x="10" y="4" width="2" height="2"/>
           <rect x="4" y="6" width="2" height="8"/><rect x="10" y="6" width="2" height="4"/>
         </svg>
@@ -325,6 +358,10 @@
         <span class="dot"></span><span>Autosave</span>
       </div>
 
+      <button onclick="toggleTheme()" id="theme-toggle" class="btn btn-icon" title="Ganti tema terang/gelap" aria-label="Ganti tema terang/gelap">
+        <svg class="icon-moon" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        <svg class="icon-sun" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      </button>
       <button onclick="undo()" id="undo-btn" title="Undo (Ctrl+Z)" class="btn btn-icon" aria-label="Undo">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a5 5 0 015 5v2m0 0l-4-4m4 4l4-4M3 10l4-4m-4 4l4 4"/></svg>
       </button>
@@ -347,7 +384,7 @@
           <span style="font-weight:400; text-transform:none; letter-spacing:0;">P, E, B, I, L, R</span>
         </h2>
         <div class="tools-grid">
-          <button onclick="setTool('pen')" id="tool-pen" title="Pensil (P)" class="tool-btn" style="background: var(--fg); color:#fff;">
+          <button onclick="setTool('pen')" id="tool-pen" title="Pensil (P)" class="tool-btn seg-on">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             <span>Pensil</span>
           </button>
@@ -646,7 +683,7 @@
 
         <button onclick="exportGooglePlayIcon()" class="export-btn">
           <span style="display:flex; align-items:center; gap:8px;">
-            <span class="export-chip" style="background:#16a34a;">
+            <span class="export-chip" style="background:#16a34a; color:#fff;">
               <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M3.609 1.814L13.792 12 3.61 22.186a2.127 2.127 0 01-.61-1.503V3.317c0-.585.226-1.12.61-1.503zM15.207 13.414l2.457 2.457-11.83 6.654 9.373-9.111zm2.457-5.242L15.207 10.6 5.834 1.475l11.83 6.697zm1.186 1.828l3.654 2.066c.928.525.928 1.465 0 1.99l-3.654 2.067-2.073-2.074 2.073-2.049z"/></svg>
             </span>
             <span>Google Play (512×512)</span>
@@ -656,7 +693,7 @@
 
         <button onclick="exportAppStoreIcon()" class="export-btn">
           <span style="display:flex; align-items:center; gap:8px;">
-            <span class="export-chip" style="background:#1d1d1f;">
+            <span class="export-chip" style="background:var(--fg); color:var(--bg);">
               <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.9.04-2.01.62-2.66 1.38-.57.65-1.07 1.73-.97 2.76.99.08 2.01-.52 2.62-1.27z"/></svg>
             </span>
             <span>Apple App Store (1024×1024)</span>
@@ -666,7 +703,7 @@
 
         <button onclick="exportMicrosoftStoreIcon()" class="export-btn">
           <span style="display:flex; align-items:center; gap:8px;">
-            <span class="export-chip" style="background:#0b63c5;">
+            <span class="export-chip" style="background:#0b63c5; color:#fff;">
               <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.8"/></svg>
             </span>
             <span>Microsoft Store (300×300)</span>
@@ -676,7 +713,7 @@
 
         <button onclick="exportWindowsIco()" class="export-btn">
           <span style="display:flex; align-items:center; gap:8px;">
-            <span class="export-chip" style="background:var(--muted);">
+            <span class="export-chip" style="background:var(--muted); color:var(--bg);">
               <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </span>
             <span>Windows Icon (multi-size)</span>
@@ -2702,6 +2739,15 @@
         toast.classList.remove('toast-show');
         setTimeout(() => toast.remove(), 300);
       }, 3000);
+    }
+
+    // Theme toggle (R-21/R-34: pilihan pengguna, kedua mode berfungsi)
+    function applyTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem('pixico-theme', theme);
+    }
+    function toggleTheme() {
+      applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
     }
 
     // Keyboard Shortcuts
