@@ -1,10 +1,10 @@
-# Privacy Policy — Pixico Studio
+# Privacy Policy — Pixico
 
 Last updated: September 27, 2026
 
-Pixico Studio is a desktop application for creating and converting pixel-art icons, ready for app-store release.
+Pixico is a desktop application for creating and converting pixel-art icons, ready for app-store release.
 
-**We collect nothing.** Pixico Studio:
+**We collect nothing.** Pixico:
 
 - runs entirely on your device and works fully offline;
 - does not collect, store, transmit, or share any personal information, usage data, or telemetry;
@@ -13,7 +13,7 @@ Pixico Studio is a desktop application for creating and converting pixel-art ico
 
 Your icons, images, and projects are processed locally on your device and never leave it unless you choose to export or share them yourself.
 
-**Microsoft Store.** If you installed Pixico Studio through the Microsoft Store, Microsoft's own privacy practices apply to the download, update, and payment processes of the Store itself. See the [Microsoft Privacy Statement](https://privacy.microsoft.com/privacystatement).
+**Microsoft Store.** If you installed Pixico through the Microsoft Store, Microsoft's own privacy practices apply to the download, update, and payment processes of the Store itself. See the [Microsoft Privacy Statement](https://privacy.microsoft.com/privacystatement).
 
 **Changes.** If this policy ever changes, the updated version will be published here and in the app's store listing, with a new "last updated" date.
 

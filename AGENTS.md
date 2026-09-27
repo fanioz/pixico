@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Pixico Studio — a single-file HTML app (`pixico_studio.html`) that generates and converts pixel-art icons ready for app-store release (Google Play 512×512, Apple App Store 1024×1024, Microsoft Store / MSIX).
+Pixico — a single-file HTML app (`pixico_studio.html`) that generates and converts pixel-art icons ready for app-store release (Google Play 512×512, Apple App Store 1024×1024, Microsoft Store / MSIX).
 
 ## Agent skills
 
