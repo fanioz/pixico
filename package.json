@@ -2,7 +2,8 @@
   "name": "pixico-desktop",
   "private": true,
   "scripts": {
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "test": "node --test"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2"
