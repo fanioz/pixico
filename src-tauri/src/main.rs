@@ -1,5 +1,5 @@
 // PROTOTYPE (branch prototype/desktop-wrap, tiket #4): wrapper Tauri minimum
-// untuk memvalidasi Pixico Studio jalan offline sebagai app desktop.
+// untuk memvalidasi Pixico jalan offline sebagai app desktop.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
