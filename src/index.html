@@ -6,233 +6,394 @@
   <title>Pixico - Generator Ikon Store Pixel Art</title>
 
   <meta name="description" content="Pixico - Aplikasi pembuat dan konverter ikon pixel art profesional siap rilis untuk Google Play Store (512x512), Apple App Store (1024x1024), dan Microsoft Store / Windows MSIX.">
-  <meta name="keywords" content="pixel art icon, app store icon generator, google play icon maker, retro icon, msix icon, ico generator">
   <meta name="author" content="Pixico">
-  <meta name="theme-color" content="#0f172a">
 
-  <!-- OpenGraph / Facebook / WhatsApp Share Preview -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Pixico - Generator Ikon Store Pixel Art">
-  <meta property="og:description" content="Rancang dan konversi ikon retro pixel-perfect siap submit ke Google Play Store, iOS App Store, dan Windows 11 secara instan.">
-  <meta property="og:image" content="https://placehold.co/1200x630/0f172a/6366f1?text=Pixico+•+Store-Ready+Pixel+Icons">
-
-  <!-- Twitter / X Card Preview -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Pixico - Generator Ikon Store Pixel Art">
-  <meta name="twitter:description" content="Generator ikon pixel art multi-platform: Google Play, Apple App Store, & Windows. 100% Client-side.">
-  <meta name="twitter:image" content="https://placehold.co/1200x630/0f172a/6366f1?text=Pixico+•+Store-Ready+Pixel+Icons">
-
-  <!-- Inline Crisp Retro Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%236366f1'/><rect x='25' y='25' width='50' height='50' fill='%23ffffff'/><rect x='40' y='40' width='20' height='20' fill='%236366f1'/></svg>">
-
-  <!-- Tailwind CSS -->
-  <script src="vendor/tailwind.js"></script>
   <!-- JSZip untuk ekspor paket ZIP multi-ukuran -->
   <script src="vendor/jszip.min.js"></script>
-  <!-- Google Fonts: Inter & Press Start 2P untuk aksen pixel retro -->
-  <link rel="stylesheet" href="fonts/fonts.css">
 
+  <!--
+    Skin: DESIGN.md (Aesthetic Pixel Studio) — Apple-system light.
+    Keputusan identitas: ADR-0003. Alasan tiap keputusan besar ada di komentar seksi.
+  -->
   <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f5f5f7;
+      --surface-warm: #fbfbfd;
+      --fg: #1d1d1f;
+      --muted: #6e6e73;          /* teks sekunder: 4.5:1 di atas putih */
+      --border: #d2d2d7;
+      --border-soft: #e8e8ed;
+      --accent: #0071e3;
+      --accent-hover: #0077ed;
+      --accent-active: #0066cc;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --stage: #1d1d1f;          /* kanvas sengaja gelap agar pixel pop — alasan: kontras artefak */
+      --motion-fast: 150ms;
+      --motion-base: 220ms;
+      --ease-standard: cubic-bezier(0.28, 0, 0.22, 1);
+      --shadow-raised: 0 12px 32px rgba(0, 0, 0, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: 'Inter', sans-serif;
+      margin: 0;
+      font-family: -apple-system, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
     }
-    .font-pixel {
-      font-family: 'Press Start 2P', monospace;
+    ::selection { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+
+    /* Fokus terlihat untuk semua kontrol (R-32) */
+    :is(button, select, input, label[tabindex], a):focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent);
+      border-radius: 8px;
     }
-    /* Checkerboard pattern for canvas transparency */
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--surface-warm); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    /* ---------- Header ---------- */
+    header.topnav {
+      position: sticky; top: 0; z-index: 40;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(14px);           /* dosis glass: hanya header */
+      border-bottom: 1px solid var(--border-soft);
+      padding: 10px 16px;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: var(--fg);                  /* alasan: logo solid ink, tanpa gradient (audit #5) */
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .brand h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
+    .brand .sub { font-size: 12px; color: var(--muted); }
+    .eyebrow {
+      font-family: "SF Mono", ui-monospace, Menlo, monospace;
+      font-size: 10px; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 500; color: var(--fg);
+      background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; cursor: pointer;
+      transition: background var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard);
+    }
+    .btn:hover { border-color: var(--fg); }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary {
+      background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600;
+    }
+    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-ghost { border-color: transparent; background: transparent; }
+    .btn-ghost:hover { color: var(--accent); border-color: transparent; }
+    .btn-icon { padding: 6px; }
+    .btn-danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 30%, transparent); }
+    .btn-danger:hover { background: color-mix(in srgb, var(--danger) 8%, transparent); border-color: var(--danger); }
+    .btn:disabled { opacity: 0.4; cursor: default; }
+
+    .seg { display: inline-flex; align-items: center; gap: 2px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 9px; padding: 2px; }
+    .seg-label { font-size: 11px; color: var(--muted); padding: 0 6px; }
+    .seg-off, .seg-on {
+      font-size: 11px; font-weight: 600; border-radius: 7px; padding: 4px 8px;
+      border: none; background: transparent; color: var(--muted); cursor: pointer;
+      transition: background var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard);
+    }
+    .seg-off:hover { color: var(--fg); }
+    .seg-on { background: var(--fg); color: #fff; }   /* alasan: segmen aktif = ink fill, satu aksen di tempat kerja */
+
+    .badge-autosave {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: "SF Mono", ui-monospace, monospace; font-size: 10px; color: var(--success);
+      border: 1px solid var(--border-soft); border-radius: 7px; padding: 4px 7px;
+    }
+    .badge-autosave .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+    /* ---------- Layout ---------- */
+    main.workspace {
+      flex: 1; width: 100%; max-width: 1600px; margin: 0 auto;
+      padding: 14px; display: grid; grid-template-columns: 1fr; gap: 14px; align-items: start;
+    }
+    @media (min-width: 1024px) {
+      main.workspace { grid-template-columns: 3fr 5fr 4fr; padding: 16px; }
+      .col-left { order: 1; } .col-center { order: 2; } .col-right { order: 3; }
+    }
+    .col-left, .col-center, .col-right { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+    .card {
+      background: var(--bg); border: 1px solid var(--border-soft); border-radius: 14px; padding: 14px;
+    }
+    .card-label {
+      font-family: "SF Mono", ui-monospace, monospace;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 10px;
+    }
+    .hint { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+    /* ---------- Tools ---------- */
+    .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .tool-btn {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      padding: 8px 4px; border-radius: 10px; font-size: 11px; font-weight: 500;
+      background: var(--surface-warm); color: var(--fg); border: 1px solid var(--border-soft); cursor: pointer;
+      transition: background var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard);
+    }
+    .tool-btn:hover { border-color: var(--border); }
+    .tool-btn svg { width: 16px; height: 16px; }
+
+    .toggles-row { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-soft); font-size: 12px; }
+    .check { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; color: var(--fg); }
+    input[type="checkbox"] { accent-color: var(--accent); width: 15px; height: 15px; }
+    input[type="range"] { accent-color: var(--accent); width: 100%; cursor: pointer; }
+
+    select, input[type="text"] {
+      font-size: 12px; color: var(--fg); background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px;
+    }
+
+    /* ---------- Palette ---------- */
+    .current-color-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+      background: var(--surface); border: 1px solid var(--border-soft); border-radius: 10px; padding: 8px;
+    }
+    .current-color-preview {
+      width: 32px; height: 32px; border-radius: 8px; border: 2px solid #fff;
+      box-shadow: 0 0 0 1px var(--border); cursor: pointer; flex-shrink: 0;
+    }
+    .swatch { width: 24px; height: 24px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.25); cursor: pointer; flex-shrink: 0; transition: transform var(--motion-fast) var(--ease-standard); }
+    .swatch:hover { transform: scale(1.1); }
+    .swatch:active { transform: scale(0.95); }
+    .recent-dot { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--border); cursor: pointer; flex-shrink: 0; transition: transform var(--motion-fast) var(--ease-standard); }
+    .recent-dot:hover { transform: scale(1.1); }
+    .recent-empty { font-size: 11px; color: var(--muted); font-style: italic; }   /* 4.5:1 di atas putih — fix audit #1 */
+
+    /* ---------- Canvas stage ---------- */
+    .stage-wrap {
+      background: var(--stage); border-radius: 14px; border: 1px solid var(--border-soft);
+      padding: 10px; display: flex; align-items: center; justify-content: center; max-width: 100%;
+    }
     .bg-checker {
-      background-color: #1e293b;
-      background-image: 
-        linear-gradient(45deg, #0f172a 25%, transparent 25%), 
-        linear-gradient(-45deg, #0f172a 25%, transparent 25%), 
-        linear-gradient(45deg, transparent 75%, #0f172a 75%), 
-        linear-gradient(-45deg, transparent 75%, #0f172a 75%);
+      background-color: #2c2c2e;
+      background-image:
+        linear-gradient(45deg, #1d1d1f 25%, transparent 25%),
+        linear-gradient(-45deg, #1d1d1f 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #1d1d1f 75%),
+        linear-gradient(-45deg, transparent 75%, #1d1d1f 75%);
       background-size: 16px 16px;
-      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0;
     }
-    .canvas-crisp {
-      image-rendering: -moz-crisp-edges;
-      image-rendering: -webkit-crisp-edges;
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
+    .canvas-crisp { image-rendering: pixelated; }
+    #canvas-wrapper {
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);   /* alasan: angkat kanvas di atas stage gelap */
+      border-radius: 4px; cursor: crosshair; user-select: none;
+      transition: transform 75ms var(--ease-standard); transform-origin: center;
     }
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+    #gridCanvas { position: absolute; inset: 0; pointer-events: none; }
+    .stage-meta { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 10px; font-size: 12px; color: var(--muted); }
+    .dim-chip { font-family: "SF Mono", ui-monospace, monospace; font-size: 11px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 7px; padding: 3px 8px; color: var(--fg); }
+    .mini-btn { font-size: 11px; padding: 3px 8px; border-radius: 7px; border: 1px solid var(--border); background: var(--bg); color: var(--fg); cursor: pointer; font-family: "SF Mono", ui-monospace, monospace; }
+    .mini-btn:hover { border-color: var(--fg); }
+    .transform-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; width: 100%; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-soft); font-size: 11px; color: var(--muted); }
+
+    /* ---------- Store mockups (pratinjau = simulasi channel asli) ---------- */
+    .mock-tabs { display: flex; flex-wrap: wrap; gap: 2px; background: var(--surface); border-radius: 9px; padding: 2px; }
+    .mock-card { background: var(--surface-warm); border: 1px solid var(--border-soft); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; }
+    .mock-spec { font-size: 10px; color: var(--muted); text-align: center; margin: 10px 0 0; font-family: "SF Mono", ui-monospace, monospace; }
+    .sample-tag { font-size: 9px; background: var(--surface); border: 1px solid var(--border-soft); color: var(--muted); border-radius: 5px; padding: 1px 5px; }  /* label kejujuran konten demo */
+    .store-pill { display: inline-block; background: var(--accent); color: #fff; font-size: 10px; font-weight: 600; border-radius: 999px; padding: 3px 12px; }
+    .homescreen {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center;
+      background: linear-gradient(180deg, #dfe7f2, #cfd9ea);   /* alasan: meniru wallpaper light OS, bagian simulasi */
+      border: 1px solid var(--border-soft); border-radius: 12px; padding: 12px;
     }
-    ::-webkit-scrollbar-track {
-      background: #0f172a;
+    .hs-icon { width: 44px; height: 44px; border-radius: 22%; display: grid; place-items: center; color: #fff; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.12); }
+    .hs-label { font-size: 9px; color: #3a3a3c; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .taskbar { background: rgba(28, 28, 30, 0.92); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); height: 40px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; }
+
+    /* ---------- Export ---------- */
+    .export-btn {
+      width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg);
+      font-size: 12px; font-weight: 500; color: var(--fg); cursor: pointer; margin-bottom: 8px;
+      transition: border-color var(--motion-fast) var(--ease-standard), background var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard);
     }
-    ::-webkit-scrollbar-thumb {
-      background: #334155;
-      border-radius: 4px;
+    .export-btn:hover { border-color: var(--fg); }
+    .export-btn:active { transform: translateY(1px); }
+    .export-chip { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; color: #fff; flex-shrink: 0; }
+    .export-fmt { font-family: "SF Mono", ui-monospace, monospace; font-size: 10px; font-weight: 700; color: var(--muted); border: 1px solid var(--border-soft); border-radius: 5px; padding: 2px 6px; }
+
+    /* ---------- Modal (blur hanya di overlay — dosis R-10) ---------- */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 50; display: none;
+      background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 16px;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #475569;
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--bg); border: 1px solid var(--border-soft); border-radius: 18px;
+      box-shadow: var(--shadow-raised); padding: 20px; width: 100%;
+      animation: modal-in var(--motion-base) var(--ease-standard);
+    }
+    @keyframes modal-in { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+
+    .tpl-item {
+      padding: 10px; border-radius: 12px; border: 1px solid var(--border-soft); cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      transition: border-color var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard);
+    }
+    .tpl-item:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .tpl-prev { width: 48px; height: 48px; border-radius: 8px; border: 1px solid var(--border-soft); image-rendering: pixelated; background: var(--stage); }
+    .tpl-label { font-size: 12px; font-weight: 600; text-align: center; }
+
+    .toast {
+      display: flex; align-items: center; gap: 8px; max-width: 340px;
+      padding: 10px 14px; border-radius: 12px; font-size: 12px; font-weight: 500;
+      background: var(--fg); color: #fff; border: 1px solid var(--fg);
+      box-shadow: var(--shadow-raised); pointer-events: none;
+      transition: transform 300ms var(--ease-standard), opacity 300ms var(--ease-standard);
+      transform: translateY(8px); opacity: 0;
+    }
+    .toast.toast-error { background: var(--danger); border-color: var(--danger); }
+    .toast svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    .dropzone { border: 2px dashed var(--border); border-radius: 12px; padding: 12px; text-align: center; cursor: pointer; transition: border-color var(--motion-fast) var(--ease-standard); background: var(--surface-warm); }
+    .dropzone:hover { border-color: var(--accent); }
+
+    .crop-stage { position: relative; width: 100%; height: 260px; background: var(--surface); border-radius: 10px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; user-select: none; }
+
+    #toast-container { position: fixed; bottom: 16px; right: 16px; z-index: 60; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .hidden { display: none !important; }
+    .flex { display: flex; }
+    @media (max-width: 640px) {
+      header.topnav { padding: 10px 12px; }
+      main.workspace { padding: 10px; }
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+<body>
 
-  <!-- Header & Brand Bar -->
-  <header class="border-b border-slate-800 bg-slate-900 sticky top-0 z-40 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-md">
-    <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center border border-indigo-500">
-        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+  <!-- Header: logo solid ink (audit #5), satu baris brand + aksi cepat -->
+  <header class="topnav">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 16 16" shape-rendering="crispEdges" fill="#ffffff">
+          <rect x="4" y="2" width="8" height="2"/><rect x="4" y="4" width="2" height="2"/><rect x="10" y="4" width="2" height="2"/>
+          <rect x="4" y="6" width="2" height="8"/><rect x="10" y="6" width="2" height="4"/>
         </svg>
       </div>
       <div>
-        <div class="flex items-center gap-2">
-          <h1 class="text-base font-bold tracking-tight text-white">Pixico <span class="text-indigo-400 font-pixel text-xs">Studio</span></h1>
-          <span class="text-[10px] font-pixel bg-indigo-950/80 text-indigo-400 border border-indigo-700/50 px-1.5 py-0.5 rounded">STORE READY</span>
-        </div>
-        <p class="text-xs text-slate-400 hidden sm:block">Pixel-Perfect Icons for Google Play, App Store & Microsoft Store</p>
+        <h1>Pixico</h1>
+        <div class="sub">Ikon pixel siap rilis: Google Play, App Store &amp; Microsoft Store</div>
       </div>
     </div>
 
-    <!-- Quick Actions & Canvas Dimensions -->
-    <div class="flex items-center flex-wrap gap-2">
-      <!-- Resolution selector -->
-      <div class="flex items-center bg-slate-800 rounded-lg p-1 border border-slate-700">
-        <span class="text-xs text-slate-400 px-2 font-medium">Grid:</span>
-        <button onclick="setGridSize(16)" id="grid-btn-16" class="px-2.5 py-1 text-xs font-semibold rounded-md transition bg-indigo-600 text-white shadow">16x16</button>
-        <button onclick="setGridSize(24)" id="grid-btn-24" class="px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white">24x24</button>
-        <button onclick="setGridSize(32)" id="grid-btn-32" class="px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white">32x32</button>
-        <button onclick="setGridSize(48)" id="grid-btn-48" class="px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white">48x48</button>
-        <button onclick="setGridSize(64)" id="grid-btn-64" class="px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white">64x64</button>
+    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+      <div class="seg" role="group" aria-label="Ukuran grid">
+        <span class="seg-label">Grid</span>
+        <button onclick="setGridSize(16)" id="grid-btn-16" class="seg-on">16</button>
+        <button onclick="setGridSize(24)" id="grid-btn-24" class="seg-off">24</button>
+        <button onclick="setGridSize(32)" id="grid-btn-32" class="seg-off">32</button>
+        <button onclick="setGridSize(48)" id="grid-btn-48" class="seg-off">48</button>
+        <button onclick="setGridSize(64)" id="grid-btn-64" class="seg-off">64</button>
       </div>
 
-      <!-- Action buttons -->
-      <button onclick="openTemplateModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium rounded-lg text-slate-200 transition">
-        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-        Template
-      </button>
+      <button onclick="openTemplateModal()" class="btn">Template</button>
+      <button onclick="openImageImportModal()" class="btn">Pixelize Foto</button>
 
-      <button onclick="openImageImportModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium rounded-lg text-slate-200 transition">
-        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-        Pixelize Foto
-      </button>
-
-      <!-- Project Save & Load Actions -->
-      <div class="flex items-center bg-slate-800 rounded-lg p-0.5 border border-slate-700">
-        <button onclick="exportProjectFile()" title="Simpan berkas proyek Pixico (.pixico)" class="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-200 hover:text-white hover:bg-slate-700 rounded transition">
-          <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-          <span class="hidden sm:inline">Simpan</span>
-        </button>
-        <button onclick="document.getElementById('project-file-input').click()" title="Buka berkas proyek (.pixico / .json)" class="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-200 hover:text-white hover:bg-slate-700 rounded transition">
-          <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-          <span class="hidden sm:inline">Buka</span>
-        </button>
+      <div class="seg" role="group" aria-label="Berkas proyek">
+        <button onclick="exportProjectFile()" title="Simpan berkas proyek Pixico (.pixico)" class="seg-off">Simpan</button>
+        <button onclick="document.getElementById('project-file-input').click()" title="Buka berkas proyek (.pixico / .json)" class="seg-off">Buka</button>
         <input type="file" id="project-file-input" accept=".pixico,.json" class="hidden" onchange="loadProjectFile(event)">
       </div>
 
-      <!-- Autosave Status Badge -->
-      <div id="autosave-badge" title="Tersimpan otomatis di browser lokal" class="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded bg-slate-900 border border-slate-800 text-[10px] text-emerald-400 font-mono">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-        <span>Autosave</span>
+      <div id="autosave-badge" class="badge-autosave" title="Tersimpan otomatis di browser lokal">
+        <span class="dot"></span><span>Autosave</span>
       </div>
 
-      <div class="h-5 w-px bg-slate-800"></div>
-
-      <!-- Undo / Redo -->
-      <button onclick="undo()" id="undo-btn" title="Undo (Ctrl+Z)" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 disabled:opacity-40 transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a5 5 0 015 5v2m0 0l-4-4m4 4l4-4M3 10l4-4m-4 4l4 4"/></svg>
+      <button onclick="undo()" id="undo-btn" title="Undo (Ctrl+Z)" class="btn btn-icon" aria-label="Undo">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a5 5 0 015 5v2m0 0l-4-4m4 4l4-4M3 10l4-4m-4 4l4 4"/></svg>
       </button>
-      <button onclick="redo()" id="redo-btn" title="Redo (Ctrl+Y)" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 disabled:opacity-40 transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a5 5 0 00-5 5v2m0 0l4-4m-4 4l-4-4m20-2l-4-4m4 4l-4 4"/></svg>
+      <button onclick="redo()" id="redo-btn" title="Redo (Ctrl+Y)" class="btn btn-icon" aria-label="Redo">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a5 5 0 00-5 5v2m0 0l4-4m-4 4l-4-4m20-2l-4-4m4 4l-4 4"/></svg>
       </button>
-      <button onclick="clearCanvas()" title="Kosongkan Kanvas" class="p-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/50 text-rose-300 transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      <button onclick="clearCanvas()" title="Kosongkan Kanvas" class="btn btn-icon btn-danger" aria-label="Kosongkan kanvas">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
       </button>
     </div>
   </header>
 
-  <!-- Workspace Layout -->
-  <main class="flex-1 max-w-[1600px] w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-    
-    <!-- LEFT PANEL: Tools & Palettes (3 Cols on Desktop) -->
-    <aside class="lg:col-span-3 flex flex-col gap-4 order-2 lg:order-1">
-      
-      <!-- Tools Card -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center justify-between">
+  <main class="workspace">
+
+    <!-- KIRI: alat & palet -->
+    <aside class="col-left">
+      <div class="card">
+        <h2 class="card-label" style="display:flex; justify-content:space-between; align-items:center;">
           <span>Alat Gambar</span>
-          <span class="text-[10px] text-slate-400 font-normal">Shortcut (P, E, B, I, L, R)</span>
+          <span style="font-weight:400; text-transform:none; letter-spacing:0;">P, E, B, I, L, R</span>
         </h2>
-        
-        <div class="grid grid-cols-4 gap-1.5">
-          <!-- Pen -->
-          <button onclick="setTool('pen')" id="tool-pen" title="Pensil (P)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-600 text-white font-medium text-xs transition border border-indigo-400/40">
-            <svg class="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+        <div class="tools-grid">
+          <button onclick="setTool('pen')" id="tool-pen" title="Pensil (P)" class="tool-btn" style="background: var(--fg); color:#fff;">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             <span>Pensil</span>
           </button>
-          
-          <!-- Eraser -->
-          <button onclick="setTool('eraser')" id="tool-eraser" title="Penghapus (E)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
-            <svg class="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          <button onclick="setTool('eraser')" id="tool-eraser" title="Penghapus (E)" class="tool-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             <span>Hapus</span>
           </button>
-
-          <!-- Bucket / Flood Fill -->
-          <button onclick="setTool('bucket')" id="tool-bucket" title="Ember Cat / Fill (B)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
-            <svg class="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+          <button onclick="setTool('bucket')" id="tool-bucket" title="Ember Cat / Fill (B)" class="tool-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
             <span>Isi</span>
           </button>
-
-          <!-- Eyedropper -->
-          <button onclick="setTool('picker')" id="tool-picker" title="Pipet Warna (I)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
-            <svg class="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4 4 4 0 014-4h.5l5.5-5.5a2.5 2.5 0 013.536 3.536L11 16.5V17a4 4 0 01-4 4zm0 0v-1.5"/></svg>
+          <button onclick="setTool('picker')" id="tool-picker" title="Pipet Warna (I)" class="tool-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4 4 4 0 014-4h.5l5.5-5.5a2.5 2.5 0 013.536 3.536L11 16.5V17a4 4 0 01-4 4zm0 0v-1.5"/></svg>
             <span>Pipet</span>
           </button>
-
-          <!-- Line Tool -->
-          <button onclick="setTool('line')" id="tool-line" title="Garis Lurus (L)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
-            <svg class="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 20L20 4"/></svg>
+          <button onclick="setTool('line')" id="tool-line" title="Garis Lurus (L)" class="tool-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 20L20 4"/></svg>
             <span>Garis</span>
           </button>
-
-          <!-- Rectangle Tool -->
-          <button onclick="setTool('rect')" id="tool-rect" title="Kotak / Bingkai (R)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
-            <svg class="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1" stroke-width="2"/></svg>
+          <button onclick="setTool('rect')" id="tool-rect" title="Kotak / Bingkai (R)" class="tool-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1" stroke-width="2"/></svg>
             <span>Kotak</span>
           </button>
-
-          <!-- Shading: Lighten -->
-          <button onclick="setTool('lighten')" id="tool-lighten" title="Efek Terang (+)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
-            <svg class="w-4 h-4 mb-1 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          <button onclick="setTool('lighten')" id="tool-lighten" title="Efek Terang (+)" class="tool-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
             <span>Terang</span>
           </button>
-
-          <!-- Shading: Darken -->
-          <button onclick="setTool('darken')" id="tool-darken" title="Efek Gelap (-)" class="tool-btn flex flex-col items-center justify-center p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
-            <svg class="w-4 h-4 mb-1 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          <button onclick="setTool('darken')" id="tool-darken" title="Efek Gelap (-)" class="tool-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
             <span>Gelap</span>
           </button>
         </div>
 
-        <!-- Toggles: Grid & Symmetry -->
-        <div class="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-          <label class="flex items-center gap-2 cursor-pointer select-none text-slate-300 hover:text-white">
-            <input type="checkbox" id="toggle-grid" checked onchange="toggleGrid(this.checked)" class="w-4 h-4 rounded text-indigo-600 focus:ring-0 bg-slate-800 border-slate-700">
+        <div class="toggles-row">
+          <label class="check" title="Tampilkan garis kisi pixel">
+            <input type="checkbox" id="toggle-grid" checked onchange="toggleGrid(this.checked)">
             <span>Kisi Garis</span>
           </label>
-          <label class="flex items-center gap-2 cursor-pointer select-none text-slate-300 hover:text-white" title="Menggambar otomatis simetris kiri-kanan">
-            <input type="checkbox" id="toggle-symmetry" onchange="toggleSymmetry(this.checked)" class="w-4 h-4 rounded text-indigo-600 focus:ring-0 bg-slate-800 border-slate-700">
-            <span class="flex items-center gap-1">
-              <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-              Simetri
-            </span>
+          <label class="check" title="Menggambar otomatis simetris kiri-kanan">
+            <input type="checkbox" id="toggle-symmetry" onchange="toggleSymmetry(this.checked)">
+            <span>Simetri</span>
           </label>
         </div>
       </div>
 
-      <!-- Palette Card -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
-        <div class="flex items-center justify-between mb-2">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Palet Warna</h2>
-          <select id="palette-selector" onchange="changePalette(this.value)" class="text-xs bg-slate-800 text-slate-200 border border-slate-700 rounded-md px-2 py-1 focus:outline-none focus:border-indigo-500">
+      <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+          <h2 class="card-label" style="margin:0;">Palet Warna</h2>
+          <select id="palette-selector" onchange="changePalette(this.value)">
             <option value="pico8">PICO-8 (Klasik)</option>
             <option value="storeVibrant">App Store Vibrant</option>
             <option value="gameboy">Retro Game Boy</option>
@@ -242,99 +403,72 @@
           </select>
         </div>
 
-        <!-- Current Colors Display & Native Color Picker -->
-        <div class="flex items-center gap-2.5 mb-3 p-2 bg-slate-800/80 rounded-lg border border-slate-700">
-          <div class="relative group">
-            <input type="color" id="native-color-picker" value="#6366f1" onchange="setCurrentColor(this.value)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
-            <div id="current-color-preview" class="w-8 h-8 rounded-md shadow border-2 border-white/80 bg-indigo-500 cursor-pointer"></div>
+        <div class="current-color-row">
+          <div style="position:relative;">
+            <input type="color" id="native-color-picker" value="#ff9ecf" onchange="setCurrentColor(this.value)" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;">
+            <div id="current-color-preview" class="current-color-preview" style="background:#ff9ecf;"></div>
           </div>
-          <div class="flex-1 min-w-0">
-            <div class="text-[11px] text-slate-400 font-medium">Warna Aktif:</div>
-            <div id="current-hex-label" class="text-xs font-mono font-bold text-slate-100 uppercase">#6366F1</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:11px; color:var(--muted);">Warna Aktif</div>
+            <div id="current-hex-label" style="font-family:'SF Mono',ui-monospace,monospace; font-size:12px; font-weight:700;">#FF9ECF</div>
           </div>
-          <button onclick="document.getElementById('native-color-picker').click()" class="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 transition">
-            Pilih Hex
-          </button>
+          <button onclick="document.getElementById('native-color-picker').click()" class="btn" style="font-size:11px; padding:4px 8px;">Pilih Hex</button>
         </div>
 
-        <!-- Palette Swatches Grid -->
-        <div id="palette-swatches" class="grid grid-cols-8 gap-1.5 p-1 bg-slate-950/60 rounded-lg border border-slate-800">
-          <!-- Injected via JavaScript -->
+        <div id="palette-swatches" style="display:grid; grid-template-columns:repeat(8,1fr); gap:6px; padding:6px; background:var(--surface); border:1px solid var(--border-soft); border-radius:10px;">
+          <!-- Diisi oleh JavaScript -->
         </div>
 
-        <!-- Quick Color History -->
-        <div class="mt-3">
-          <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block mb-1">Riwayat Warna Terpakai</span>
-          <div id="recent-colors" class="flex gap-1.5 overflow-x-auto pb-1">
-            <div class="text-[11px] text-slate-400 italic">Belum ada riwayat</div>
+        <div style="margin-top:10px;">
+          <span class="hint" style="display:block; margin-bottom:4px;">Riwayat Warna Terpakai</span>
+          <div id="recent-colors" style="display:flex; gap:6px; overflow-x:auto; padding-bottom:2px;">
+            <div class="recent-empty">Belum ada riwayat</div>
           </div>
         </div>
       </div>
 
-      <!-- Quick Tips Card -->
-      <div class="bg-indigo-950/30 border border-indigo-900/50 rounded-xl p-3 text-xs text-indigo-300">
-        <div class="font-bold flex items-center gap-1.5 text-indigo-200 mb-1">
-          <svg class="w-4 h-4 text-indigo-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
-          Tips Desain Ikon Pixico:
-        </div>
-        <p class="leading-relaxed text-indigo-300/90 text-[11px]">
-          Fokus pada siluet utama yang kuat dan kontras tinggi. Ikon di smartphone dilihat pada ukuran ~48x48 px, sehingga kurangi detail mikroskopis agar bentuk langsung terbaca.
-        </p>
+      <div class="card" style="background:var(--surface-warm);">
+        <p class="hint" style="margin:0;"><strong style="color:var(--fg);">Tips:</strong> fokus pada siluet kuat dan kontras tinggi. Ikon dilihat pada ukuran ±48 px, jadi kurangi detail mikroskopis agar bentuk langsung terbaca.</p>
       </div>
-
     </aside>
 
-    <!-- CENTER PANEL: Drawing Canvas (5 Cols on Desktop) -->
-    <section class="lg:col-span-5 flex flex-col items-center justify-center order-1 lg:order-2">
-      <div class="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col items-center shadow-lg">
-        
-        <!-- Canvas Status & Zoom -->
-        <div class="w-full flex items-center justify-between mb-3 text-xs text-slate-400">
-          <div class="flex items-center gap-2">
-            <span id="canvas-dim-indicator" class="font-pixel text-[10px] bg-slate-800 px-2 py-1 rounded text-indigo-300 border border-slate-700">16 x 16</span>
-            <span id="mouse-coords" class="font-mono text-[11px] text-slate-400">X: 0, Y: 0</span>
+    <!-- TENGAH: kanvas -->
+    <section class="col-center" style="align-items:center;">
+      <div class="card" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+
+        <div class="stage-meta">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span id="canvas-dim-indicator" class="dim-chip">16 x 16</span>
+            <span id="mouse-coords" style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px;">X: 0, Y: 0</span>
           </div>
-          <div class="flex items-center gap-1">
-            <button onclick="adjustZoom(-1)" title="Perkecil Kanvas" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-bold">-</button>
-            <span id="zoom-level-text" class="text-[11px] font-mono w-10 text-center">100%</span>
-            <button onclick="adjustZoom(1)" title="Perbesar Kanvas" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-bold">+</button>
-            <button onclick="resetZoom()" title="Reset Zoom" class="text-[10px] px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-400">Reset</button>
+          <div style="display:flex; align-items:center; gap:4px;">
+            <button onclick="adjustZoom(-1)" title="Perkecil" class="mini-btn" aria-label="Perkecil kanvas">-</button>
+            <span id="zoom-level-text" style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px; width:42px; text-align:center;">100%</span>
+            <button onclick="adjustZoom(1)" title="Perbesar" class="mini-btn" aria-label="Perbesar kanvas">+</button>
+            <button onclick="resetZoom()" title="Reset Zoom" class="mini-btn">Reset</button>
           </div>
         </div>
 
-        <!-- Canvas Container with Checkerboard Background -->
-        <div class="relative overflow-hidden p-2 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center shadow-inner max-w-full">
-          <div id="canvas-wrapper" class="relative bg-checker shadow-2xl rounded cursor-crosshair select-none transition-transform duration-75 origin-center">
-            <!-- Main Drawing Canvas -->
-            <canvas id="pixelCanvas" class="canvas-crisp block"></canvas>
-            <!-- Overlay Canvas for Grid & Previews -->
-            <canvas id="gridCanvas" class="absolute inset-0 pointer-events-none"></canvas>
+        <div class="stage-wrap">
+          <div id="canvas-wrapper" class="bg-checker">
+            <canvas id="pixelCanvas" class="canvas-crisp" style="display:block;"></canvas>
+            <canvas id="gridCanvas" class="canvas-crisp"></canvas>
           </div>
         </div>
 
-        <!-- Quick Transform & Shift Controls -->
-        <div class="w-full mt-4 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
-          <span class="text-[11px] text-slate-400 font-medium">Geser Pixel:</span>
-          <div class="flex items-center gap-1">
-            <button onclick="shiftPixels('up')" title="Geser ke Atas" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 border border-slate-700">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
-            </button>
-            <button onclick="shiftPixels('down')" title="Geser ke Bawah" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 border border-slate-700">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-            <button onclick="shiftPixels('left')" title="Geser ke Kiri" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 border border-slate-700">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            </button>
-            <button onclick="shiftPixels('right')" title="Geser ke Kanan" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 border border-slate-700">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
+        <div class="transform-row">
+          <span>Geser Pixel:</span>
+          <div style="display:flex; gap:4px;">
+            <button onclick="shiftPixels('up')" title="Geser ke Atas" class="btn btn-icon" aria-label="Geser atas"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button>
+            <button onclick="shiftPixels('down')" title="Geser ke Bawah" class="btn btn-icon" aria-label="Geser bawah"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+            <button onclick="shiftPixels('left')" title="Geser ke Kiri" class="btn btn-icon" aria-label="Geser kiri"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+            <button onclick="shiftPixels('right')" title="Geser ke Kanan" class="btn btn-icon" aria-label="Geser kanan"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
           </div>
-
-          <div class="flex items-center gap-1.5">
-            <button onclick="flipHorizontal()" title="Balik Horizontal" class="px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700">Flip X</button>
-            <button onclick="flipVertical()" title="Balik Vertikal" class="px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700">Flip Y</button>
-            <button onclick="rotateCanvas90()" title="Putar 90 Derajat" class="p-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <div style="display:flex; gap:4px;">
+            <button onclick="flipHorizontal()" title="Balik Horizontal" class="mini-btn">Flip X</button>
+            <button onclick="flipVertical()" title="Balik Vertikal" class="mini-btn">Flip Y</button>
+            <button onclick="rotateCanvas90()" title="Putar 90 Derajat" class="btn btn-icon" aria-label="Putar 90 derajat">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             </button>
           </div>
         </div>
@@ -342,250 +476,223 @@
       </div>
     </section>
 
-    <!-- RIGHT PANEL: Store Styling, Mockups & Exporters (4 Cols on Desktop) -->
-    <aside class="lg:col-span-4 flex flex-col gap-4 order-3">
-      
-      <!-- Store Styling Options Card -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center justify-between">
-          <span>Pengaturan Latar & Frame Ikon</span>
-          <span class="text-[10px] text-indigo-400 bg-indigo-950/60 px-1.5 py-0.5 rounded border border-indigo-800">Preview Nyata</span>
-        </h2>
+    <!-- KANAN: latar, pratinjau store, ekspor -->
+    <aside class="col-right">
 
-        <div class="grid grid-cols-2 gap-2 mb-3">
-          <!-- Background Mode -->
+      <div class="card">
+        <h2 class="card-label">Latar &amp; Frame Ikon</h2>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
           <div>
-            <label class="text-[11px] text-slate-400 block mb-1 font-medium">Gaya Latar:</label>
-            <select id="bg-style-selector" onchange="updateStorePreviews()" class="w-full text-xs bg-slate-800 text-slate-200 border border-slate-700 rounded-md px-2 py-1.5 focus:outline-none focus:border-indigo-500">
+            <label class="hint" style="display:block; margin-bottom:4px;">Gaya Latar:</label>
+            <select id="bg-style-selector" onchange="updateStorePreviews()" style="width:100%;">
               <option value="solid">Warna Solid</option>
               <option value="gradient">Gradasi Retro</option>
               <option value="dark-slate" selected>Dark Slate Modern</option>
               <option value="transparent">Transparan (Icon Game)</option>
             </select>
           </div>
-
-          <!-- Background Color -->
           <div>
-            <label class="text-[11px] text-slate-400 block mb-1 font-medium">Warna Latar:</label>
-            <div class="flex items-center gap-1.5">
-              <input type="color" id="bg-color-picker" value="#0f172a" onchange="updateStorePreviews()" class="w-7 h-7 rounded cursor-pointer border border-slate-700 bg-slate-800">
-              <span id="bg-hex-label" class="text-xs font-mono text-slate-300 uppercase">#0F172A</span>
+            <label class="hint" style="display:block; margin-bottom:4px;">Warna Latar:</label>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <input type="color" id="bg-color-picker" value="#0f172a" onchange="updateStorePreviews()" style="width:30px; height:30px; padding:0; border:1px solid var(--border); border-radius:7px; background:var(--bg); cursor:pointer;">
+              <span id="bg-hex-label" style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px;">#0F172A</span>
             </div>
           </div>
         </div>
 
-        <!-- Padding / Icon Scale inside Store container -->
-        <div class="mb-3">
-          <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+        <div style="margin-bottom:10px;">
+          <div style="display:flex; justify-content:space-between;" class="hint">
             <span>Ukuran Objek dalam Ikon:</span>
-            <span id="icon-padding-val" class="font-mono text-slate-200">80%</span>
+            <span id="icon-padding-val" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--fg);">80%</span>
           </div>
-          <input type="range" id="icon-scale-slider" min="50" max="100" value="80" oninput="document.getElementById('icon-padding-val').innerText = this.value + '%'; updateStorePreviews();" class="w-full accent-indigo-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+          <input type="range" id="icon-scale-slider" min="50" max="100" value="80" oninput="document.getElementById('icon-padding-val').innerText = this.value + '%'; updateStorePreviews();">
         </div>
 
-        <!-- Frame Effect -->
-        <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-800">
-          <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-            <input type="checkbox" id="toggle-frame-gloss" checked onchange="updateStorePreviews()" class="w-4 h-4 rounded text-indigo-600 bg-slate-800 border-slate-700">
+        <div style="display:flex; justify-content:space-between; padding-top:10px; border-top:1px solid var(--border-soft); font-size:12px;">
+          <label class="check">
+            <input type="checkbox" id="toggle-frame-gloss" checked onchange="updateStorePreviews()">
             <span>Efek Kilau (iOS Gloss)</span>
           </label>
-          <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-            <input type="checkbox" id="toggle-pixel-border" checked onchange="updateStorePreviews()" class="w-4 h-4 rounded text-indigo-600 bg-slate-800 border-slate-700">
+          <label class="check">
+            <input type="checkbox" id="toggle-pixel-border" checked onchange="updateStorePreviews()">
             <span>Garis Tepi Pixel</span>
           </label>
         </div>
       </div>
 
-      <!-- Live Store Mockups Card -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
-        <!-- Mockup Tab selector -->
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Pratinjau Store</h2>
-          <div class="flex flex-wrap bg-slate-800 p-0.5 rounded-lg text-xs gap-0.5">
-            <button onclick="switchMockupTab('playstore')" id="tab-playstore" class="px-2 py-1 rounded-md bg-indigo-600 text-white font-medium text-[11px]">Play Store</button>
-            <button onclick="switchMockupTab('appstore')" id="tab-appstore" class="px-2 py-1 rounded-md text-slate-300 hover:text-white font-medium text-[11px]">App Store</button>
-            <button onclick="switchMockupTab('msstore')" id="tab-msstore" class="px-2 py-1 rounded-md text-slate-300 hover:text-white font-medium text-[11px]">MS Store & Win11</button>
-            <button onclick="switchMockupTab('homescreen')" id="tab-homescreen" class="px-2 py-1 rounded-md text-slate-300 hover:text-white font-medium text-[11px]">Home Screen</button>
+      <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border-soft); padding-bottom:8px; margin-bottom:10px; gap:8px;">
+          <h2 class="card-label" style="margin:0;">Pratinjau Store</h2>
+          <div class="mock-tabs" role="tablist">
+            <button onclick="switchMockupTab('playstore')" id="tab-playstore" class="seg-on">Play</button>
+            <button onclick="switchMockupTab('appstore')" id="tab-appstore" class="seg-off">App Store</button>
+            <button onclick="switchMockupTab('msstore')" id="tab-msstore" class="seg-off">MS Store</button>
+            <button onclick="switchMockupTab('homescreen')" id="tab-homescreen" class="seg-off">Home</button>
           </div>
         </div>
 
-        <!-- Tab 1: Google Play Store Card Preview -->
-        <div id="mockup-view-playstore" class="space-y-3">
-          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800/80 flex items-center gap-3">
-            <!-- Google Play squircle icon -->
-            <div class="relative w-16 h-16 rounded-[22%] overflow-hidden shadow-lg border border-white/10 flex-shrink-0 bg-slate-800">
-              <canvas id="preview-playstore-canvas" class="w-full h-full canvas-crisp"></canvas>
+        <!-- Play Store: konten demo diberi label "contoh" (kejujuran audit #2) -->
+        <div id="mockup-view-playstore">
+          <div class="mock-card">
+            <div style="position:relative; width:64px; height:64px; border-radius:22%; overflow:hidden; border:1px solid var(--border); flex-shrink:0;">
+              <canvas id="preview-playstore-canvas" class="canvas-crisp" style="width:100%; height:100%;"></canvas>
             </div>
-            <div class="min-w-0">
-              <div class="text-xs font-bold text-slate-100 truncate">Petualangan Pixel RPG</div>
-              <div class="text-[11px] text-emerald-400 font-medium">Studio Game Indie</div>
-              <div class="flex flex-wrap items-center gap-1 text-[10px] text-slate-400 mt-1">
-                <span class="flex items-center text-amber-400 font-bold">4.9 ★</span>
-                <span>• 500rb+ Unduhan</span>
-                <span class="px-1 rounded bg-slate-800 text-slate-300 text-[9px]">angka contoh</span>
+            <div style="min-width:0;">
+              <div style="font-size:12px; font-weight:700;">Petualangan Pixel RPG</div>
+              <div style="font-size:11px; color:var(--muted);">Studio Game Indie</div>
+              <div style="display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-top:3px; font-size:10px; color:var(--muted);">
+                <span style="color:#b8860b; font-weight:700;">4.9 ★</span>
+                <span>• 500rb+ unduhan</span>
+                <span class="sample-tag">contoh</span>
               </div>
             </div>
           </div>
-          <div class="text-[10px] text-slate-400 text-center">Spesifikasi Google Play: 512 x 512 px, 32-bit PNG (Maks 1024KB)</div>
+          <p class="mock-spec">Google Play: 512 × 512 px, 32-bit PNG (maks 1024KB)</p>
         </div>
 
-        <!-- Tab 2: Apple App Store Preview (iOS Squircle) -->
-        <div id="mockup-view-appstore" class="hidden space-y-3">
-          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800/80 flex items-center gap-3">
-            <!-- iOS Squircle icon with subtle rim -->
-            <div class="relative w-16 h-16 rounded-[22.5%] overflow-hidden shadow-xl border border-white/20 flex-shrink-0 bg-slate-800">
-              <canvas id="preview-appstore-canvas" class="w-full h-full canvas-crisp"></canvas>
-              <div id="ios-gloss-overlay" class="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-black/20 pointer-events-none"></div>
+        <div id="mockup-view-appstore" class="hidden">
+          <div class="mock-card">
+            <div style="position:relative; width:64px; height:64px; border-radius:22.5%; overflow:hidden; border:1px solid var(--border); flex-shrink:0;">
+              <canvas id="preview-appstore-canvas" class="canvas-crisp" style="width:100%; height:100%;"></canvas>
+              <div id="ios-gloss-overlay" style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(255,255,255,0.2), transparent 40%, rgba(0,0,0,0.2)); pointer-events:none;"></div>
             </div>
-            <div class="min-w-0">
-              <div class="text-xs font-bold text-slate-100 truncate">Pixel Quest Mobile</div>
-              <div class="text-[11px] text-slate-400">Game Peran & Aksi Retro</div>
-              <button class="mt-1.5 px-3 py-0.5 rounded-full bg-indigo-600 text-white font-semibold text-[10px]">DAPATKAN</button>
+            <div style="min-width:0;">
+              <div style="font-size:12px; font-weight:700;">Pixel Quest Mobile</div>
+              <div style="font-size:11px; color:var(--muted);">Game Peran &amp; Aksi Retro</div>
+              <span class="store-pill" style="margin-top:6px;">Dapatkan</span>
             </div>
           </div>
-          <div class="text-[10px] text-slate-400 text-center">Spesifikasi Apple Store: 1024 x 1024 px, Solid PNG (Tanpa Transparansi)</div>
+          <p class="mock-spec">App Store: 1024 × 1024 px, PNG solid (tanpa transparansi)</p>
         </div>
 
-        <!-- Tab 3: Mobile Home Screen Preview -->
         <div id="mockup-view-homescreen" class="hidden">
-          <div class="p-3 bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 rounded-xl border border-slate-800 grid grid-cols-4 gap-2 text-center">
-            <!-- App Icon 1 (Yours) -->
-            <div class="flex flex-col items-center">
-              <div class="w-11 h-11 rounded-[22%] overflow-hidden shadow-lg border border-white/10 bg-slate-800 ring-2 ring-indigo-500/50">
-                <canvas id="preview-homescreen-canvas" class="w-full h-full canvas-crisp"></canvas>
+          <div class="homescreen">
+            <div>
+              <div style="width:44px; height:44px; border-radius:22%; overflow:hidden; border:2px solid var(--accent); margin:0 auto;">
+                <canvas id="preview-homescreen-canvas" class="canvas-crisp" style="width:100%; height:100%;"></canvas>
               </div>
-              <span class="text-[9px] text-indigo-300 font-bold mt-1 truncate w-full">App Kamu</span>
+              <div class="hs-label" style="color:#0b63c5; font-weight:600;">App Kamu</div>
             </div>
-
-            <!-- Mock Neighbor Icons -->
-            <div class="flex flex-col items-center opacity-60">
-              <div class="w-11 h-11 rounded-[22%] bg-emerald-600 flex items-center justify-center shadow text-white font-bold text-sm">💬</div>
-              <span class="text-[9px] text-slate-300 mt-1 truncate w-full">Chat</span>
+            <div style="opacity:0.75;">
+              <div class="hs-icon" style="background:#34c759;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h8m-8 4h5M21 12a9 9 0 11-4-7.5L21 3l-1 4.5A8.96 8.96 0 0121 12z"/></svg>
+              </div>
+              <div class="hs-label">Chat</div>
             </div>
-            <div class="flex flex-col items-center opacity-60">
-              <div class="w-11 h-11 rounded-[22%] bg-rose-600 flex items-center justify-center shadow text-white font-bold text-sm">🎵</div>
-              <span class="text-[9px] text-slate-300 mt-1 truncate w-full">Musik</span>
+            <div style="opacity:0.75;">
+              <div class="hs-icon" style="background:#ff375f;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19a3 3 0 11-2-2.83V6l10-2v9m0 3a3 3 0 11-2-2.83V8"/></svg>
+              </div>
+              <div class="hs-label">Musik</div>
             </div>
-            <div class="flex flex-col items-center opacity-60">
-              <div class="w-11 h-11 rounded-[22%] bg-amber-600 flex items-center justify-center shadow text-white font-bold text-sm">⚙️</div>
-              <span class="text-[9px] text-slate-300 mt-1 truncate w-full">Setelan</span>
+            <div style="opacity:0.75;">
+              <div class="hs-icon" style="background:#ff9f0a;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <div class="hs-label">Setelan</div>
             </div>
           </div>
-          <div class="text-[10px] text-slate-400 text-center mt-2">Tampilan langsung berdampingan dengan aplikasi lain</div>
+          <p class="mock-spec">Tampilan berdampingan dengan aplikasi lain</p>
         </div>
 
-        <!-- Tab 4: Microsoft Store & Windows 11 Taskbar Preview -->
-        <div id="mockup-view-msstore" class="hidden space-y-3">
-          <!-- MS Store Listing Card -->
-          <div class="p-3 bg-slate-950 rounded-xl border border-sky-900/40">
-            <div class="flex items-center gap-3">
-              <div class="relative w-16 h-16 rounded-xl overflow-hidden shadow-lg border border-sky-500/30 flex-shrink-0 bg-slate-900">
-                <canvas id="preview-msstore-canvas" class="w-full h-full canvas-crisp"></canvas>
+        <div id="mockup-view-msstore" class="hidden">
+          <div class="mock-card" style="align-items:flex-start;">
+            <div style="position:relative; width:64px; height:64px; border-radius:12px; overflow:hidden; border:1px solid var(--border); flex-shrink:0;">
+              <canvas id="preview-msstore-canvas" class="canvas-crisp" style="width:100%; height:100%;"></canvas>
+            </div>
+            <div style="min-width:0; flex:1;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:12px; font-weight:700;">Pixico WinApp</span>
+                <span class="sample-tag">MSIX</span>
               </div>
-              <div class="min-w-0 flex-1">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-xs font-bold text-slate-100 truncate">Pixico WinApp</span>
-                  <span class="text-[9px] px-1 bg-sky-950 text-sky-400 border border-sky-700/50 rounded font-semibold">MSIX</span>
-                </div>
-                <div class="text-[11px] text-slate-400">Game & Utilitas Windows</div>
-                <div class="flex items-center gap-2 mt-1.5">
-                  <span class="px-2.5 py-0.5 rounded bg-sky-600 hover:bg-sky-500 text-white font-semibold text-[10px] cursor-pointer shadow-sm transition">Dapatkan</span>
-                  <span class="text-[10px] text-slate-400">Gratis</span>
-                </div>
+              <div style="font-size:11px; color:var(--muted);">Game &amp; Utilitas Windows</div>
+              <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+                <span style="background:var(--accent); color:#fff; font-size:10px; font-weight:600; border-radius:6px; padding:3px 10px;">Dapatkan</span>
+                <span style="font-size:10px; color:var(--muted);">Gratis</span>
               </div>
             </div>
           </div>
 
-          <!-- Windows 11 Taskbar Mockup -->
-          <div class="p-2.5 bg-slate-900 rounded-xl border border-slate-800">
-            <div class="text-[10px] text-slate-400 font-semibold mb-1.5 flex items-center justify-between">
-              <span>Windows 11 Taskbar:</span>
-              <span class="text-[9px] text-sky-400 font-mono">48x48 / 32x32</span>
+          <div style="margin-top:10px; background:var(--surface); border:1px solid var(--border-soft); border-radius:12px; padding:10px;">
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--muted); font-weight:600; margin-bottom:6px;">
+              <span>Windows 11 Taskbar</span>
+              <span style="font-family:'SF Mono',ui-monospace,monospace;">48x48 / 32x32</span>
             </div>
-            <div class="h-10 bg-slate-950/90 rounded-lg border border-slate-800 flex items-center justify-center gap-2 px-3 shadow-inner">
-              <!-- Windows Start Button -->
-              <div class="w-6 h-6 rounded flex items-center justify-center hover:bg-white/10 transition cursor-pointer" title="Start Windows">
-                <svg class="w-3.5 h-3.5 text-sky-400" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.8"/></svg>
+            <div class="taskbar">
+              <div title="Start Windows" style="width:24px; height:24px; border-radius:5px; display:grid; place-items:center;">
+                <svg width="13" height="13" fill="#4cc2ff" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.8"/></svg>
               </div>
-              <!-- Edge / Explorer placeholder -->
-              <div class="w-6 h-6 rounded bg-sky-700/30 flex items-center justify-center" title="File Explorer">
-                <svg class="w-3.5 h-3.5 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h3.6l1.8 2H19a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
+              <div title="File Explorer" style="width:24px; height:24px; border-radius:5px; display:grid; place-items:center; background:rgba(255,255,255,0.08);">
+                <svg width="13" height="13" fill="none" stroke="#9ad2ff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h3.6l1.8 2H19a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
               </div>
-              <!-- User App Icon On Taskbar -->
-              <div class="relative w-7 h-7 rounded p-0.5 bg-white/5 border border-sky-400/40 flex items-center justify-center group" title="Aplikasi Anda (Aktif)">
-                <canvas id="preview-wintaskbar-canvas" class="w-5 h-5 canvas-crisp"></canvas>
-                <!-- Windows active indicator bar -->
-                <div class="absolute -bottom-0.5 w-1.5 h-0.5 bg-sky-400 rounded-full"></div>
+              <div title="Aplikasi Anda (Aktif)" style="position:relative; width:28px; height:28px; border-radius:5px; padding:2px; background:rgba(255,255,255,0.1); border:1px solid rgba(76,194,255,0.6); display:grid; place-items:center;">
+                <canvas id="preview-wintaskbar-canvas" class="canvas-crisp" style="width:20px; height:20px;"></canvas>
+                <div style="position:absolute; bottom:-2px; width:6px; height:2px; border-radius:2px; background:#4cc2ff;"></div>
               </div>
-              <div class="w-6 h-6 rounded bg-purple-700/30 flex items-center justify-center" title="Setelan Windows">
-                <svg class="w-3.5 h-3.5 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <div title="Setelan Windows" style="width:24px; height:24px; border-radius:5px; display:grid; place-items:center; background:rgba(255,255,255,0.08);">
+                <svg width="13" height="13" fill="none" stroke="#d1d1d6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
               </div>
             </div>
           </div>
-          <div class="text-[10px] text-slate-400 text-center">Spesifikasi Windows: 300x300 px (Store), 44x44 (App List), & Multi-size .ICO</div>
+          <p class="mock-spec">Windows: 300×300 (Store), 44×44 (App List), multi-size .ICO</p>
         </div>
       </div>
 
-      <!-- Export Center Card -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2.5 flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-          Pusat Ekspor Pixico Store
-        </h2>
+      <div class="card">
+        <h2 class="card-label">Pusat Ekspor</h2>
 
-        <!-- Quick 1-Click Store Buttons -->
-        <div class="space-y-2">
-          <!-- Google Play 512x512 Button -->
-          <button onclick="exportGooglePlayIcon()" class="w-full flex items-center justify-between p-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition shadow shadow-emerald-900/30 group">
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-emerald-200" fill="currentColor" viewBox="0 0 24 24"><path d="M3.609 1.814L13.792 12 3.61 22.186a2.127 2.127 0 01-.61-1.503V3.317c0-.585.226-1.12.61-1.503zM15.207 13.414l2.457 2.457-11.83 6.654 9.373-9.111zm2.457-5.242L15.207 10.6 5.834 1.475l11.83 6.697zm1.186 1.828l3.654 2.066c.928.525.928 1.465 0 1.99l-3.654 2.067-2.073-2.074 2.073-2.049z"/></svg>
-              <span>Download Google Play (512x512)</span>
-            </div>
-            <span class="text-[10px] bg-emerald-700 px-2 py-0.5 rounded font-mono font-bold group-hover:bg-emerald-800">PNG</span>
-          </button>
+        <button onclick="exportGooglePlayIcon()" class="export-btn">
+          <span style="display:flex; align-items:center; gap:8px;">
+            <span class="export-chip" style="background:#16a34a;">
+              <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M3.609 1.814L13.792 12 3.61 22.186a2.127 2.127 0 01-.61-1.503V3.317c0-.585.226-1.12.61-1.503zM15.207 13.414l2.457 2.457-11.83 6.654 9.373-9.111zm2.457-5.242L15.207 10.6 5.834 1.475l11.83 6.697zm1.186 1.828l3.654 2.066c.928.525.928 1.465 0 1.99l-3.654 2.067-2.073-2.074 2.073-2.049z"/></svg>
+            </span>
+            <span>Google Play (512×512)</span>
+          </span>
+          <span class="export-fmt">PNG</span>
+        </button>
 
-          <!-- Apple App Store 1024x1024 Button -->
-          <button onclick="exportAppStoreIcon()" class="w-full flex items-center justify-between p-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition shadow shadow-indigo-900/30 group">
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-indigo-200" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.9.04-2.01.62-2.66 1.38-.57.65-1.07 1.73-.97 2.76.99.08 2.01-.52 2.62-1.27z"/></svg>
-              <span>Download Apple Store (1024x1024)</span>
-            </div>
-            <span class="text-[10px] bg-indigo-700 px-2 py-0.5 rounded font-mono font-bold group-hover:bg-indigo-800">PNG</span>
-          </button>
+        <button onclick="exportAppStoreIcon()" class="export-btn">
+          <span style="display:flex; align-items:center; gap:8px;">
+            <span class="export-chip" style="background:#1d1d1f;">
+              <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.9.04-2.01.62-2.66 1.38-.57.65-1.07 1.73-.97 2.76.99.08 2.01-.52 2.62-1.27z"/></svg>
+            </span>
+            <span>Apple App Store (1024×1024)</span>
+          </span>
+          <span class="export-fmt">PNG</span>
+        </button>
 
-          <!-- Microsoft Store 300x300 Button -->
-          <button onclick="exportMicrosoftStoreIcon()" class="w-full flex items-center justify-between p-2.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs transition shadow shadow-sky-900/30 group">
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-sky-200" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.8"/></svg>
-              <span>Download Microsoft Store (300x300)</span>
-            </div>
-            <span class="text-[10px] bg-sky-700 px-2 py-0.5 rounded font-mono font-bold group-hover:bg-sky-800">PNG</span>
-          </button>
+        <button onclick="exportMicrosoftStoreIcon()" class="export-btn">
+          <span style="display:flex; align-items:center; gap:8px;">
+            <span class="export-chip" style="background:#0b63c5;">
+              <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.8"/></svg>
+            </span>
+            <span>Microsoft Store (300×300)</span>
+          </span>
+          <span class="export-fmt">PNG</span>
+        </button>
 
-          <!-- Windows .ICO Multi-Size Button -->
-          <button onclick="exportWindowsIco()" class="w-full flex items-center justify-between p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs transition group">
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-              <span>Download Windows Icon (.ICO Multi-Size)</span>
-            </div>
-            <span class="text-[10px] bg-slate-700 px-2 py-0.5 rounded font-mono font-bold text-sky-300">.ICO</span>
-          </button>
+        <button onclick="exportWindowsIco()" class="export-btn">
+          <span style="display:flex; align-items:center; gap:8px;">
+            <span class="export-chip" style="background:var(--muted);">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </span>
+            <span>Windows Icon (multi-size)</span>
+          </span>
+          <span class="export-fmt">.ICO</span>
+        </button>
 
-          <!-- Complete ZIP Bundle Button -->
-          <button onclick="exportAllZipBundle()" id="btn-export-zip" class="w-full flex items-center justify-center gap-2 p-2.5 rounded-lg bg-indigo-700 hover:bg-indigo-600 text-white font-semibold text-xs transition shadow-lg shadow-indigo-900/40">
-            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-            <span>Ekspor Semua Paket Pixico (Android, iOS & Windows ZIP)</span>
-          </button>
-        </div>
+        <button onclick="exportAllZipBundle()" id="btn-export-zip" class="btn btn-primary" style="width:100%; justify-content:center; padding:10px; font-size:12px;">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+          <span>Ekspor Semua Paket (ZIP)</span>
+        </button>
 
-        <!-- Custom Scale Download -->
-        <div class="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-          <span>Ekspor Ukuran Asli:</span>
-          <div class="flex items-center gap-1">
-            <button onclick="exportSingleScale(1)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">1x</button>
-            <button onclick="exportSingleScale(8)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">8x</button>
-            <button onclick="exportSingleScale(16)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">16x</button>
-            <button onclick="exportSingleScale(32)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">32x</button>
+        <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border-soft); display:flex; align-items:center; justify-content:space-between; font-size:12px;" class="hint">
+          <span>Ukuran asli:</span>
+          <div style="display:flex; gap:4px;">
+            <button onclick="exportSingleScale(1)" class="mini-btn">1x</button>
+            <button onclick="exportSingleScale(8)" class="mini-btn">8x</button>
+            <button onclick="exportSingleScale(16)" class="mini-btn">16x</button>
+            <button onclick="exportSingleScale(32)" class="mini-btn">32x</button>
           </div>
         </div>
       </div>
@@ -594,177 +701,149 @@
 
   </main>
 
-  <!-- Template Picker Modal -->
-  <div id="template-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-        <h3 class="font-bold text-white text-sm">Pilih Template Ikon Pixico Siap Pakai</h3>
-        <button onclick="closeTemplateModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">✕</button>
+  <!-- Modal Template -->
+  <div id="template-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:520px;">
+      <div style="display:flex; align-items:center; justify-content:center; position:relative; padding-bottom:10px; border-bottom:1px solid var(--border-soft);">
+        <h3 style="margin:0; font-size:14px;">Pilih Template Ikon Siap Pakai</h3>
+        <button onclick="closeTemplateModal()" class="btn btn-ghost btn-icon" style="position:absolute; right:-6px; top:-6px;" aria-label="Tutup">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
-      <p class="text-xs text-slate-400 my-3">Pilih salah satu template di bawah untuk mulai mengedit ikon aplikasimu:</p>
-      
-      <div id="template-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-[360px] overflow-y-auto pr-1">
-        <!-- Templates will be rendered here dynamically -->
+      <p class="hint" style="margin:10px 0;">Pilih template untuk mulai mengedit ikon aplikasimu:</p>
+      <div id="template-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; max-height:360px; overflow-y:auto; padding-right:4px;">
+        <!-- Template dirender oleh JavaScript -->
       </div>
-
-      <div class="mt-4 pt-3 border-t border-slate-800 flex justify-end">
-        <button onclick="closeTemplateModal()" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">Tutup</button>
+      <div style="margin-top:14px; padding-top:10px; border-top:1px solid var(--border-soft); display:flex; justify-content:flex-end;">
+        <button onclick="closeTemplateModal()" class="btn">Tutup</button>
       </div>
     </div>
   </div>
 
-  <!-- Image to Pixel Art Modal (with Interactive Cropping & Focus Tool) -->
-  <div id="import-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-2 sm:p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-5xl w-full p-4 sm:p-5 shadow-2xl flex flex-col max-h-[94vh] overflow-hidden">
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between pb-3 border-b border-slate-800 flex-shrink-0">
+  <!-- Modal Crop & Pixelize -->
+  <div id="import-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:1000px; max-height:94vh; overflow:hidden; display:flex; flex-direction:column; padding:16px;">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; padding-bottom:10px; border-bottom:1px solid var(--border-soft); flex-shrink:0;">
         <div>
-          <h3 class="font-bold text-white text-sm sm:text-base">Crop & Pixelize Gambar Original</h3>
-          <p class="text-[11px] text-slate-400 mt-0.5">Pilih dan fokuskan area tertentu pada foto/logo HD, lalu konversi ke pixel art tanpa blur</p>
+          <h3 style="margin:0; font-size:15px;">Crop &amp; Pixelize Gambar</h3>
+          <p class="hint" style="margin:3px 0 0;">Pilih area fokus pada foto/logo HD, lalu konversi ke pixel art tanpa blur</p>
         </div>
-        <button onclick="closeImageImportModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition">✕</button>
+        <button onclick="closeImageImportModal()" class="btn btn-ghost btn-icon" aria-label="Tutup">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
 
-      <!-- Modal Scrollable Content -->
-      <div class="overflow-y-auto pr-1 my-3 space-y-3.5 flex-1">
-        <!-- Upload Trigger / Dropzone -->
-        <div id="import-dropzone" class="border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-xl p-3 text-center cursor-pointer transition bg-slate-950/40" onclick="document.getElementById('image-upload-input').click()">
+      <div style="overflow-y:auto; padding-right:4px; margin:12px 0; flex:1;">
+        <div id="import-dropzone" class="dropzone" onclick="document.getElementById('image-upload-input').click()">
           <input type="file" id="image-upload-input" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
-          <div class="flex items-center justify-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-indigo-950/60 border border-indigo-800/60 flex items-center justify-center text-indigo-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
+            <div style="width:32px; height:32px; border-radius:8px; background:var(--surface); border:1px solid var(--border-soft); display:grid; place-items:center; color:var(--muted);">
+              <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </div>
-            <div class="text-left">
-              <div class="text-xs font-semibold text-slate-200" id="upload-status-text">Klik atau seret gambar (PNG / JPG / WEBP) di sini</div>
-              <div class="text-[10px] text-slate-400" id="upload-file-details">Mendukung gambar beresolusi tinggi hingga 4K</div>
+            <div style="text-align:left;">
+              <div style="font-size:12px; font-weight:600;" id="upload-status-text">Klik atau seret gambar (PNG / JPG / WEBP) di sini</div>
+              <div class="hint" id="upload-file-details">Mendukung gambar beresolusi tinggi hingga 4K</div>
             </div>
           </div>
         </div>
 
-        <!-- Controls & Interactive Cropper Workspace -->
-        <div id="import-workspace" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-4 pt-1 items-start">
-          
-          <!-- Column 1: Interactive Crop Canvas (5 Cols) -->
-          <div class="lg:col-span-5 flex flex-col bg-slate-950/80 p-3 rounded-xl border border-slate-800">
-            <div class="flex items-center justify-between mb-2 text-[11px]">
-              <span class="font-bold text-slate-300 flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
-                Pilih Area Fokus (1:1)
-              </span>
-              <span id="crop-coords-label" class="font-mono text-[10px] text-indigo-300">0, 0 (0 x 0)</span>
+        <div id="import-workspace" class="hidden" style="display:grid; grid-template-columns:1fr; gap:14px; padding-top:10px; align-items:start;">
+          <div style="display:flex; flex-direction:column; background:var(--surface-warm); padding:12px; border-radius:12px; border:1px solid var(--border-soft);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-size:11px;">
+              <span style="font-weight:700;">Pilih Area Fokus (1:1)</span>
+              <span id="crop-coords-label" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--accent);">0, 0 (0 x 0)</span>
             </div>
-
-            <!-- Crop Canvas Container -->
-            <div class="relative w-full h-[250px] sm:h-[280px] bg-slate-900 rounded-lg overflow-hidden border border-slate-700 flex items-center justify-center select-none shadow-inner">
-              <canvas id="crop-canvas" class="max-w-full max-h-full block cursor-crosshair"></canvas>
+            <div class="crop-stage">
+              <canvas id="crop-canvas" style="max-width:100%; max-height:100%; display:block; cursor:crosshair;"></canvas>
             </div>
-            <p class="text-[10px] text-slate-400 mt-1.5 text-center">Geser kotak untuk memilih bagian objek, tarik sudut kanan-bawah untuk ubah ukuran.</p>
+            <p class="hint" style="margin:6px 0 0; text-align:center;">Geser kotak untuk memilih bagian objek, tarik sudut kanan-bawah untuk ubah ukuran.</p>
 
-            <!-- Quick Crop Presets & Size Slider -->
-            <div class="mt-2.5 pt-2.5 border-t border-slate-800 space-y-2">
-              <div class="flex items-center justify-between text-xs">
-                <span class="text-[11px] text-slate-400">Ukuran Area Crop:</span>
-                <span id="crop-size-label" class="font-mono text-[11px] text-slate-200">100%</span>
+            <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border-soft);">
+              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;" class="hint">
+                <span>Ukuran Area Crop:</span>
+                <span id="crop-size-label" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--fg);">100%</span>
               </div>
-              <input type="range" id="crop-size-slider" min="15" max="100" value="100" oninput="handleCropSlider(this.value)" class="w-full accent-indigo-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer">
-
-              <div class="flex items-center justify-between gap-1.5 pt-1">
-                <button type="button" onclick="centerCropBox()" class="flex-1 py-1 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] rounded border border-slate-700 transition">Pusat</button>
-                <button type="button" onclick="presetCropSize(0.5)" class="flex-1 py-1 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] rounded border border-slate-700 transition">Fokus 50%</button>
-                <button type="button" onclick="presetCropSize(1.0)" class="flex-1 py-1 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] rounded border border-slate-700 transition">Maksimal (1:1)</button>
+              <input type="range" id="crop-size-slider" min="15" max="100" value="100" oninput="handleCropSlider(this.value)">
+              <div style="display:flex; gap:6px; padding-top:6px;">
+                <button type="button" onclick="centerCropBox()" class="btn" style="flex:1; justify-content:center; font-size:11px;">Pusat</button>
+                <button type="button" onclick="presetCropSize(0.5)" class="btn" style="flex:1; justify-content:center; font-size:11px;">Fokus 50%</button>
+                <button type="button" onclick="presetCropSize(1.0)" class="btn" style="flex:1; justify-content:center; font-size:11px;">Maksimal</button>
               </div>
             </div>
           </div>
 
-          <!-- Column 2: Live Pixel Art Preview (3 Cols) -->
-          <div class="lg:col-span-3 flex flex-col items-center justify-center bg-slate-950/80 p-3 rounded-xl border border-slate-800">
-            <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center justify-between w-full">
-              <span>Hasil Pixel Art</span>
-              <span id="import-stats-label" class="text-indigo-400 font-mono text-[10px]">16x16</span>
+          <div style="display:flex; flex-direction:column; align-items:center; background:var(--surface-warm); padding:12px; border-radius:12px; border:1px solid var(--border-soft);">
+            <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="card-label" style="margin:0;">Hasil Pixel Art</span>
+              <span id="import-stats-label" style="font-family:'SF Mono',ui-monospace,monospace; font-size:10px; color:var(--accent);">16x16</span>
             </div>
-            
-            <div class="relative w-36 h-36 sm:w-40 sm:h-40 rounded-lg overflow-hidden border border-slate-700 bg-checker flex items-center justify-center shadow-inner">
-              <canvas id="modal-pixel-preview-canvas" class="w-full h-full canvas-crisp block"></canvas>
+            <div style="position:relative; width:150px; height:150px; border-radius:10px; overflow:hidden; border:1px solid var(--border);" class="bg-checker">
+              <canvas id="modal-pixel-preview-canvas" class="canvas-crisp" style="width:100%; height:100%; display:block;"></canvas>
             </div>
-
-            <!-- Resolution Selector for Import -->
-            <div class="mt-3 flex items-center justify-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs w-full flex-wrap">
-              <span class="text-[10px] text-slate-400 px-1 font-medium">Grid:</span>
-              <button type="button" onclick="setImportGrid(16)" id="import-grid-16" class="px-2 py-0.5 text-[11px] font-semibold rounded bg-indigo-600 text-white">16x</button>
-              <button type="button" onclick="setImportGrid(24)" id="import-grid-24" class="px-2 py-0.5 text-[11px] font-semibold rounded text-slate-300 hover:text-white">24x</button>
-              <button type="button" onclick="setImportGrid(32)" id="import-grid-32" class="px-2 py-0.5 text-[11px] font-semibold rounded text-slate-300 hover:text-white">32x</button>
-              <button type="button" onclick="setImportGrid(48)" id="import-grid-48" class="px-2 py-0.5 text-[11px] font-semibold rounded text-slate-300 hover:text-white">48x</button>
-              <button type="button" onclick="setImportGrid(64)" id="import-grid-64" class="px-2 py-0.5 text-[11px] font-semibold rounded text-slate-300 hover:text-white">64x</button>
+            <div style="margin-top:10px; display:flex; align-items:center; justify-content:center; gap:2px; background:var(--surface); border:1px solid var(--border-soft); border-radius:9px; padding:2px; width:100%; flex-wrap:wrap;">
+              <span class="hint" style="padding:0 4px;">Grid:</span>
+              <button type="button" onclick="setImportGrid(16)" id="import-grid-16" class="seg-on">16x</button>
+              <button type="button" onclick="setImportGrid(24)" id="import-grid-24" class="seg-off">24x</button>
+              <button type="button" onclick="setImportGrid(32)" id="import-grid-32" class="seg-off">32x</button>
+              <button type="button" onclick="setImportGrid(48)" id="import-grid-48" class="seg-off">48x</button>
+              <button type="button" onclick="setImportGrid(64)" id="import-grid-64" class="seg-off">64x</button>
               <input type="hidden" id="import-grid-size" value="16">
             </div>
-
-            <div class="text-[10px] text-slate-400 mt-2 text-center">Otomatis di-*scale* sesuai grid yang dipilih.</div>
+            <div class="hint" style="margin-top:8px; text-align:center;">Otomatis diskalakan sesuai grid.</div>
           </div>
 
-          <!-- Column 3: Processing Adjustments (4 Cols) -->
-          <div class="lg:col-span-4 space-y-2.5 text-xs bg-slate-950/50 p-3 rounded-xl border border-slate-800">
-            <!-- Color Mode -->
+          <div style="display:flex; flex-direction:column; gap:10px; font-size:12px; background:var(--surface-warm); padding:12px; border-radius:12px; border:1px solid var(--border-soft);">
             <div>
-              <label class="text-[11px] font-medium text-slate-300 block mb-1">Gaya Warna & Kuantisasi:</label>
-              <select id="import-color-mode" onchange="processPixelizeImage()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                <option value="palette" selected>Cocokkan ke Palet Toko Aktif</option>
+              <label class="hint" style="display:block; margin-bottom:4px;">Gaya Warna &amp; Kuantisasi:</label>
+              <select id="import-color-mode" onchange="processPixelizeImage()" style="width:100%;">
+                <option value="palette" selected>Cocokkan ke Palet Aktif</option>
                 <option value="quantize16">Kuantisasi 16 Warna (Retro)</option>
                 <option value="quantize8">Kuantisasi 8 Warna (Flat)</option>
                 <option value="vibrant">Warna Asli Super Kontras</option>
               </select>
             </div>
-
-            <!-- Dithering -->
             <div>
-              <label class="text-[11px] font-medium text-slate-300 block mb-1">Dithering (Tekstur Piksel):</label>
-              <select id="import-dither" onchange="processPixelizeImage()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+              <label class="hint" style="display:block; margin-bottom:4px;">Dithering:</label>
+              <select id="import-dither" onchange="processPixelizeImage()" style="width:100%;">
                 <option value="none" selected>Tanpa Dither (Blok Solid)</option>
                 <option value="floyd">Floyd-Steinberg</option>
                 <option value="bayer">Bayer Matrix (4x4)</option>
               </select>
             </div>
-
-            <!-- Contrast Boost Slider -->
             <div>
-              <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <div style="display:flex; justify-content:space-between; margin-bottom:2px;" class="hint">
                 <span>Penguat Kontras Siluet:</span>
-                <span id="contrast-val-label" class="font-mono text-slate-200">145%</span>
+                <span id="contrast-val-label" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--fg);">145%</span>
               </div>
-              <input type="range" id="import-contrast" min="100" max="240" value="145" oninput="document.getElementById('contrast-val-label').innerText = this.value + '%'; processPixelizeImage();" class="w-full accent-indigo-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+              <input type="range" id="import-contrast" min="100" max="240" value="145" oninput="document.getElementById('contrast-val-label').innerText = this.value + '%'; processPixelizeImage();">
             </div>
-
-            <!-- Saturation Boost Slider -->
             <div>
-              <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
-                <span>Kepekatan Warna (Saturasi):</span>
-                <span id="saturate-val-label" class="font-mono text-slate-200">130%</span>
+              <div style="display:flex; justify-content:space-between; margin-bottom:2px;" class="hint">
+                <span>Kepekatan Warna:</span>
+                <span id="saturate-val-label" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--fg);">130%</span>
               </div>
-              <input type="range" id="import-saturate" min="80" max="220" value="130" oninput="document.getElementById('saturate-val-label').innerText = this.value + '%'; processPixelizeImage();" class="w-full accent-indigo-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+              <input type="range" id="import-saturate" min="80" max="220" value="130" oninput="document.getElementById('saturate-val-label').innerText = this.value + '%'; processPixelizeImage();">
             </div>
-
-            <!-- Background Cleanup Toggles -->
-            <div class="pt-2 border-t border-slate-800 space-y-1.5">
-              <label class="flex items-center gap-2 cursor-pointer text-slate-300 text-xs">
-                <input type="checkbox" id="import-remove-white" checked onchange="processPixelizeImage()" class="w-4 h-4 rounded text-indigo-600 bg-slate-800 border-slate-700">
+            <div style="padding-top:8px; border-top:1px solid var(--border-soft);">
+              <label class="check">
+                <input type="checkbox" id="import-remove-white" checked onchange="processPixelizeImage()">
                 <span>Hapus Background Putih/Terang</span>
               </label>
-              <div class="flex items-center gap-2 pl-6">
-                <span class="text-[10px] text-slate-400 whitespace-nowrap">Sensitivitas:</span>
-                <input type="range" id="import-white-threshold" min="200" max="254" value="230" oninput="processPixelizeImage()" class="w-full accent-indigo-500 h-1 bg-slate-800 rounded cursor-pointer">
+              <div style="display:flex; align-items:center; gap:8px; padding-left:22px; margin-top:6px;" class="hint">
+                <span style="white-space:nowrap;">Sensitivitas:</span>
+                <input type="range" id="import-white-threshold" min="200" max="254" value="230" oninput="processPixelizeImage()">
               </div>
             </div>
-
           </div>
         </div>
       </div>
 
-      <!-- Modal Footer -->
-      <div class="flex items-center justify-between pt-3 border-t border-slate-800 flex-shrink-0">
-        <span class="text-[11px] text-slate-400 hidden sm:inline">Tips: Geser kotak crop untuk menonjolkan simbol utama aplikasimu.</span>
-        <div class="flex items-center gap-2 ml-auto">
-          <button onclick="closeImageImportModal()" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">Batal</button>
-          <button onclick="applyPixelizedImage()" id="btn-apply-pixelize" disabled class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white text-xs font-medium transition shadow-md shadow-indigo-900/30 flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+      <div style="display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px solid var(--border-soft); flex-shrink:0;">
+        <span class="hint">Tips: geser kotak crop untuk menonjolkan simbol utama.</span>
+        <div style="display:flex; gap:8px; margin-left:auto;">
+          <button onclick="closeImageImportModal()" class="btn">Batal</button>
+          <button onclick="applyPixelizedImage()" id="btn-apply-pixelize" disabled class="btn btn-primary">
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             <span>Terapkan ke Kanvas</span>
           </button>
         </div>
@@ -772,14 +851,13 @@
     </div>
   </div>
 
-  <!-- Notification Toast Container -->
-  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <div id="toast-container"></div>
 
   <script>
     // State variables
     let gridSize = 16;
     let canvasPixels = []; // 2D array: grid[y][x] = hexColor or null
-    let currentColor = '#6366f1';
+    let currentColor = '#ff9ecf';
     let currentTool = 'pen'; // 'pen', 'eraser', 'bucket', 'picker', 'line', 'rect', 'lighten', 'darken'
     let isDrawing = false;
     let symmetry = false;
@@ -803,7 +881,7 @@
       monochrome: ['#FFFFFF', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B', '#475569', '#334155', '#1E293B', '#0F172A', '#000000']
     };
 
-    let recentColors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#ffffff', '#0f172a'];
+    let recentColors = ['#ff9ecf', '#10b981', '#f59e0b', '#ef4444', '#ffffff', '#1d1d1f'];
 
     // Canvas elements & contexts
     const mainCanvas = document.getElementById('pixelCanvas');
@@ -822,7 +900,7 @@
 
       colors.forEach(hex => {
         const swatch = document.createElement('button');
-        swatch.className = 'w-6 h-6 rounded shadow-sm border border-black/40 hover:scale-110 active:scale-95 transition-transform flex-shrink-0';
+        swatch.className = 'swatch';
         swatch.style.backgroundColor = hex;
         swatch.title = hex;
         swatch.onclick = () => setCurrentColor(hex);
@@ -853,7 +931,7 @@
       container.innerHTML = '';
       recentColors.forEach(c => {
         const dot = document.createElement('button');
-        dot.className = 'w-5 h-5 rounded-full border border-slate-700 hover:scale-110 transition-transform flex-shrink-0';
+        dot.className = 'recent-dot';
         dot.style.backgroundColor = c;
         dot.title = c;
         dot.onclick = () => setCurrentColor(c);
@@ -886,9 +964,9 @@
         const btn = document.getElementById(`grid-btn-${s}`);
         if (!btn) return;
         if (s === size) {
-          btn.className = "px-2.5 py-1 text-xs font-semibold rounded-md transition bg-indigo-600 text-white shadow";
+          btn.className = "seg-on";
         } else {
-          btn.className = "px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white";
+          btn.className = "seg-off";
         }
       });
 
@@ -1002,13 +1080,13 @@
     function setTool(toolName) {
       currentTool = toolName;
       document.querySelectorAll('.tool-btn').forEach(btn => {
-        btn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-400/40');
-        btn.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700');
+        btn.classList.remove('seg-on');
+        btn.classList.add('seg-off');
       });
       const activeBtn = document.getElementById(`tool-${toolName}`);
       if (activeBtn) {
-        activeBtn.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700');
-        activeBtn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-400/40');
+        activeBtn.classList.remove('seg-off');
+        activeBtn.classList.add('seg-on');
       }
     }
 
@@ -1305,8 +1383,8 @@
           const btn = document.getElementById(`grid-btn-${s}`);
           if (!btn) return;
           btn.className = (s === gridSize) 
-            ? "px-2.5 py-1 text-xs font-semibold rounded-md transition bg-indigo-600 text-white shadow"
-            : "px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white";
+            ? "seg-on"
+            : "seg-off";
         });
         document.getElementById('canvas-dim-indicator').innerText = `${gridSize} x ${gridSize}`;
         mainCanvas.width = gridSize;
@@ -1456,10 +1534,10 @@
         const view = document.getElementById(`mockup-view-${t}`);
         if (!btn || !view) return;
         if (t === tab) {
-          btn.className = "px-2 py-1 rounded-md bg-indigo-600 text-white font-medium text-[11px]";
+          btn.className = "seg-on";
           view.classList.remove('hidden');
         } else {
-          btn.className = "px-2 py-1 rounded-md text-slate-300 hover:text-white font-medium text-[11px]";
+          btn.className = "seg-off";
           view.classList.add('hidden');
         }
       });
@@ -1981,14 +2059,14 @@
 
       TEMPLATES.forEach(tpl => {
         const item = document.createElement('div');
-        item.className = 'p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700/80 border border-slate-700 cursor-pointer flex flex-col items-center gap-2 group transition';
+        item.className = 'tpl-item';
         item.onclick = () => loadTemplate(tpl);
 
         // Render preview canvas
         const preview = document.createElement('canvas');
         preview.width = 16;
         preview.height = 16;
-        preview.className = 'w-12 h-12 canvas-crisp rounded bg-slate-900 border border-slate-700 group-hover:scale-105 transition-transform';
+        preview.className = 'tpl-prev';
         const pCtx = preview.getContext('2d');
 
         tpl.data16.forEach((row, y) => {
@@ -2004,7 +2082,7 @@
 
         item.appendChild(preview);
         const label = document.createElement('span');
-        label.className = 'text-xs font-semibold text-slate-200 group-hover:text-indigo-400 text-center';
+        label.className = 'tpl-label';
         label.innerText = tpl.name;
         item.appendChild(label);
 
@@ -2079,9 +2157,9 @@
         const btn = document.getElementById(`import-grid-${s}`);
         if (btn) {
           if (s === size) {
-            btn.className = "px-2 py-0.5 text-[11px] font-semibold rounded bg-indigo-600 text-white";
+            btn.className = "seg-on";
           } else {
-            btn.className = "px-2 py-0.5 text-[11px] font-semibold rounded text-slate-300 hover:text-white";
+            btn.className = "seg-off";
           }
         }
       });
@@ -2237,7 +2315,7 @@
       cropCtx.restore();
 
       // Draw border of crop box
-      cropCtx.strokeStyle = '#6366f1';
+      cropCtx.strokeStyle = '#0071e3';
       cropCtx.lineWidth = 2;
       cropCtx.strokeRect(screenX, screenY, screenSize, screenSize);
 
@@ -2603,11 +2681,7 @@
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
-      toast.className = `px-3.5 py-2 rounded-xl border shadow-xl flex items-center gap-2 text-xs font-medium transition-all duration-300 transform translate-y-2 opacity-0 ${
-        type === 'error' 
-          ? 'bg-rose-950 text-rose-200 border-rose-800' 
-          : 'bg-slate-900 text-slate-100 border-indigo-500/50'
-      }`;
+      toast.className = 'toast' + (type === 'error' ? ' toast-error' : '');
       
       const iconPath = type === 'error'
         ? 'M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z'
@@ -2618,11 +2692,11 @@
       container.appendChild(toast);
 
       requestAnimationFrame(() => {
-        toast.classList.remove('translate-y-2', 'opacity-0');
+        toast.classList.add('toast-show');
       });
 
       setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-2');
+        toast.classList.remove('toast-show');
         setTimeout(() => toast.remove(), 300);
       }, 3000);
     }
