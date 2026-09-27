@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Package.appxmanifest untuk jalur Microsoft Store (winapp pack — lihat ADR-0001
+  dan .github/workflows/release.yml, job Windows).
+
+  DITULIS TANGAN — winapp CLI tidak jalan di macOS; bila Windows PC sudah
+  tersedia, file ini bisa di-regenerate via `winapp manifest` untuk memastikan
+  tetap cocok dengan versi CLI terkini.
+
+  PLACEHOLDER IDENTITAS — WAJIB diganti setelah tiket #16 (reserve nama +
+  listing Partner Center) selesai, dengan nilai persis (case-sensitive) dari
+  Partner Center → Product management → Product identity:
+    - Identity/@Name      : nama pendaftar yang di-reserve (bukan nama tampil)
+    - Identity/@Publisher : string publisher (bentuknya CN=..., panjang)
+  Kalau tidak cocok, Store menolak paket ("name found in the package is not
+  one of your reserved app names").
+
+  Versi: segmen ke-4 HARUS 0 (dipesan Store). Sinkronkan 3 segmen pertama
+  dengan tauri.conf.json setiap rilis.
+-->
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10">
+
+  <Identity Name="Pixico.Fanioz"
+            Publisher="CN=BA000000-0000-0000-0000-000000000000"
+            Version="0.1.0.0"
+            ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>Pixico</DisplayName>
+    <PublisherDisplayName>Fanioz</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop"
+                        MinVersion="10.0.17763.0"
+                        MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+
+  <Applications>
+    <Application Id="Pixico"
+                 Executable="Pixico.exe"
+                 EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="Pixico"
+                          Description="Generator ikon store pixel art — offline, gratis, tanpa iklan."
+                          Square150x150Logo="Assets\Square150x150Logo.png"
+                          Square44x44Logo="Assets\Square44x44Logo.png"
+                          BackgroundColor="#0f172a" />
+    </Application>
+  </Applications>
+
+</Package>

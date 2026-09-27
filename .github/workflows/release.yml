@@ -1,0 +1,95 @@
+name: release
+
+# Trigger: tag rilis `app-v*` (termasuk tag uji seperti app-v0.1.0-test) + manual
+# dispatch untuk validasi pipeline tanpa tag. Lihat research/ci-pipeline.md (#13).
+on:
+  push:
+    tags: ['app-v*']
+  workflow_dispatch:
+
+jobs:
+  publish-tauri:
+    permissions:
+      contents: write # tauri-action membuat draft release + upload asset
+    strategy:
+      fail-fast: false # satu platform gagal tak membatalkan yang lain
+      matrix:
+        include:
+          - platform: macos-latest # Apple Silicon
+            args: --target aarch64-apple-darwin
+          - platform: macos-latest # Intel (cross-compile dari runner arm64)
+            args: --target x86_64-apple-darwin
+          - platform: ubuntu-22.04
+            args: ''
+          - platform: windows-latest
+            args: ''
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file \
+            libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev \
+            patchelf xdg-utils
+
+      - name: install frontend dependencies
+        run: npm ci
+
+      # Semua platform: build + buat draft release + upload asset.
+      # DMG macOS unsigned/ad-hoc sampai #5 (Apple Developer Program) selesai;
+      # setelah itu isi env APPLE_* di bawah dan hapus komentar.
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # --- macOS, isi SETELAH tiket #5 selesai ---
+          # APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}          # .p12 base64
+          # APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          # APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}            # notarytool
+          # APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}                  # Key ID
+          # APPLE_API_KEY_PATH: /Users/runner/AuthKey.p8                 # ditulis dari secret base64
+        with:
+          tagName: app-v__VERSION__
+          releaseName: 'Pixico v__VERSION__'
+          releaseBody: 'Lihat aset untuk mengunduh dan memasang versi ini.'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
+
+      # ===== Windows saja: MSIX untuk Microsoft Store =====
+      - name: setup WinApp CLI
+        if: matrix.platform == 'windows-latest'
+        uses: microsoft/setup-WinAppCli@v0.1
+
+      # winapp pack mencari Package.appxmanifest + Assets di direktori kerja (root
+      # repo) dan menyalinnya ke folder target. Identitas manifest masih placeholder
+      # sampai #16 selesai — lihat catatan di Package.appxmanifest. Tanpa --cert:
+      # Store me-re-sign MSIX saat submit (riset #6), jadi nol secret di sini.
+      - name: pack MSIX (unsigned — Store me-re-sign)
+        if: matrix.platform == 'windows-latest'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item 'src-tauri/target/release/Pixico.exe' 'dist/'
+          winapp pack .\dist
+
+      # MSIX jadi workflow artifact, bukan asset release — konsumennya adalah
+      # submit manual ke Partner Center (#9).
+      - name: upload MSIX sebagai artifact
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: msix-store
+          path: '*.msix'
