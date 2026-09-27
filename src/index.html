@@ -273,6 +273,9 @@
 
     .crop-stage { position: relative; width: 100%; height: 260px; background: var(--surface); border-radius: 10px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; user-select: none; }
 
+    .zip-spin { animation: zip-rotate 0.8s linear infinite; }
+    @keyframes zip-rotate { to { transform: rotate(360deg); } }
+
     #toast-container { position: fixed; bottom: 16px; right: 16px; z-index: 60; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
     .hidden { display: none !important; }
     .flex { display: flex; }
@@ -1790,7 +1793,7 @@
       const zipBtn = document.getElementById('btn-export-zip');
       const originalText = zipBtn.innerHTML;
       zipBtn.innerHTML = `
-        <svg class="animate-spin w-4 h-4 text-amber-400 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <svg class="zip-spin" style="width:14px;height:14px;color:inherit;margin-right:6px;" fill="none" viewBox="0 0 24 24"><circle style="opacity:.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path style="opacity:.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         <span>Mengompres Paket Pixico...</span>
       `;
 
