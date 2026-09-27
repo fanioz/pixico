@@ -1,5 +1,5 @@
 [package]
-name = "pixico-studio"
+name = "pixico"
 version = "0.1.0"
 edition = "2021"
 description = "Pixico - Generator Ikon Store Pixel Art"

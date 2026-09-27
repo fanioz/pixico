@@ -1,7 +1,6 @@
 {
-  "name": "pixico-studio-desktop",
+  "name": "pixico-desktop",
   "private": true,
-  "PROTOTYPE": "branch prototype/desktop-wrap — tiket wayfinder #4",
   "scripts": {
     "tauri": "tauri"
   },
