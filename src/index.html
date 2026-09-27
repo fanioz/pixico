@@ -2789,6 +2789,17 @@
         try {
           const parsed = JSON.parse(savedProject);
           applyProjectData(parsed);
+          // Jalur restore tidak lewat setGridSize, jadi ukuran tampilan kanvas
+          // harus dipasang di sini juga (bug lama: kanvas menyusut ke 16px).
+          canvasWrapper.style.width = `${SCREEN_CANVAS_SIZE}px`;
+          canvasWrapper.style.height = `${SCREEN_CANVAS_SIZE}px`;
+          mainCanvas.style.width = `${SCREEN_CANVAS_SIZE}px`;
+          mainCanvas.style.height = `${SCREEN_CANVAS_SIZE}px`;
+          gridCanvas.width = SCREEN_CANVAS_SIZE;
+          gridCanvas.height = SCREEN_CANVAS_SIZE;
+          redrawMainCanvas();
+          drawGrid();
+          updateStorePreviews();
           showToast('Proyek sebelumnya berhasil dipulihkan otomatis!');
           return;
         } catch (e) {
