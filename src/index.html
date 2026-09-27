@@ -106,7 +106,15 @@
       padding: 10px 16px;
       display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
     }
-    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-panel {
+      display: flex; align-items: center; gap: 10px;
+      padding-top: 12px; border-top: 1px solid var(--border-soft);
+      margin-top: auto;   /* alasan: identitas menempel di dasar kolom kiri, bukan card biasa */
+    }
+    .brand-panel .brand-mark { width: 28px; height: 28px; border-radius: 7px; }
+    .brand-panel .brand-name { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+    .brand-panel .brand-sub { font-size: 11px; color: var(--muted); line-height: 1.45; }
+    header.topnav { justify-content: flex-start; }   /* alasan: tanpa brand, header murni toolbar kontrol */
     .brand-mark {
       width: 36px; height: 36px; border-radius: 9px;
       background: var(--fg); color: var(--bg);   /* alasan: logo solid (audit #5); warna ikut token agar dark mode benar */
@@ -324,18 +332,6 @@
 
   <!-- Header: logo solid ink (audit #5), satu baris brand + aksi cepat -->
   <header class="topnav">
-    <div class="brand">
-      <div class="brand-mark" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 16 16" shape-rendering="crispEdges" fill="currentColor">
-          <rect x="4" y="2" width="8" height="2"/><rect x="4" y="4" width="2" height="2"/><rect x="10" y="4" width="2" height="2"/>
-          <rect x="4" y="6" width="2" height="8"/><rect x="10" y="6" width="2" height="4"/>
-        </svg>
-      </div>
-      <div>
-        <h1>Pixico</h1>
-        <div class="sub" data-i18n="brand.sub">Store-ready pixel icons: Google Play, App Store &amp; Microsoft Store</div>
-      </div>
-    </div>
 
     <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
       <div class="seg" role="group" aria-label="Ukuran grid">
@@ -475,6 +471,20 @@
 
       <div class="card" style="background:var(--surface-warm);">
         <p class="hint" style="margin:0;" data-i18n="tip.body">Tip: focus on a strong silhouette and high contrast. Icons are viewed at roughly 48 px, so skip microscopic detail.</p>
+      </div>
+
+      <!-- Panel identitas: kiri bawah (keputusan pemilik, ADR-0003 arah) -->
+      <div class="brand-panel">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges" fill="currentColor">
+            <rect x="4" y="2" width="8" height="2"/><rect x="4" y="4" width="2" height="2"/><rect x="10" y="4" width="2" height="2"/>
+            <rect x="4" y="6" width="2" height="8"/><rect x="10" y="6" width="2" height="4"/>
+          </svg>
+        </div>
+        <div style="min-width:0;">
+          <h1 class="brand-name">Pixico</h1>
+          <div class="brand-sub" data-i18n="brand.sub">Store-ready pixel icons: Google Play, App Store &amp; Microsoft Store</div>
+        </div>
       </div>
     </aside>
 
