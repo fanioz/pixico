@@ -978,6 +978,7 @@
         'toast.restored': 'Previous project restored automatically!',
         'toast.symmetryOn': 'Mirror symmetry on',
         'toast.cleared': 'Canvas cleared',
+        'toast.saveFailed': 'Failed to save file',
         'toast.pixelized': 'HD image converted to pixel art ({s}\u00d7{s})!',
       },
       id: {
@@ -1046,6 +1047,7 @@
         'toast.restored': 'Proyek sebelumnya berhasil dipulihkan otomatis!',
         'toast.symmetryOn': 'Mode Simetri Cermin aktif',
         'toast.cleared': 'Kanvas Pixico telah dibersihkan',
+        'toast.saveFailed': 'Gagal menyimpan berkas',
         'toast.pixelized': 'Gambar HD berhasil dikonversi ke pixel art ({s}x{s})!',
       }
     };
@@ -1544,7 +1546,7 @@
       }
     }
 
-    function exportProjectFile() {
+    async function exportProjectFile() {
       const projectPayload = {
         appName: 'Pixico Project',
         format: 'pixico',
@@ -1566,8 +1568,7 @@
 
       const jsonStr = JSON.stringify(projectPayload, null, 2);
       const blob = new Blob([jsonStr], { type: 'application/json' });
-      downloadBlob(blob, `proyek-pixico-${gridSize}x${gridSize}.pixico`);
-      showToast(t('toast.projectSaved'));
+      if (await downloadBlob(blob, `proyek-pixico-${gridSize}x${gridSize}.pixico`)) showToast(t('toast.projectSaved'));
     }
 
     function loadProjectFile(event) {
@@ -1882,24 +1883,40 @@
       }
     }
 
-    function downloadBlob(blob, filename) {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+    async function downloadBlob(blob, filename) {
+      // Desktop (Tauri): dialog simpan native -> tulis via fs.
+      // Web murni: fallback <a download> (browser menaruh ke folder unduhan).
+      const tauri = window.__TAURI__;
+      try {
+        if (tauri && tauri.dialog && tauri.fs) {
+          const path = await tauri.dialog.save({ defaultPath: filename });
+          if (!path) return false; // pengguna batal: senyap, tanpa toast
+          const bytes = new Uint8Array(await blob.arrayBuffer());
+          await tauri.fs.writeFile(path, bytes);
+          return true;
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        return true;
+      } catch (err) {
+        console.warn('Gagal menyimpan berkas:', err);
+        showToast(t('toast.saveFailed'), 'error');
+        return false;
+      }
     }
 
     function exportGooglePlayIcon() {
       // Official Google Play: 512x512, 32-bit PNG
       const exportCanvas = getStoreRenderCanvas(512, false);
-      exportCanvas.toBlob((blob) => {
+      exportCanvas.toBlob(async (blob) => {
         if (blob) {
-          downloadBlob(blob, 'google-play-icon-512x512.png');
-          showToast(t('toast.playExported'));
+          if (await downloadBlob(blob, 'google-play-icon-512x512.png')) showToast(t('toast.playExported'));
         }
       }, 'image/png');
     }
@@ -1907,10 +1924,9 @@
     function exportAppStoreIcon() {
       // Apple App Store: 1024x1024, Solid background mandatory
       const exportCanvas = getStoreRenderCanvas(1024, true);
-      exportCanvas.toBlob((blob) => {
+      exportCanvas.toBlob(async (blob) => {
         if (blob) {
-          downloadBlob(blob, 'app-store-icon-1024x1024.png');
-          showToast(t('toast.appExported'));
+          if (await downloadBlob(blob, 'app-store-icon-1024x1024.png')) showToast(t('toast.appExported'));
         }
       }, 'image/png');
     }
@@ -1918,10 +1934,9 @@
     function exportMicrosoftStoreIcon() {
       // Official Microsoft Store Listing icon: 300x300 PNG
       const exportCanvas = getStoreRenderCanvas(300, false);
-      exportCanvas.toBlob((blob) => {
+      exportCanvas.toBlob(async (blob) => {
         if (blob) {
-          downloadBlob(blob, 'microsoft-store-logo-300x300.png');
-          showToast(t('toast.msExported'));
+          if (await downloadBlob(blob, 'microsoft-store-logo-300x300.png')) showToast(t('toast.msExported'));
         }
       }, 'image/png');
     }
@@ -1970,8 +1985,7 @@
           entries.push({ size: sz, blob });
         }
         const icoBlob = await createIcoFromPngBlobs(entries);
-        downloadBlob(icoBlob, 'app.ico');
-        showToast(t('toast.icoExported'));
+        if (await downloadBlob(icoBlob, 'app.ico')) showToast(t('toast.icoExported'));
       } catch (err) {
         console.error(err);
         showToast(t('toast.icoFail'), 'error');
@@ -1996,10 +2010,9 @@
         }
       }
 
-      offscreen.toBlob((blob) => {
+      offscreen.toBlob(async (blob) => {
         if (blob) {
-          downloadBlob(blob, `pixico-${size}x${size}.png`);
-          showToast(t('toast.scaleExported', { s: size }));
+          if (await downloadBlob(blob, `pixico-${size}x${size}.png`)) showToast(t('toast.scaleExported', { s: size }));
         }
       });
     }
@@ -2097,8 +2110,7 @@
 
         // Generate and download
         const content = await zip.generateAsync({ type: "blob" });
-        downloadBlob(content, "Pixico_Store_Icon_Package.zip");
-        showToast(t('toast.zipExported'));
+        if (await downloadBlob(content, "Pixico_Store_Icon_Package.zip")) showToast(t('toast.zipExported'));
       } catch (err) {
         console.error(err);
         showToast(t('toast.zipFail'), 'error');

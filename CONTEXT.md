@@ -36,3 +36,7 @@ _Avoid_: import (terlalu umum)
 
 **Autosave**:
 Pemulihan otomatis proyek dari localStorage saat app dibuka.
+
+**Export**:
+Merender canvas menjadi berkas siap-store (PNG/ICO/ZIP) lewat dialog simpan native; membatalkan dialog berarti tidak ada berkas dan tanpa notifikasi.
+_Avoid_: download (istilah browser)
