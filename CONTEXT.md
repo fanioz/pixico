@@ -1,6 +1,6 @@
 # Pixico
 
-Aplikasi editor dan generator ikon pixel-art siap rilis ke store — web app satu file yang dibungkus menjadi aplikasi desktop lintas platform.
+Aplikasi editor dan generator ikon pixel-art siap rilis ke store: web app satu file yang dibungkus menjadi aplikasi desktop lintas platform.
 
 ## Language
 
@@ -23,11 +23,11 @@ Ukuran matriks pixel (16/24/32/48/64). Satu canvas = satu grid.
 _Avoid_: resolution, size
 
 **Starter**:
-Template ikon siap pakai yang dimuat ke canvas.
+Ikon contoh siap pakai yang dimuat ke canvas.
 _Avoid_: template (istilah lama), preset
 
 **Store preview**:
-Simulasi tampilan ikon di channel asli (Play Store, App Store, MS Store, home screen) — konten demonya berlabel "sample/contoh".
+Simulasi tampilan ikon di channel asli (Play Store, App Store, MS Store, home screen). Konten demonya berlabel "sample/contoh".
 _Avoid_: mockup
 
 **Pixelize**:
