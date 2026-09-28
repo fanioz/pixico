@@ -9,7 +9,7 @@ Nama resmi produk di semua channel (Microsoft Store, GitHub Releases, judul app)
 _Avoid_: Pixico Studio
 
 **Aset ter-vendor**:
-Dependensi yang dulu diambil dari CDN (Tailwind Play CDN, JSZip, Google Fonts) kini disalin ke `src/vendor/` dan `src/fonts/`, supaya app jalan **offline penuh** — tanpa satu pun panggilan jaringan saat runtime.
+Dependensi yang disalin ke dalam repo agar app jalan **offline penuh** (tanpa satu pun panggilan jaringan saat runtime). Sejak rebuild DESIGN.md (ADR 0003) isinya tinggal JSZip di `src/vendor/`: styling ditulis inline di `index.html` dan font memakai font sistem.
 
 **Store sizes**:
 Ukuran ikon siap rilis yang menjadi target inti aplikasi: Google Play 512×512, Apple App Store 1024×1024, Microsoft Store/MSIX.
