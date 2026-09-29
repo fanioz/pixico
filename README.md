@@ -7,7 +7,7 @@
 
 Editor dan generator ikon pixel-art siap rilis ke Google Play, App Store, dan Microsoft Store.
 
-Pixico adalah aplikasi desktop lintas platform (Windows, macOS, Linux) yang dibungkus Tauri v2 di atas sebuah web app satu file (`src/index.html`). Seluruh styling dan logika hidup di satu berkas HTML: CSS ditulis inline, font memakai font sistem, dan satu-satunya dependensi eksternal (JSZip) ter-vendor di `src/vendor/`, sehingga aplikasi berjalan **offline penuh**, tanpa satu pun panggilan jaringan saat runtime. Canvas, gambar, dan proyek pengguna diproses lokal di perangkat. Saat ini versi 0.1.0 (pra-rilis), gratis, dengan antarmuka dwibahasa EN|ID.
+Pixico adalah aplikasi desktop lintas platform (Windows, macOS, Linux) yang dibungkus Tauri v2 di atas sebuah web app satu file (`src/index.html`). Seluruh styling dan logika hidup di satu berkas HTML: CSS ditulis inline, font memakai font sistem, dan satu-satunya dependensi eksternal (JSZip) ter-vendor di `src/vendor/`, sehingga aplikasi berjalan **offline penuh**, tanpa satu pun panggilan jaringan saat runtime. Canvas, gambar, dan proyek pengguna diproses lokal di perangkat. Saat ini versi 0.1.0 (pra-rilis) dan gratis.
 
 ## Latar Belakang
 
@@ -61,7 +61,6 @@ Proyek terakhir otomatis dipulihkan lewat autosave (localStorage) saat app dibuk
 - **Ukuran target store**: Google Play 512×512, Apple App Store 1024×1024, Microsoft Store/MSIX.
 - **Autosave**: pemulihan otomatis proyek dari localStorage.
 - **Offline penuh**: tanpa panggilan jaringan saat runtime.
-- **Dwibahasa EN|ID**: toggle bahasa di app.
 
 ## Struktur
 
