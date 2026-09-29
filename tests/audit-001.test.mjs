@@ -11,18 +11,6 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const html = readFileSync(join(root, 'src/index.html'), 'utf8');
 const lines = html.split('\n');
 
-// Skala slate Tailwind v3.4 (nilai diambil dari src/vendor/tailwind.js).
-const SLATE = {
-  300: '#cbd5e1',
-  400: '#94a3b8',
-  500: '#64748b',
-  600: '#475569',
-  700: '#334155',
-  800: '#1e293b',
-  900: '#0f172a',
-  950: '#020617',
-};
-
 function luminance(hex) {
   const channels = [1, 3, 5].map((i) => {
     const c = parseInt(hex.slice(i, i + 2), 16) / 255;
@@ -50,38 +38,42 @@ function linesContaining(needle) {
     .filter(({ text }) => text.includes(needle));
 }
 
-const storeMockups = block('<!-- Live Store Mockups Card -->', '<!-- Export Center Card -->');
-
-// Tab 1-3 mensimulasikan UI store & home screen pihak ketiga: bintang rating, ikon
-// tetangga, wallpaper gradient adalah *konten* simulasi, bukan gaya Pixico sendiri.
-// Region ini dikecualikan dari aturan chrome; Tab 4 (taskbar) tidak, karena di sana
-// emoji dipakai sebagai ikon UI.
+// Empat panel simulasi store (Play / App Store / MS Store / home screen) meniru
+// UI pihak ketiga: bintang rating, gloss iOS, taskbar Windows, ikon tetangga adalah
+// *konten* simulasi, bukan gaya Pixico sendiri. Region ini dikecualikan dari aturan
+// chrome; kartu Export center sesudahnya tetap dihitung chrome.
 const simulatedListings = block(
-  '<!-- Tab 1: Google Play Store Card Preview -->',
-  '<!-- Tab 4:'
+  '<!-- Play Store: konten demo diberi label "contoh" (kejujuran audit #2) -->',
+  '<h2 class="card-label" data-i18n="export.title">'
 );
 const uiChrome = html.replace(simulatedListings, '');
 
-test('teks empty state riwayat warna lolos kontras WCAG AA (R-25)', () => {
-  const line = linesContaining('Belum ada riwayat');
-  assert.strictEqual(line.length, 1);
+test('teks sekunder memakai token --muted yang lolos WCAG AA (R-25)', () => {
+  // Empty state riwayat warna (teksnya kini via i18n) digate lewat kelasnya:
+  // warna harus datang dari var(--muted), bukan token lebih redup.
+  const line = linesContaining('class="recent-empty"');
+  assert.strictEqual(line.length, 1, 'elemen .recent-empty hilang dari src/index.html');
+  assert.doesNotMatch(line[0].text, /--meta/, 'teks jangan pakai --meta (3.5:1, hanya untuk non-teks)');
 
-  const shade = line[0].text.match(/text-slate-(\d{3})/)?.[1];
-  assert.ok(shade, 'empty state harus pakai warna teks slate eksplisit');
-
-  // Empty state duduk di dalam Palette Card: bg-slate-900.
-  const ratio = contrast(SLATE[shade], SLATE[900]);
-  assert.ok(ratio >= 4.5, `kontras text-slate-${shade} di bg-slate-900 hanya ${ratio.toFixed(2)}:1`);
+  // Token warnanya sendiri yang dicek kontrasnya di atas --bg (varian light).
+  const muted = html.match(/--muted:\s*(#[0-9a-fA-F]{6})/)?.[1];
+  const bg = html.match(/--bg:\s*(#[0-9a-fA-F]{6})/)?.[1];
+  assert.ok(muted && bg, 'token --muted/--bg hilang dari src/index.html');
+  const ratio = contrast(muted, bg);
+  assert.ok(ratio >= 4.5, `--muted ${muted} di atas --bg ${bg} hanya ${ratio.toFixed(2)}:1`);
 });
 
 test('panel Pratinjau Store menandai angkanya sebagai data contoh (R-38/R-17)', () => {
-  const playListing = block('<!-- Tab 1: Google Play Store Card Preview -->', '<!-- Tab 2:');
+  const playListing = block(
+    '<!-- Play Store: konten demo diberi label "contoh" (kejujuran audit #2) -->',
+    'id="mockup-view-appstore"'
+  );
   const hasInventedNumber = /\d/.test(playListing);
   if (hasInventedNumber) {
     assert.match(
       playListing,
-      /contoh/i,
-      'rating & jumlah unduhan di mockup adalah angka karangan — jika tetap ditampilkan, panel wajib menandainya sebagai contoh'
+      /contoh|sample/i,
+      'rating & jumlah unduhan di simulasi Play Store adalah angka karangan; jika tetap ditampilkan, panel wajib menandainya sebagai contoh'
     );
   }
 });
@@ -97,15 +89,19 @@ test('tidak ada teks slate-500/600/700 (R-25 digeneralisasi)', () => {
   assert.deepStrictEqual(hits, []);
 });
 
-test('backdrop-blur hanya pada overlay modal (R-10)', () => {
-  const hits = linesContaining('backdrop-blur');
-  assert.ok(hits.length > 0, 'overlay modal masih perlu backdrop-blur');
+test('backdrop-filter hanya di header topnav dan overlay modal (R-10)', () => {
+  const headerBlock = block('header.topnav {', '}');
+  const modalBlock = block('.modal-overlay {', '}');
+  const hits = linesContaining('backdrop-filter');
+  assert.strictEqual(
+    hits.length, 2,
+    'dosis glass berubah: header.topnav dan .modal-overlay saja'
+  );
 
   for (const { number, text } of hits) {
-    assert.match(
-      text,
-      /fixed inset-0/,
-      `backdrop-blur di luar overlay modal (src/index.html:${number})`
+    assert.ok(
+      headerBlock.includes(text) || modalBlock.includes(text),
+      `backdrop-filter di luar header.topnav / .modal-overlay (src/index.html:${number})`
     );
   }
 });
@@ -147,4 +143,28 @@ test('script inline masih ter-parse (gerbang sintaks)', () => {
   const inline = html.match(/<script>([\s\S]*?)<\/script>/);
   assert.ok(inline, 'script inline hilang dari src/index.html');
   assert.doesNotThrow(() => new Script(inline[1], { filename: 'src/index.html' }));
+});
+
+test('og:image & twitter:image memakai aset lokal hasil generator (R-23)', () => {
+  const og = linesContaining('property="og:image"');
+  const tw = linesContaining('name="twitter:image"');
+  assert.strictEqual(og.length, 1, 'tepat satu meta og:image');
+  assert.strictEqual(tw.length, 1, 'tepat satu meta twitter:image');
+
+  const metaContent = (line) => line.match(/content="([^"]+)"/)?.[1];
+
+  for (const { number, text } of [...og, ...tw]) {
+    const content = metaContent(text);
+    assert.ok(content, `meta image tanpa content (src/index.html:${number})`);
+    assert.doesNotMatch(content, /placehold\.co/i, 'og image masih placehold.co');
+    assert.doesNotMatch(content, /^https?:/i, 'aset image harus lokal di repo, bukan hotlink');
+  }
+
+  // Asetnya ada di repo, benar-benar PNG, dan 1200x630 (dibaca langsung dari IHDR).
+  const ref = metaContent(og[0].text);
+  assert.doesNotMatch(ref, /[\\/]\.\.(?:[\\/]|$)/, 'path aset og:image harus tetap di dalam src/');
+  const png = readFileSync(join(root, 'src', ref));
+  assert.strictEqual(png.subarray(1, 4).toString('ascii'), 'PNG', 'aset og:image bukan PNG');
+  assert.strictEqual(png.readUInt32BE(16), 1200, 'lebar og:image harus 1200');
+  assert.strictEqual(png.readUInt32BE(20), 630, 'tinggi og:image harus 630');
 });

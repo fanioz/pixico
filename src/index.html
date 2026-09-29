@@ -7,6 +7,17 @@
 
   <meta name="description" content="Pixico - Aplikasi pembuat dan konverter ikon pixel art profesional siap rilis untuk Google Play Store (512x512), Apple App Store (1024x1024), dan Microsoft Store / Windows MSIX.">
   <meta name="author" content="Pixico">
+
+  <!-- Open Graph / Twitter: aset lokal og-image.png, digambar via tools/generate-og-image.html (tiket #24, R-23).
+       Path sengaja relatif karena app tidak punya domain publik (di luar cakupan peta #1); absolutkan saat ada hosting. -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Pixico - Generator Ikon Store Pixel Art">
+  <meta property="og:description" content="Rancang dan konversi ikon pixel art siap rilis untuk Google Play (512x512), Apple App Store (1024x1024), dan Microsoft Store / MSIX. 100% client-side, jalan offline penuh.">
+  <meta property="og:image" content="og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Pixico - Generator Ikon Store Pixel Art">
+  <meta name="twitter:description" content="Generator ikon pixel art multi-platform: Google Play, Apple App Store, dan Microsoft Store / MSIX. 100% client-side.">
+  <meta name="twitter:image" content="og-image.png">
   <script>
     // Tema: preferensi tersimpan > preferensi sistem > light (identitas DESIGN.md)
     (function () {
@@ -23,7 +34,7 @@
   <script src="vendor/jszip.min.js"></script>
 
   <!--
-    Skin: DESIGN.md (Aesthetic Pixel Studio) — Apple-system light.
+    Skin: DESIGN.md (Aesthetic Pixel Studio), Apple-system light.
     Keputusan identitas: ADR-0003. Alasan tiap keputusan besar ada di komentar seksi.
   -->
   <style>
@@ -40,7 +51,7 @@
       --accent-active: #0066cc;
       --success: #16a34a;
       --danger: #dc2626;
-      --stage: #1d1d1f;          /* kanvas sengaja gelap agar pixel pop — alasan: kontras artefak */
+      --stage: #1d1d1f;          /* Canvas sengaja gelap agar pixel pop; alasan: kontras artefak */
       --motion-fast: 150ms;
       --motion-base: 220ms;
       --ease-standard: cubic-bezier(0.28, 0, 0.22, 1);
@@ -220,7 +231,7 @@
     .swatch:active { transform: scale(0.95); }
     .recent-dot { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--border); cursor: pointer; flex-shrink: 0; transition: transform var(--motion-fast) var(--ease-standard); }
     .recent-dot:hover { transform: scale(1.1); }
-    .recent-empty { font-size: 11px; color: var(--muted); font-style: italic; }   /* 4.5:1 di atas putih — fix audit #1 */
+    .recent-empty { font-size: 11px; color: var(--muted); font-style: italic; }   /* 4.5:1 di atas putih; fix audit #1 */
 
     /* ---------- Canvas stage ---------- */
     .stage-wrap {
@@ -277,7 +288,7 @@
     .export-chip { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; color: #fff; flex-shrink: 0; }
     .export-fmt { font-family: "SF Mono", ui-monospace, monospace; font-size: 10px; font-weight: 700; color: var(--muted); border: 1px solid var(--border-soft); border-radius: 5px; padding: 2px 6px; }
 
-    /* ---------- Modal (blur hanya di overlay — dosis R-10) ---------- */
+    /* ---------- Modal (blur hanya di overlay; dosis R-10) ---------- */
     .modal-overlay {
       position: fixed; inset: 0; z-index: 50; display: none;
       background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(6px);

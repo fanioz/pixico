@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>og-image</title>
+  <!--
+    Penghasil og-image.png (tiket #24, R-23 audit 001).
+
+    Ikonnya digambar oleh generator Pixico sendiri: halaman ini memuat
+    src/index.html di iframe, memanggil loadTemplate() asli milik app, membaca
+    data canvasPixels app (bukan salinan), dan menarik token warna langsung dari
+    CSS app, lalu menyusun kartu 1200x630 dari semuanya.
+
+    Jalankan (Chrome headless):
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+        --headless=new --disable-gpu --hide-scrollbars \
+        --force-device-scale-factor=1 --window-size=1200,630 \
+        --virtual-time-budget=12000 --allow-file-access-from-files \
+        --screenshot=src/og-image.png \
+        "file://$PWD/tools/generate-og-image.html"
+
+    Catatan reproduksi: render bergantung font sistem (SF Pro/SF Mono di macOS);
+    di mesin lain stack fallback mengubah hasil gambar, jadi PNG tidak
+    byte-reproducible lintas mesin. Struktur komposisinya tetap sama.
+
+    Identitas visual: DESIGN.md skin light Apple-system. Permukaan solid,
+    tanpa gradient, aksen #0071e3 maksimal dua pukulan (R-01/R-13).
+  -->
+  <style>
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #ffffff; }
+    #app-frame { position: absolute; left: -9999px; top: 0; width: 500px; height: 400px; }
+  </style>
+</head>
+<body>
+  <iframe id="app-frame" src="../src/index.html"></iframe>
+  <canvas id="og" width="1200" height="630"></canvas>
+
+  <script>
+    const SANS = '-apple-system, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif';
+    const MONO = '"SF Mono", ui-monospace, Menlo, Monaco, Consolas, monospace';
+
+    function tokensFromApp(win) {
+      // Paksa tema light agar hasil deterministik (first-run headless memang light,
+      // tapi eksplisit lebih jujur). Token dibaca dari CSS app, bukan disalin.
+      win.eval("document.documentElement.dataset.theme = 'light'");
+      const css = win.getComputedStyle(win.document.documentElement);
+      const v = (name) => css.getPropertyValue(name).trim();
+      return {
+        bg: v('--bg'),
+        surface: v('--surface'),
+        fg: v('--fg'),
+        muted: v('--muted'),
+        border: v('--border'),
+        accent: v('--accent'),
+        stage: v('--stage'),
+        checkerAlt: '#2c2c2e', // dari .bg-checker app; bukan token CSS
+      };
+    }
+
+    function compose(pixels, T) {
+      const cv = document.getElementById('og');
+      const ctx = cv.getContext('2d');
+
+      // Latar halaman: putih polos (binary light rhythm, DESIGN.md).
+      ctx.fillStyle = T.bg;
+      ctx.fillRect(0, 0, 1200, 630);
+
+      // Kartu stage gelap: sama dengan .stage-wrap app (radius, shadow angkat).
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.08)';
+      ctx.shadowBlur = 32;
+      ctx.shadowOffsetY = 12;
+      ctx.fillStyle = T.stage;
+      ctx.beginPath();
+      ctx.roundRect(80, 115, 400, 400, 28);
+      ctx.fill();
+      ctx.restore();
+
+      // Checker transparansi: pola 8px --stage/#2c2c2e persis .bg-checker app.
+      const cSize = 8;
+      const cOriginX = 120;
+      const cOriginY = 155;
+      const cSpan = 320;
+      for (let cy = 0; cy < cSpan / cSize; cy++) {
+        for (let cx = 0; cx < cSpan / cSize; cx++) {
+          ctx.fillStyle = (cx + cy) % 2 === 0 ? T.stage : T.checkerAlt;
+          ctx.fillRect(cOriginX + cx * cSize, cOriginY + cy * cSize, cSize, cSize);
+        }
+      }
+
+      // Ikon: 16x16 canvasPixels app, dirender crisp per piksel (scale integer 20).
+      const scale = 20;
+      for (let y = 0; y < pixels.length; y++) {
+        for (let x = 0; x < pixels[y].length; x++) {
+          const color = pixels[y][x];
+          if (color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(cOriginX + x * scale, cOriginY + y * scale, scale, scale);
+          }
+        }
+      }
+
+      // Kolom teks kanan.
+      const tx = 560;
+
+      // Pukulan aksen pertama dan terakhir: eyebrow mono.
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillStyle = T.accent;
+      ctx.font = `600 22px ${MONO}`;
+      if ('letterSpacing' in ctx) ctx.letterSpacing = '6px';
+      ctx.fillText('STORE-READY PIXEL ICONS', tx, 230);
+      if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+
+      ctx.fillStyle = T.fg;
+      ctx.font = `600 120px ${SANS}`;
+      if ('letterSpacing' in ctx) ctx.letterSpacing = '-3px';
+      ctx.fillText('Pixico', tx - 4, 352);
+      if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+
+      ctx.fillStyle = T.muted;
+      ctx.font = `400 32px ${SANS}`;
+      ctx.fillText('Generator ikon pixel art siap rilis ke store.', tx, 424);
+
+      // Chip ukuran store: meniru .dim-chip app (mono, surface, border halus).
+      const chips = ['Google Play 512', 'App Store 1024', 'MSIX'];
+      ctx.font = `500 20px ${MONO}`;
+      let chipX = tx;
+      for (const label of chips) {
+        const w = Math.ceil(ctx.measureText(label).width) + 36;
+        ctx.fillStyle = T.surface;
+        ctx.beginPath();
+        ctx.roundRect(chipX, 462, w, 46, 10);
+        ctx.fill();
+        ctx.strokeStyle = T.border;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.fillStyle = T.fg;
+        ctx.fillText(label, chipX + 18, 492);
+        chipX += w + 14;
+      }
+    }
+
+    function fail(message) {
+      const ctx = document.getElementById('og').getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 1200, 630);
+      ctx.fillStyle = '#dc2626';
+      ctx.font = `400 28px ${MONO}`;
+      ctx.fillText('GAGAL: ' + message, 60, 120);
+      document.title = 'OG-ERROR';
+    }
+
+    window.addEventListener('load', () => {
+      const frame = document.getElementById('app-frame');
+      try {
+        const win = frame.contentWindow;
+        // Muat starter default lewat kode app sendiri, lalu ambil grid + token warnanya.
+        win.eval('loadTemplate(TEMPLATES[0])');
+        const pixels = JSON.parse(win.eval('JSON.stringify(canvasPixels)'));
+        compose(pixels, tokensFromApp(win));
+        document.title = 'OG-READY';
+      } catch (err) {
+        fail(err && err.message ? err.message : String(err));
+      }
+    });
+  </script>
+</body>
+</html>
