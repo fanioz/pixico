@@ -1,4 +1,5 @@
-// Gerbang regresi untuk anti-slop/audit-001-2026-09-27.md.
+// Gerbang regresi untuk anti-slop/audit-001-2026-09-27.md,
+// plus kontrak integritas UI hasil rebuild 73d5bad (uji paling bawah).
 // Tanpa dependensi: `node --test tests/` harus jalan offline, sama seperti app-nya.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -167,4 +168,18 @@ test('og:image & twitter:image memakai aset lokal hasil generator (R-23)', () =>
   assert.strictEqual(png.subarray(1, 4).toString('ascii'), 'PNG', 'aset og:image bukan PNG');
   assert.strictEqual(png.readUInt32BE(16), 1200, 'lebar og:image harus 1200');
   assert.strictEqual(png.readUInt32BE(20), 630, 'tinggi og:image harus 630');
+});
+
+test('kelas UI yang ditoggle JS punya rule CSS (kontrak rebuild)', () => {
+  // Rebuild 73d5bad dua kali mematahkan kontrak ini: .zip-spin (spinner mati,
+  // fix c5b4fbd) dan .toast-show (toast abadi opacity:0 karena rule CSS-nya
+  // tak ikut dibuat saat skin Tailwind ditulis ulang). Kelas yang dinyalakan
+  // lewat classList/className wajib punya selector titik di stylesheet.
+  for (const cls of ['toast-show', 'toast-error', 'zip-spin']) {
+    assert.match(
+      html,
+      new RegExp(`\\.${cls}[\\s,{.:]`),
+      `rule CSS .${cls} hilang dari stylesheet`
+    );
+  }
 });

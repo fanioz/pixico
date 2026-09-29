@@ -250,7 +250,7 @@
     }
     .canvas-crisp { image-rendering: pixelated; }
     #canvas-wrapper {
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);   /* alasan: angkat kanvas di atas stage gelap */
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);   /* alasan: angkat Canvas di atas stage gelap */
       border-radius: 4px; cursor: crosshair; user-select: none;
       transition: transform 75ms var(--ease-standard); transform-origin: center;
     }
@@ -320,6 +320,7 @@
       transform: translateY(8px); opacity: 0;
     }
     .toast.toast-error { background: var(--danger); border-color: var(--danger); }
+    .toast.toast-show { transform: translateY(0); opacity: 1; }   /* kelas reveal dari showToast(); tanpa ini toast abadi opacity:0 */
     .toast svg { width: 15px; height: 15px; flex-shrink: 0; }
 
     .dropzone { border: 2px dashed var(--border); border-radius: 12px; padding: 12px; text-align: center; cursor: pointer; transition: border-color var(--motion-fast) var(--ease-standard); background: var(--surface-warm); }
@@ -499,7 +500,7 @@
       </div>
     </aside>
 
-    <!-- TENGAH: kanvas -->
+    <!-- TENGAH: Canvas -->
     <section class="col-center" style="align-items:center;">
       <div class="card" style="width:100%; display:flex; flex-direction:column; align-items:center;">
 
@@ -768,7 +769,7 @@
 
   </main>
 
-  <!-- Modal Template -->
+  <!-- Modal Starter -->
   <div id="template-modal" class="modal-overlay">
     <div class="modal-box" style="max-width:520px;">
       <div style="display:flex; align-items:center; justify-content:center; position:relative; padding-bottom:10px; border-bottom:1px solid var(--border-soft);">
@@ -779,7 +780,7 @@
       </div>
       <p class="hint" style="margin:10px 0;" data-i18n="tpl.sub">Load a starter, make it yours:</p>
       <div id="template-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; max-height:360px; overflow-y:auto; padding-right:4px;">
-        <!-- Template dirender oleh JavaScript -->
+        <!-- Starter dirender oleh JavaScript -->
       </div>
       <div style="margin-top:14px; padding-top:10px; border-top:1px solid var(--border-soft); display:flex; justify-content:flex-end;">
         <button onclick="closeTemplateModal()" class="btn" data-i18n="tpl.close">Close</button>
@@ -926,7 +927,7 @@
       en: {
         'app.title': 'Pixico - Store-ready pixel icons',
         'brand.sub': 'Store-ready pixel icons: Google Play, App Store & Microsoft Store',
-        'hdr.grid': 'Grid', 'hdr.templates': 'Templates', 'hdr.pixelize': 'Pixelize photo',
+        'hdr.grid': 'Grid', 'hdr.templates': 'Starters', 'hdr.pixelize': 'Pixelize photo',
         'hdr.save': 'Save', 'hdr.open': 'Open', 'hdr.autosave': 'Autosave',
         'hdr.saveTip': 'Save a Pixico project file (.pixico)', 'hdr.openTip': 'Open a project file (.pixico / .json)',
         'hdr.undo': 'Undo (Ctrl+Z)', 'hdr.redo': 'Redo (Ctrl+Y)', 'hdr.clear': 'Clear canvas',
@@ -973,16 +974,16 @@
         'imp.contrast': 'Silhouette contrast:', 'imp.saturation': 'Saturation:', 'imp.removeWhite': 'Remove white/light background', 'imp.sensitivity': 'Sensitivity:',
         'imp.tip': 'Tip: drag the crop box to feature the main symbol.', 'imp.cancel': 'Cancel', 'imp.apply': 'Apply to canvas',
         'toast.gridChanged': 'Grid changed to {s}\u00d7{s}',
-        'toast.projectSaved': 'Project file (.pixico) downloaded!',
+        'toast.projectSaved': 'Project file (.pixico) saved!',
         'toast.projectInvalid': 'Invalid project file format',
-        'toast.projectOpenFail': 'Failed to import project file',
+        'toast.projectOpenFail': 'Failed to open project file',
         'toast.projectOpened': 'Project "{name}" opened!',
-        'toast.playExported': 'Google Play icon 512\u00d7512 downloaded!',
-        'toast.appExported': 'App Store icon 1024\u00d71024 downloaded!',
-        'toast.msExported': 'Microsoft Store icon 300\u00d7300 downloaded!',
-        'toast.icoExported': 'Windows icon (multi-size .ico) downloaded!',
+        'toast.playExported': 'Google Play icon 512\u00d7512 exported!',
+        'toast.appExported': 'App Store icon 1024\u00d71024 exported!',
+        'toast.msExported': 'Microsoft Store icon 300\u00d7300 exported!',
+        'toast.icoExported': 'Windows icon (multi-size .ico) exported!',
         'toast.icoFail': 'Failed to build .ico',
-        'toast.scaleExported': '{s}\u00d7{s} downloaded!',
+        'toast.scaleExported': '{s}\u00d7{s} exported!',
         'toast.zipWorking': 'Compressing Pixico package...',
         'toast.zipExported': 'Full Pixico package (Android, iOS & Windows ZIP) exported!',
         'toast.zipFail': 'Failed to build ZIP',
@@ -995,11 +996,11 @@
       id: {
         'app.title': 'Pixico - Generator Ikon Store Pixel Art',
         'brand.sub': 'Ikon pixel siap rilis: Google Play, App Store & Microsoft Store',
-        'hdr.grid': 'Grid', 'hdr.templates': 'Template', 'hdr.pixelize': 'Pixelize Foto',
+        'hdr.grid': 'Grid', 'hdr.templates': 'Starter', 'hdr.pixelize': 'Pixelize Foto',
         'hdr.save': 'Simpan', 'hdr.open': 'Buka', 'hdr.autosave': 'Autosave',
         'hdr.saveTip': 'Simpan berkas proyek Pixico (.pixico)', 'hdr.openTip': 'Buka berkas proyek (.pixico / .json)',
-        'hdr.undo': 'Undo (Ctrl+Z)', 'hdr.redo': 'Redo (Ctrl+Y)', 'hdr.clear': 'Kosongkan Kanvas',
-        'hdr.clearAria': 'Kosongkan kanvas', 'hdr.theme': 'Tema', 'hdr.lang': 'Bahasa',
+        'hdr.undo': 'Undo (Ctrl+Z)', 'hdr.redo': 'Redo (Ctrl+Y)', 'hdr.clear': 'Kosongkan Canvas',
+        'hdr.clearAria': 'Kosongkan Canvas', 'hdr.theme': 'Tema', 'hdr.lang': 'Bahasa',
         'hdr.autosaveTip': 'Tersimpan otomatis di browser lokal',
         'hdr.themeLight': 'Terang',
         'hdr.themeDark': 'Gelap',
@@ -1013,7 +1014,7 @@
         'palette.title': 'Palet Warna', 'palette.active': 'Warna Aktif', 'palette.pick': 'Pilih Hex',
         'palette.recent': 'Riwayat Warna Terpakai', 'palette.recentEmpty': 'Belum ada riwayat',
         'tip.body': 'Tips: fokus pada siluet kuat dan kontras tinggi. Ikon dilihat pada ukuran \u00b148 px, jadi kurangi detail mikroskopis agar bentuk langsung terbaca.',
-        'canvas.zoomOut': 'Perkecil Kanvas', 'canvas.zoomIn': 'Perbesar Kanvas', 'canvas.reset': 'Reset Zoom',
+        'canvas.zoomOut': 'Perkecil Canvas', 'canvas.zoomIn': 'Perbesar Canvas', 'canvas.reset': 'Reset Zoom',
         'canvas.shift': 'Geser Pixel:', 'canvas.up': 'Geser ke Atas', 'canvas.down': 'Geser ke Bawah', 'canvas.left': 'Geser ke Kiri', 'canvas.right': 'Geser ke Kanan',
         'canvas.flipX': 'Flip X', 'canvas.flipY': 'Flip Y', 'canvas.rotate': 'Putar 90 Derajat',
         'bg.title': 'Latar & Frame Ikon', 'bg.style': 'Gaya Latar:',
@@ -1031,7 +1032,7 @@
         'export.title': 'Pusat Ekspor', 'export.play': 'Google Play (512\u00d7512)', 'export.app': 'Apple App Store (1024\u00d71024)',
         'export.ms': 'Microsoft Store (300\u00d7300)', 'export.ico': 'Windows icon (multi-size)', 'export.zip': 'Ekspor Semua Paket (ZIP)',
         'export.native': 'Ukuran asli:',
-        'tpl.title': 'Pilih Template Ikon Siap Pakai', 'tpl.sub': 'Pilih template untuk mulai mengedit ikon aplikasimu:', 'tpl.close': 'Tutup',
+        'tpl.title': 'Pilih Starter Ikon Siap Pakai', 'tpl.sub': 'Pilih starter untuk mulai mengedit ikon aplikasimu:', 'tpl.close': 'Tutup',
         'imp.title': 'Crop & Pixelize Gambar', 'imp.sub': 'Pilih area fokus pada foto/logo HD, lalu konversi ke pixel art tanpa blur',
         'imp.drop': 'Klik atau seret gambar (PNG / JPG / WEBP) di sini', 'imp.dropSub': 'Mendukung gambar beresolusi tinggi hingga 4K',
         'imp.focus': 'Pilih Area Fokus (1:1)', 'imp.result': 'Hasil Pixel Art', 'imp.scaled': 'Otomatis diskalakan sesuai grid.',
@@ -1040,24 +1041,24 @@
         'imp.q8': 'Kuantisasi 8 Warna (Flat)', 'imp.vibrant': 'Warna Asli Super Kontras',
         'imp.dither': 'Dithering:', 'imp.ditherNone': 'Tanpa Dither (Blok Solid)', 'imp.floyd': 'Floyd-Steinberg', 'imp.bayer': 'Bayer Matrix (4x4)',
         'imp.contrast': 'Penguat Kontras Siluet:', 'imp.saturation': 'Kepekatan Warna:', 'imp.removeWhite': 'Hapus Background Putih/Terang', 'imp.sensitivity': 'Sensitivitas:',
-        'imp.tip': 'Tips: geser kotak crop untuk menonjolkan simbol utama.', 'imp.cancel': 'Batal', 'imp.apply': 'Terapkan ke Kanvas',
+        'imp.tip': 'Tips: geser kotak crop untuk menonjolkan simbol utama.', 'imp.cancel': 'Batal', 'imp.apply': 'Terapkan ke Canvas',
         'toast.gridChanged': 'Ukuran grid Pixico diubah ke {s}x{s}',
-        'toast.projectSaved': 'File proyek .pixico berhasil diunduh!',
+        'toast.projectSaved': 'Berkas proyek .pixico tersimpan!',
         'toast.projectInvalid': 'Format berkas proyek tidak valid',
-        'toast.projectOpenFail': 'Gagal mengimpor file proyek',
+        'toast.projectOpenFail': 'Gagal membuka file proyek',
         'toast.projectOpened': 'Proyek "{name}" berhasil dibuka!',
-        'toast.playExported': 'Ikon Google Play 512x512 berhasil diunduh!',
-        'toast.appExported': 'Ikon Apple App Store 1024x1024 berhasil diunduh!',
-        'toast.msExported': 'Ikon Microsoft Store 300x300 berhasil diunduh!',
-        'toast.icoExported': 'File Windows Icon (app.ico multi-ukuran) berhasil diunduh!',
+        'toast.playExported': 'Ikon Google Play 512x512 berhasil diekspor!',
+        'toast.appExported': 'Ikon Apple App Store 1024x1024 berhasil diekspor!',
+        'toast.msExported': 'Ikon Microsoft Store 300x300 berhasil diekspor!',
+        'toast.icoExported': 'File Windows Icon (app.ico multi-ukuran) berhasil diekspor!',
         'toast.icoFail': 'Gagal membuat file .ico',
-        'toast.scaleExported': 'Ukuran {s}x{s} berhasil diunduh!',
+        'toast.scaleExported': 'Ukuran {s}x{s} berhasil diekspor!',
         'toast.zipWorking': 'Mengompres Paket Pixico...',
         'toast.zipExported': 'Paket Lengkap Pixico (Android, iOS & Windows ZIP) berhasil diekspor!',
         'toast.zipFail': 'Gagal membuat paket ZIP',
         'toast.restored': 'Proyek sebelumnya berhasil dipulihkan otomatis!',
         'toast.symmetryOn': 'Mode Simetri Cermin aktif',
-        'toast.cleared': 'Kanvas Pixico telah dibersihkan',
+        'toast.cleared': 'Canvas Pixico telah dibersihkan',
         'toast.saveFailed': 'Gagal menyimpan berkas',
         'toast.pixelized': 'Gambar HD berhasil dikonversi ke pixel art ({s}x{s})!',
       }
@@ -2355,7 +2356,7 @@
       pushHistory();
       updateStorePreviews();
       closeTemplateModal();
-      showToast(`Template "${tpl.name}" berhasil dimuat!`);
+      showToast(`Starter "${tpl.name}" berhasil dimuat!`);
     }
 
     let uploadedImageElement = null;
@@ -2991,8 +2992,8 @@
         try {
           const parsed = JSON.parse(savedProject);
           applyProjectData(parsed);
-          // Jalur restore tidak lewat setGridSize, jadi ukuran tampilan kanvas
-          // harus dipasang di sini juga (bug lama: kanvas menyusut ke 16px).
+          // Jalur restore tidak lewat setGridSize, jadi ukuran tampilan Canvas
+          // harus dipasang di sini juga (bug lama: Canvas menyusut ke 16px).
           canvasWrapper.style.width = `${SCREEN_CANVAS_SIZE}px`;
           canvasWrapper.style.height = `${SCREEN_CANVAS_SIZE}px`;
           mainCanvas.style.width = `${SCREEN_CANVAS_SIZE}px`;
@@ -3010,7 +3011,7 @@
       }
 
       setGridSize(16);
-      // Load initial template (Game Controller)
+      // Load initial starter (Game Controller)
       loadTemplate(TEMPLATES[0]);
     };
   </script>
