@@ -4,3 +4,5 @@ src-tauri/gen/
 .DS_Store
 .DS_Store
 research/
+
+gui-test-screenshots/
