@@ -389,8 +389,8 @@
         <button id="theme-dark" onclick="applyTheme('dark')" class="seg-off" data-i18n-title="hdr.theme" data-i18n="hdr.themeDark">Dark</button>
       </div>
       <div class="seg" role="group" aria-label="Bahasa" title="Language / Bahasa">
-        <button id="lang-en" onclick="setLang('en')" class="seg-on">EN</button>
-        <button id="lang-id" onclick="setLang('id')" class="seg-off">ID</button>
+        <button id="lang-en" onclick="applyLang('en')" class="seg-on">EN</button>
+        <button id="lang-id" onclick="applyLang('id')" class="seg-off">ID</button>
       </div>
       <button onclick="undo()" id="undo-btn" title="Undo (Ctrl+Z)" class="btn btn-icon" aria-label="Undo">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a5 5 0 015 5v2m0 0l-4-4m4 4l4-4M3 10l4-4m-4 4l4 4"/></svg>
@@ -482,7 +482,7 @@
             <div style="font-size:11px; color:var(--muted);" data-i18n="palette.active">Active color</div>
             <div id="current-hex-label" style="font-family:'SF Mono',ui-monospace,monospace; font-size:12px; font-weight:700;">#FF9ECF</div>
           </div>
-          <button onclick="document.getElementById('native-color-picker').click()" class="btn" style="font-size:11px; padding:4px 8px;"data-i18n="palette.pick">Pick hex</button>
+          <button onclick="document.getElementById('native-color-picker').click()" class="btn" style="font-size:11px; padding:4px 8px;" data-i18n="palette.pick">Pick hex</button>
         </div>
 
         <div id="palette-swatches" style="display:grid; grid-template-columns:repeat(8,1fr); gap:6px; padding:6px; background:var(--surface); border:1px solid var(--border-soft); border-radius:10px;">
@@ -631,7 +631,7 @@
               </div>
             </div>
           </div>
-          <p class="mock-spec"data-i18n="spec.play">Google Play: 512 × 512 px, 32-bit PNG (max 1MB)</p>
+          <p class="mock-spec" data-i18n="spec.play">Google Play: 512 × 512 px, 32-bit PNG (max 1MB)</p>
         </div>
 
         <div id="mockup-view-appstore" class="hidden">
@@ -646,7 +646,7 @@
               <span class="store-pill" style="margin-top:6px;" data-i18n="sample.get">Get</span>
             </div>
           </div>
-          <p class="mock-spec"data-i18n="spec.app">App Store: 1024 × 1024 px, solid PNG (no transparency)</p>
+          <p class="mock-spec" data-i18n="spec.app">App Store: 1024 × 1024 px, solid PNG (no transparency)</p>
         </div>
 
         <div id="mockup-view-homescreen" class="hidden">
@@ -676,7 +676,7 @@
               <div class="hs-label" data-i18n="hs.settings">Settings</div>
             </div>
           </div>
-          <p class="mock-spec"data-i18n="spec.home">Side by side with other apps</p>
+          <p class="mock-spec" data-i18n="spec.home">Side by side with other apps</p>
         </div>
 
         <div id="mockup-view-msstore" class="hidden">
@@ -718,7 +718,7 @@
               </div>
             </div>
           </div>
-          <p class="mock-spec"data-i18n="spec.ms">Windows: 300×300 (Store), 44×44 (app list), multi-size .ICO</p>
+          <p class="mock-spec" data-i18n="spec.ms">Windows: 300×300 (Store), 44×44 (app list), multi-size .ICO</p>
         </div>
       </div>
 
@@ -1099,7 +1099,6 @@
         id.className = currentLang === 'id' ? 'seg-on' : 'seg-off';
       }
     }
-    function setLang(lang) { applyLang(lang); }
     applyLang(document.documentElement.lang || 'en');
 
     // State variables
@@ -1206,6 +1205,17 @@
       return rgbToHex(r, g, b);
     }
 
+    function applyCanvasDisplaySize() {
+      mainCanvas.width = gridSize;
+      mainCanvas.height = gridSize;
+      gridCanvas.width = SCREEN_CANVAS_SIZE;
+      gridCanvas.height = SCREEN_CANVAS_SIZE;
+      canvasWrapper.style.width = `${SCREEN_CANVAS_SIZE}px`;
+      canvasWrapper.style.height = `${SCREEN_CANVAS_SIZE}px`;
+      mainCanvas.style.width = `${SCREEN_CANVAS_SIZE}px`;
+      mainCanvas.style.height = `${SCREEN_CANVAS_SIZE}px`;
+    }
+
     function setGridSize(size) {
       gridSize = size;
       [16, 24, 32, 48, 64].forEach(s => {
@@ -1220,16 +1230,7 @@
 
       document.getElementById('canvas-dim-indicator').innerText = `${size} x ${size}`;
 
-      // Resize visual elements
-      mainCanvas.width = size;
-      mainCanvas.height = size;
-      gridCanvas.width = SCREEN_CANVAS_SIZE;
-      gridCanvas.height = SCREEN_CANVAS_SIZE;
-
-      canvasWrapper.style.width = `${SCREEN_CANVAS_SIZE}px`;
-      canvasWrapper.style.height = `${SCREEN_CANVAS_SIZE}px`;
-      mainCanvas.style.width = `${SCREEN_CANVAS_SIZE}px`;
-      mainCanvas.style.height = `${SCREEN_CANVAS_SIZE}px`;
+      applyCanvasDisplaySize();
 
       // Initialize empty matrix
       canvasPixels = Array.from({ length: size }, () => Array(size).fill(null));
@@ -1634,8 +1635,7 @@
             : "seg-off";
         });
         document.getElementById('canvas-dim-indicator').innerText = `${gridSize} x ${gridSize}`;
-        mainCanvas.width = gridSize;
-        mainCanvas.height = gridSize;
+        applyCanvasDisplaySize();
       }
 
       if (data.canvasPixels) {
@@ -2573,7 +2573,9 @@
       cropCtx.restore();
 
       // Draw border of crop box
-      cropCtx.strokeStyle = '#0071e3';
+      // Token accent dibaca saat menggambar agar crop box ikut tema (light/dark);
+      // fallback hanya jaring pengaman bila token tak terbaca.
+      cropCtx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#0071e3';
       cropCtx.lineWidth = 2;
       cropCtx.strokeRect(screenX, screenY, screenSize, screenSize);
 
@@ -3008,17 +3010,6 @@
         try {
           const parsed = JSON.parse(savedProject);
           applyProjectData(parsed);
-          // Jalur restore tidak lewat setGridSize, jadi ukuran tampilan Canvas
-          // harus dipasang di sini juga (bug lama: Canvas menyusut ke 16px).
-          canvasWrapper.style.width = `${SCREEN_CANVAS_SIZE}px`;
-          canvasWrapper.style.height = `${SCREEN_CANVAS_SIZE}px`;
-          mainCanvas.style.width = `${SCREEN_CANVAS_SIZE}px`;
-          mainCanvas.style.height = `${SCREEN_CANVAS_SIZE}px`;
-          gridCanvas.width = SCREEN_CANVAS_SIZE;
-          gridCanvas.height = SCREEN_CANVAS_SIZE;
-          redrawMainCanvas();
-          drawGrid();
-          updateStorePreviews();
           showToast(t('toast.restored'));
           return;
         } catch (e) {
