@@ -394,10 +394,10 @@
         <button id="lang-en" onclick="applyLang('en')" class="seg-on">EN</button>
         <button id="lang-id" onclick="applyLang('id')" class="seg-off">ID</button>
       </div>
-      <button onclick="undo()" id="undo-btn" title="Undo (Ctrl+Z)" class="btn btn-icon" aria-label="Undo">
+      <button onclick="undo()" id="undo-btn" title="Undo (Ctrl+Z)" class="btn btn-icon" aria-label="Undo" data-i18n-aria="hdr.undo">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a5 5 0 015 5v2m0 0l-4-4m4 4l4-4M3 10l4-4m-4 4l4 4"/></svg>
       </button>
-      <button onclick="redo()" id="redo-btn" title="Redo (Ctrl+Y)" class="btn btn-icon" aria-label="Redo">
+      <button onclick="redo()" id="redo-btn" title="Redo (Ctrl+Y)" class="btn btn-icon" aria-label="Redo" data-i18n-aria="hdr.redo">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a5 5 0 00-5 5v2m0 0l4-4m-4 4l-4-4m20-2l-4-4m4 4l-4 4"/></svg>
       </button>
       <button onclick="clearCanvas()" data-i18n-title="hdr.clear" class="btn btn-icon btn-danger" data-i18n-aria="hdr.clearAria">
@@ -701,14 +701,14 @@
 
           <div style="margin-top:10px; background:var(--surface); border:1px solid var(--border-soft); border-radius:12px; padding:10px;">
             <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--muted); font-weight:600; margin-bottom:6px;">
-              <span>Windows 11 Taskbar</span>
+              <span data-i18n="ms.taskbar">Windows 11 Taskbar</span>
               <span class="mono">48x48 / 32x32</span>
             </div>
             <div class="taskbar">
-              <div title="Start Windows" style="width:24px; height:24px; border-radius:5px; display:grid; place-items:center;">
+              <div data-i18n-title="ms.startTip" style="width:24px; height:24px; border-radius:5px; display:grid; place-items:center;">
                 <svg width="13" height="13" fill="#4cc2ff" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.8"/></svg>
               </div>
-              <div title="File Explorer" style="width:24px; height:24px; border-radius:5px; display:grid; place-items:center; background:rgba(255,255,255,0.08);">
+              <div data-i18n-title="ms.explorerTip" style="width:24px; height:24px; border-radius:5px; display:grid; place-items:center; background:rgba(255,255,255,0.08);">
                 <svg width="13" height="13" fill="none" stroke="#9ad2ff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h3.6l1.8 2H19a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
               </div>
               <div data-i18n-title="title.appActive" style="position:relative; width:28px; height:28px; border-radius:5px; padding:2px; background:rgba(255,255,255,0.1); border:1px solid rgba(76,194,255,0.6); display:grid; place-items:center;">
@@ -976,6 +976,7 @@
         'sample.appName': 'Pixel Quest Mobile', 'sample.appDev': 'Retro RPG & action', 'sample.get': 'Get',
         'hs.yours': 'Your app', 'hs.chat': 'Chat', 'hs.music': 'Music', 'hs.settings': 'Settings',
         'ms.name': 'Pixico WinApp', 'ms.dev': 'Windows games & utilities', 'ms.get': 'Get', 'ms.free': 'Free',
+        'ms.taskbar': 'Windows 11 Taskbar', 'ms.startTip': 'Start Windows', 'ms.explorerTip': 'File Explorer',
         'spec.play': 'Google Play: 512 \u00d7 512 px, 32-bit PNG (max 1MB)',
         'spec.app': 'App Store: 1024 \u00d7 1024 px, solid PNG (no transparency)',
         'spec.home': 'Side by side with other apps',
@@ -1049,6 +1050,7 @@
         'sample.appName': 'Pixel Quest Mobile', 'sample.appDev': 'Game Peran & Aksi Retro', 'sample.get': 'Dapatkan',
         'hs.yours': 'App Kamu', 'hs.chat': 'Chat', 'hs.music': 'Musik', 'hs.settings': 'Setelan',
         'ms.name': 'Pixico WinApp', 'ms.dev': 'Game & Utilitas Windows', 'ms.get': 'Dapatkan', 'ms.free': 'Gratis',
+        'ms.taskbar': 'Bilah Tugas Windows 11', 'ms.startTip': 'Mulai Windows', 'ms.explorerTip': 'File Explorer',
         'spec.play': 'Google Play: 512 \u00d7 512 px, 32-bit PNG (maks 1024KB)',
         'spec.app': 'App Store: 1024 \u00d7 1024 px, PNG solid (tanpa transparansi)',
         'spec.home': 'Tampilan berdampingan dengan aplikasi lain',

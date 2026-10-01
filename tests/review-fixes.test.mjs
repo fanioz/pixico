@@ -27,7 +27,7 @@ test('#29: tidak ada lagi middle-man setLang', () => {
 
 test('#29: ukuran tampilan kanvas dipasang lewat satu fungsi bersama', () => {
   assert.match(html, /function applyCanvasDisplaySize\(/);
-  assert.ok(count(/applyCanvasDisplaySize\(\)/) >= 3, 'dipanggil dari setGridSize, applyProjectData, dan tersirat di jalur pemulihan');
+  assert.ok(count(/applyCanvasDisplaySize\(\)/) >= 3, 'harus ada definisi + panggilan di setGridSize dan applyProjectData');
   const onload = html.slice(html.indexOf('window.onload'));
   assert.doesNotMatch(onload, /gridCanvas\.width = SCREEN_CANVAS_SIZE/, 'jalur restore tidak menyalin isi sizing lagi');
 });
@@ -77,9 +77,13 @@ test('#30: 12 string hardcoded Indonesia ikut toggle bahasa (temuan #30 audit-00
   // Semua kunci baru terdaftar di kamus en dan id (masing-masing 2x):
   for (const k of ['aria.gridSize', 'aria.projectFiles', 'aria.lang', 'common.close',
     'title.appActive', 'title.windowsSettings', 'imp.cropHint', 'imp.gridLabel',
-    'imp.originalSize', 'imp.statLabel', 'toast.starterLoaded']) {
+    'imp.originalSize', 'imp.statLabel', 'toast.starterLoaded', 'ms.taskbar',
+    'ms.startTip', 'ms.explorerTip']) {
     assert.strictEqual(count(new RegExp(`'${k}':`)), 2, `kunci ${k} harus ada di kamus en dan id`);
   }
+  // Aria Undo/Redo ikut toggle (kunci hdr.undo/hdr.redo sudah ada sebelumnya):
+  assert.match(html, /aria-label="Undo" data-i18n-aria="hdr\.undo"/);
+  assert.match(html, /aria-label="Redo" data-i18n-aria="hdr\.redo"/);
   assert.match(html, /data-i18n="imp\.cropHint"/);
   assert.match(html, /data-i18n="imp\.gridLabel"/);
   assert.match(html, /data-i18n="imp\.dither"/);
