@@ -335,6 +335,8 @@
     #toast-container { position: fixed; bottom: 16px; right: 16px; z-index: 60; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
     .hidden { display: none !important; }
     .flex { display: flex; }
+    .mono { font-family: "SF Mono", ui-monospace, monospace; }
+    #palette-swatches { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; padding: 6px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 10px; }
     /* ---------- Mobile: tap target >=44px (temuan verifikasi tiket #21, R-03) ---------- */
     @media (max-width: 920px) {
       .seg > button, .btn, .mini-btn, .mock-tabs button { min-height: 44px; }
@@ -352,7 +354,7 @@
     @media (max-width: 640px) {
       header.topnav { padding: 10px 12px; }
       main.workspace { padding: 10px; }
-      #palette-swatches { grid-template-columns: repeat(6, 1fr) !important; gap: 8px !important; }   /* !important: markup memasang repeat(8,1fr) inline */
+      #palette-swatches { grid-template-columns: repeat(6, 1fr); gap: 8px; }
     }
   </style>
 </head>
@@ -480,12 +482,12 @@
           </div>
           <div style="flex:1; min-width:0;">
             <div style="font-size:11px; color:var(--muted);" data-i18n="palette.active">Active color</div>
-            <div id="current-hex-label" style="font-family:'SF Mono',ui-monospace,monospace; font-size:12px; font-weight:700;">#FF9ECF</div>
+            <div id="current-hex-label" class="mono" style="font-size:12px; font-weight:700;">#FF9ECF</div>
           </div>
           <button onclick="document.getElementById('native-color-picker').click()" class="btn" style="font-size:11px; padding:4px 8px;" data-i18n="palette.pick">Pick hex</button>
         </div>
 
-        <div id="palette-swatches" style="display:grid; grid-template-columns:repeat(8,1fr); gap:6px; padding:6px; background:var(--surface); border:1px solid var(--border-soft); border-radius:10px;">
+        <div id="palette-swatches">
           <!-- Diisi oleh JavaScript -->
         </div>
 
@@ -523,11 +525,11 @@
         <div class="stage-meta">
           <div style="display:flex; align-items:center; gap:8px;">
             <span id="canvas-dim-indicator" class="dim-chip">16 x 16</span>
-            <span id="mouse-coords" style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px;">X: 0, Y: 0</span>
+            <span id="mouse-coords" class="mono" style="font-size:11px;">X: 0, Y: 0</span>
           </div>
           <div style="display:flex; align-items:center; gap:4px;">
             <button onclick="adjustZoom(-1)" class="mini-btn" data-i18n-title="canvas.zoomOut" data-i18n-aria="canvas.zoomOut">-</button>
-            <span id="zoom-level-text" style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px; width:42px; text-align:center;">100%</span>
+            <span id="zoom-level-text" class="mono" style="font-size:11px; width:42px; text-align:center;">100%</span>
             <button onclick="adjustZoom(1)" class="mini-btn" data-i18n-title="canvas.zoomIn" data-i18n-aria="canvas.zoomIn">+</button>
             <button onclick="resetZoom()" class="mini-btn" data-i18n-title="canvas.reset" data-i18n="canvas.reset">Reset</button>
           </div>
@@ -579,7 +581,7 @@
             <label class="hint" style="display:block; margin-bottom:4px;" data-i18n="bg.color">Background color:</label>
             <div style="display:flex; align-items:center; gap:6px;">
               <input type="color" id="bg-color-picker" value="#0f172a" onchange="updateStorePreviews()" style="width:30px; height:30px; padding:0; border:1px solid var(--border); border-radius:7px; background:var(--bg); cursor:pointer;">
-              <span id="bg-hex-label" style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px;">#0F172A</span>
+              <span id="bg-hex-label" class="mono" style="font-size:11px;">#0F172A</span>
             </div>
           </div>
         </div>
@@ -587,7 +589,7 @@
         <div style="margin-bottom:10px;">
           <div style="display:flex; justify-content:space-between;" class="hint">
             <span data-i18n="bg.scale">Icon object scale:</span>
-            <span id="icon-padding-val" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--fg);">80%</span>
+            <span id="icon-padding-val" class="mono" style="color:var(--fg);">80%</span>
           </div>
           <input type="range" id="icon-scale-slider" min="50" max="100" value="80" oninput="document.getElementById('icon-padding-val').innerText = this.value + '%'; updateStorePreviews();">
         </div>
@@ -700,7 +702,7 @@
           <div style="margin-top:10px; background:var(--surface); border:1px solid var(--border-soft); border-radius:12px; padding:10px;">
             <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--muted); font-weight:600; margin-bottom:6px;">
               <span>Windows 11 Taskbar</span>
-              <span style="font-family:'SF Mono',ui-monospace,monospace;">48x48 / 32x32</span>
+              <span class="mono">48x48 / 32x32</span>
             </div>
             <div class="taskbar">
               <div title="Start Windows" style="width:24px; height:24px; border-radius:5px; display:grid; place-items:center;">
@@ -835,7 +837,7 @@
           <div style="display:flex; flex-direction:column; background:var(--surface-warm); padding:12px; border-radius:12px; border:1px solid var(--border-soft);">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-size:11px;">
               <span style="font-weight:700;" data-i18n="imp.focus">Focus area (1:1)</span>
-              <span id="crop-coords-label" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--accent);">0, 0 (0 x 0)</span>
+              <span id="crop-coords-label" class="mono" style="color:var(--accent);">0, 0 (0 x 0)</span>
             </div>
             <div class="crop-stage">
               <canvas id="crop-canvas" style="max-width:100%; max-height:100%; display:block; cursor:crosshair;"></canvas>
@@ -845,7 +847,7 @@
             <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border-soft);">
               <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;" class="hint">
                 <span data-i18n="imp.cropSize">Crop size:</span>
-                <span id="crop-size-label" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--fg);">100%</span>
+                <span id="crop-size-label" class="mono" style="color:var(--fg);">100%</span>
               </div>
               <input type="range" id="crop-size-slider" min="15" max="100" value="100" oninput="handleCropSlider(this.value)">
               <div style="display:flex; gap:6px; padding-top:6px;">
@@ -859,7 +861,7 @@
           <div style="display:flex; flex-direction:column; align-items:center; background:var(--surface-warm); padding:12px; border-radius:12px; border:1px solid var(--border-soft);">
             <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
               <span class="card-label" style="margin:0;" data-i18n="imp.result">Pixel result</span>
-              <span id="import-stats-label" style="font-family:'SF Mono',ui-monospace,monospace; font-size:10px; color:var(--accent);">16x16</span>
+              <span id="import-stats-label" class="mono" style="font-size:10px; color:var(--accent);">16x16</span>
             </div>
             <div style="position:relative; width:150px; height:150px; border-radius:10px; overflow:hidden; border:1px solid var(--border);" class="bg-checker">
               <canvas id="modal-pixel-preview-canvas" class="canvas-crisp" style="width:100%; height:100%; display:block;"></canvas>
@@ -897,14 +899,14 @@
             <div>
               <div style="display:flex; justify-content:space-between; margin-bottom:2px;" class="hint">
                 <span data-i18n="imp.contrast">Silhouette contrast:</span>
-                <span id="contrast-val-label" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--fg);">145%</span>
+                <span id="contrast-val-label" class="mono" style="color:var(--fg);">145%</span>
               </div>
               <input type="range" id="import-contrast" min="100" max="240" value="145" oninput="document.getElementById('contrast-val-label').innerText = this.value + '%'; processPixelizeImage();">
             </div>
             <div>
               <div style="display:flex; justify-content:space-between; margin-bottom:2px;" class="hint">
                 <span data-i18n="imp.saturation">Saturation:</span>
-                <span id="saturate-val-label" style="font-family:'SF Mono',ui-monospace,monospace; color:var(--fg);">130%</span>
+                <span id="saturate-val-label" class="mono" style="color:var(--fg);">130%</span>
               </div>
               <input type="range" id="import-saturate" min="80" max="220" value="130" oninput="document.getElementById('saturate-val-label').innerText = this.value + '%'; processPixelizeImage();">
             </div>

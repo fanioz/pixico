@@ -57,3 +57,10 @@ test('#33: identifier memakai istilah Starter, bukan template', () => {
   assert.match(og, /win\.eval\('loadStarter\(STARTERS\[0\]\)'\)/);
   assert.strictEqual(count(/loadTemplate|TEMPLATES/, og), 0);
 });
+
+test('#32: font monospace lewat satu kelas .mono, grid palet di CSS tanpa !important', () => {
+  assert.strictEqual(count(/style="[^"]*font-family:'SF Mono'/), 0, 'tidak ada lagi font-family inline');
+  assert.match(html, /\.mono \{ font-family: "SF Mono", ui-monospace, monospace; \}/);
+  assert.match(html, /#palette-swatches \{ display: grid; grid-template-columns: repeat\(8, 1fr\);/);
+  assert.strictEqual(count(/#palette-swatches[^}]*!important/), 0, 'override !important untuk grid palet dihapus');
+});
