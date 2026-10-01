@@ -7,7 +7,7 @@
     Penghasil og-image.png (tiket #24, R-23 audit 001).
 
     Ikonnya digambar oleh generator Pixico sendiri: halaman ini memuat
-    src/index.html di iframe, memanggil loadTemplate() asli milik app, membaca
+    src/index.html di iframe, memanggil loadStarter() asli milik app, membaca
     data canvasPixels app (bukan salinan), dan menarik token warna langsung dari
     CSS app, lalu menyusun kartu 1200x630 dari semuanya.
 
@@ -155,7 +155,7 @@
       try {
         const win = frame.contentWindow;
         // Muat starter default lewat kode app sendiri, lalu ambil grid + token warnanya.
-        win.eval('loadTemplate(TEMPLATES[0])');
+        win.eval('loadStarter(STARTERS[0])');
         const pixels = JSON.parse(win.eval('JSON.stringify(canvasPixels)'));
         compose(pixels, tokensFromApp(win));
         document.title = 'OG-READY';

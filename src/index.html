@@ -303,14 +303,14 @@
     }
     @keyframes modal-in { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
-    .tpl-item {
+    .starter-item {
       padding: 10px; border-radius: 12px; border: 1px solid var(--border-soft); cursor: pointer;
       display: flex; flex-direction: column; align-items: center; gap: 6px;
       transition: border-color var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard);
     }
-    .tpl-item:hover { border-color: var(--accent); transform: translateY(-1px); }
-    .tpl-prev { width: 48px; height: 48px; border-radius: 8px; border: 1px solid var(--border-soft); image-rendering: pixelated; background: var(--stage); }
-    .tpl-label { font-size: 12px; font-weight: 600; text-align: center; }
+    .starter-item:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .starter-prev { width: 48px; height: 48px; border-radius: 8px; border: 1px solid var(--border-soft); image-rendering: pixelated; background: var(--stage); }
+    .starter-label { font-size: 12px; font-weight: 600; text-align: center; }
 
     .toast {
       display: flex; align-items: center; gap: 8px; max-width: 340px;
@@ -371,7 +371,7 @@
         <button onclick="setGridSize(64)" id="grid-btn-64" class="seg-off">64</button>
       </div>
 
-      <button onclick="openTemplateModal()" class="btn" data-i18n="hdr.templates">Templates</button>
+      <button onclick="openStarterModal()" class="btn" data-i18n="hdr.starters">Starter</button>
       <button onclick="openImageImportModal()" class="btn" data-i18n="hdr.pixelize">Pixelize photo</button>
 
       <div class="seg" role="group" aria-label="Berkas proyek">
@@ -786,20 +786,20 @@
   </main>
 
   <!-- Modal Starter -->
-  <div id="template-modal" class="modal-overlay">
+  <div id="starter-modal" class="modal-overlay">
     <div class="modal-box" style="max-width:520px;">
       <div style="display:flex; align-items:center; justify-content:center; position:relative; padding-bottom:10px; border-bottom:1px solid var(--border-soft);">
-        <h3 style="margin:0; font-size:14px;" data-i18n="tpl.title">Pick a starter icon</h3>
-        <button onclick="closeTemplateModal()" class="btn btn-ghost btn-icon" style="position:absolute; right:-6px; top:-6px;" aria-label="Tutup">
+        <h3 style="margin:0; font-size:14px;" data-i18n="starter.title">Pick a starter icon</h3>
+        <button onclick="closeStarterModal()" class="btn btn-ghost btn-icon" style="position:absolute; right:-6px; top:-6px;" aria-label="Tutup">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
-      <p class="hint" style="margin:10px 0;" data-i18n="tpl.sub">Load a starter, make it yours:</p>
-      <div id="template-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; max-height:360px; overflow-y:auto; padding-right:4px;">
+      <p class="hint" style="margin:10px 0;" data-i18n="starter.sub">Load a starter, make it yours:</p>
+      <div id="starter-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; max-height:360px; overflow-y:auto; padding-right:4px;">
         <!-- Starter dirender oleh JavaScript -->
       </div>
       <div style="margin-top:14px; padding-top:10px; border-top:1px solid var(--border-soft); display:flex; justify-content:flex-end;">
-        <button onclick="closeTemplateModal()" class="btn" data-i18n="tpl.close">Close</button>
+        <button onclick="closeStarterModal()" class="btn" data-i18n="starter.close">Close</button>
       </div>
     </div>
   </div>
@@ -943,7 +943,7 @@
       en: {
         'app.title': 'Pixico - Store-ready pixel icons',
         'brand.sub': 'Store-ready pixel icons: Google Play, App Store & Microsoft Store',
-        'hdr.grid': 'Grid', 'hdr.templates': 'Starters', 'hdr.pixelize': 'Pixelize photo',
+        'hdr.grid': 'Grid', 'hdr.starters': 'Starters', 'hdr.pixelize': 'Pixelize photo',
         'hdr.save': 'Save', 'hdr.open': 'Open', 'hdr.autosave': 'Autosave',
         'hdr.saveTip': 'Save a Pixico project file (.pixico)', 'hdr.openTip': 'Open a project file (.pixico / .json)',
         'hdr.undo': 'Undo (Ctrl+Z)', 'hdr.redo': 'Redo (Ctrl+Y)', 'hdr.clear': 'Clear canvas',
@@ -979,7 +979,7 @@
         'export.title': 'Export center', 'export.play': 'Google Play (512\u00d7512)', 'export.app': 'Apple App Store (1024\u00d71024)',
         'export.ms': 'Microsoft Store (300\u00d7300)', 'export.ico': 'Windows icon (multi-size)', 'export.zip': 'Export all packages (ZIP)',
         'export.native': 'Native size:',
-        'tpl.title': 'Pick a starter icon', 'tpl.sub': 'Load a starter, make it yours:', 'tpl.close': 'Close',
+        'starter.title': 'Pick a starter icon', 'starter.sub': 'Load a starter, make it yours:', 'starter.close': 'Close',
         'imp.title': 'Crop & pixelize an image', 'imp.sub': 'Pick the focus area on a HD photo/logo, then convert to blur-free pixel art',
         'imp.drop': 'Click or drop an image (PNG / JPG / WEBP)', 'imp.dropSub': 'Supports high-res images up to 4K',
         'imp.focus': 'Focus area (1:1)', 'imp.result': 'Pixel result', 'imp.scaled': 'Auto-scaled to the chosen grid.',
@@ -1012,7 +1012,7 @@
       id: {
         'app.title': 'Pixico - Generator Ikon Store Pixel Art',
         'brand.sub': 'Ikon pixel siap rilis: Google Play, App Store & Microsoft Store',
-        'hdr.grid': 'Grid', 'hdr.templates': 'Starter', 'hdr.pixelize': 'Pixelize Foto',
+        'hdr.grid': 'Grid', 'hdr.starters': 'Starter', 'hdr.pixelize': 'Pixelize Foto',
         'hdr.save': 'Simpan', 'hdr.open': 'Buka', 'hdr.autosave': 'Autosave',
         'hdr.saveTip': 'Simpan berkas proyek Pixico (.pixico)', 'hdr.openTip': 'Buka berkas proyek (.pixico / .json)',
         'hdr.undo': 'Undo (Ctrl+Z)', 'hdr.redo': 'Redo (Ctrl+Y)', 'hdr.clear': 'Kosongkan Canvas',
@@ -1048,7 +1048,7 @@
         'export.title': 'Pusat Ekspor', 'export.play': 'Google Play (512\u00d7512)', 'export.app': 'Apple App Store (1024\u00d71024)',
         'export.ms': 'Microsoft Store (300\u00d7300)', 'export.ico': 'Windows icon (multi-size)', 'export.zip': 'Ekspor Semua Paket (ZIP)',
         'export.native': 'Ukuran asli:',
-        'tpl.title': 'Pilih Starter Ikon Siap Pakai', 'tpl.sub': 'Pilih starter untuk mulai mengedit ikon aplikasimu:', 'tpl.close': 'Tutup',
+        'starter.title': 'Pilih Starter Ikon Siap Pakai', 'starter.sub': 'Pilih starter untuk mulai mengedit ikon aplikasimu:', 'starter.close': 'Tutup',
         'imp.title': 'Crop & Pixelize Gambar', 'imp.sub': 'Pilih area fokus pada foto/logo HD, lalu konversi ke pixel art tanpa blur',
         'imp.drop': 'Klik atau seret gambar (PNG / JPG / WEBP) di sini', 'imp.dropSub': 'Mendukung gambar beresolusi tinggi hingga 4K',
         'imp.focus': 'Pilih Area Fokus (1:1)', 'imp.result': 'Hasil Pixel Art', 'imp.scaled': 'Otomatis diskalakan sesuai grid.',
@@ -2131,7 +2131,7 @@
       }
     }
 
-    const TEMPLATES = [
+    const STARTERS = [
       {
         id: 'controller',
         name: 'Game Controller',
@@ -2295,26 +2295,26 @@
       }
     ];
 
-    function openTemplateModal() {
-      const container = document.getElementById('template-grid');
+    function openStarterModal() {
+      const container = document.getElementById('starter-grid');
       container.innerHTML = '';
 
-      TEMPLATES.forEach(tpl => {
+      STARTERS.forEach(starter => {
         const item = document.createElement('div');
-        item.className = 'tpl-item';
-        item.onclick = () => loadTemplate(tpl);
+        item.className = 'starter-item';
+        item.onclick = () => loadStarter(starter);
 
         // Render preview canvas
         const preview = document.createElement('canvas');
         preview.width = 16;
         preview.height = 16;
-        preview.className = 'tpl-prev';
+        preview.className = 'starter-prev';
         const pCtx = preview.getContext('2d');
 
-        tpl.data16.forEach((row, y) => {
+        starter.data16.forEach((row, y) => {
           for (let x = 0; x < 16; x++) {
             const char = row[x];
-            const color = tpl.paletteMap[char];
+            const color = starter.paletteMap[char];
             if (color) {
               pCtx.fillStyle = color;
               pCtx.fillRect(x, y, 1, 1);
@@ -2324,30 +2324,30 @@
 
         item.appendChild(preview);
         const label = document.createElement('span');
-        label.className = 'tpl-label';
-        label.innerText = tpl.name;
+        label.className = 'starter-label';
+        label.innerText = starter.name;
         item.appendChild(label);
 
         container.appendChild(item);
       });
 
-      document.getElementById('template-modal').classList.remove('hidden');
-      document.getElementById('template-modal').classList.add('flex');
+      document.getElementById('starter-modal').classList.remove('hidden');
+      document.getElementById('starter-modal').classList.add('flex');
     }
 
-    function closeTemplateModal() {
-      document.getElementById('template-modal').classList.add('hidden');
-      document.getElementById('template-modal').classList.remove('flex');
+    function closeStarterModal() {
+      document.getElementById('starter-modal').classList.add('hidden');
+      document.getElementById('starter-modal').classList.remove('flex');
     }
 
-    function loadTemplate(tpl) {
+    function loadStarter(starter) {
       setGridSize(16);
       canvasPixels = Array.from({ length: 16 }, () => Array(16).fill(null));
 
-      tpl.data16.forEach((row, y) => {
+      starter.data16.forEach((row, y) => {
         for (let x = 0; x < 16; x++) {
           const char = row[x];
-          const color = tpl.paletteMap[char];
+          const color = starter.paletteMap[char];
           canvasPixels[y][x] = color || null;
         }
       });
@@ -2355,8 +2355,8 @@
       redrawMainCanvas();
       pushHistory();
       updateStorePreviews();
-      closeTemplateModal();
-      showToast(`Starter "${tpl.name}" berhasil dimuat!`);
+      closeStarterModal();
+      showToast(`Starter "${starter.name}" berhasil dimuat!`);
     }
 
     let uploadedImageElement = null;
@@ -2994,7 +2994,7 @@
 
       setGridSize(16);
       // Load initial starter (Game Controller)
-      loadTemplate(TEMPLATES[0]);
+      loadStarter(STARTERS[0]);
     };
   </script>
 </body>

@@ -47,3 +47,13 @@ test('#31: toggle seg-on/seg-off lewat satu helper setSegActive', () => {
   assert.strictEqual(count(/classList\.remove\('seg-(on|off)'\)/), 0, 'tidak ada lagi pola remove/add manual');
   assert.ok(count(/setSegActive\(/) >= 8, 'helper terpakai di semua lokasi (definisi + 7 situs)');
 });
+
+test('#33: identifier memakai istilah Starter, bukan template', () => {
+  const sisa = count(/TEMPLATES\b|loadTemplate|TemplateModal|template-modal|template-grid|tpl-label|tpl-item|tpl-prev|tpl\.title|tpl\.sub|tpl\.close|hdr\.templates/);
+  assert.strictEqual(sisa, 0, `src/index.html masih memuat ${sisa} simbol template`);
+  assert.match(html, /const STARTERS = \[/);
+  assert.match(html, /function loadStarter\(starter\)/);
+  const og = readFileSync(join(root, 'tools/generate-og-image.html'), 'utf8');
+  assert.match(og, /win\.eval\('loadStarter\(STARTERS\[0\]\)'\)/);
+  assert.strictEqual(count(/loadTemplate|TEMPLATES/, og), 0);
+});
