@@ -40,3 +40,10 @@ test('#29: stroke crop box membaca token --accent, bukan kode warna literal', ()
 test('#29: tidak ada atribut HTML berimpit tanpa whitespace', () => {
   assert.strictEqual(count(/[a-z;]"data-i18n/), 0, `ditemukan ${count(/[a-z;]"data-i18n/)} atribut berimpit`);
 });
+
+test('#31: toggle seg-on/seg-off lewat satu helper setSegActive', () => {
+  assert.match(html, /function setSegActive\(/);
+  assert.strictEqual(count(/className\s*=\s*[^;\n]*seg-(on|off)/), 0, 'tidak ada lagi assignment className manual');
+  assert.strictEqual(count(/classList\.remove\('seg-(on|off)'\)/), 0, 'tidak ada lagi pola remove/add manual');
+  assert.ok(count(/setSegActive\(/) >= 8, 'helper terpakai di semua lokasi (definisi + 7 situs)');
+});
