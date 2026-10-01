@@ -364,7 +364,7 @@
   <header class="topnav">
 
     <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
-      <div class="seg" role="group" aria-label="Ukuran grid">
+      <div class="seg" role="group" data-i18n-aria="aria.gridSize">
         <span class="seg-label">Grid</span>
         <button onclick="setGridSize(16)" id="grid-btn-16" class="seg-on">16</button>
         <button onclick="setGridSize(24)" id="grid-btn-24" class="seg-off">24</button>
@@ -376,7 +376,7 @@
       <button onclick="openStarterModal()" class="btn" data-i18n="hdr.starters">Starter</button>
       <button onclick="openImageImportModal()" class="btn" data-i18n="hdr.pixelize">Pixelize photo</button>
 
-      <div class="seg" role="group" aria-label="Berkas proyek">
+      <div class="seg" role="group" data-i18n-aria="aria.projectFiles">
         <button onclick="exportProjectFile()" class="seg-off" data-i18n="hdr.save" data-i18n-title="hdr.saveTip">Save</button>
         <button onclick="document.getElementById('project-file-input').click()" class="seg-off" data-i18n="hdr.open" data-i18n-title="hdr.openTip">Open</button>
         <input type="file" id="project-file-input" accept=".pixico,.json" class="hidden" onchange="loadProjectFile(event)">
@@ -390,7 +390,7 @@
         <button id="theme-light" onclick="applyTheme('light')" class="seg-off" data-i18n-title="hdr.theme" data-i18n="hdr.themeLight">Light</button>
         <button id="theme-dark" onclick="applyTheme('dark')" class="seg-off" data-i18n-title="hdr.theme" data-i18n="hdr.themeDark">Dark</button>
       </div>
-      <div class="seg" role="group" aria-label="Bahasa" title="Language / Bahasa">
+      <div class="seg" role="group" data-i18n-aria="aria.lang" title="Language / Bahasa">
         <button id="lang-en" onclick="applyLang('en')" class="seg-on">EN</button>
         <button id="lang-id" onclick="applyLang('id')" class="seg-off">ID</button>
       </div>
@@ -711,11 +711,11 @@
               <div title="File Explorer" style="width:24px; height:24px; border-radius:5px; display:grid; place-items:center; background:rgba(255,255,255,0.08);">
                 <svg width="13" height="13" fill="none" stroke="#9ad2ff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h3.6l1.8 2H19a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
               </div>
-              <div title="Aplikasi Anda (Aktif)" style="position:relative; width:28px; height:28px; border-radius:5px; padding:2px; background:rgba(255,255,255,0.1); border:1px solid rgba(76,194,255,0.6); display:grid; place-items:center;">
+              <div data-i18n-title="title.appActive" style="position:relative; width:28px; height:28px; border-radius:5px; padding:2px; background:rgba(255,255,255,0.1); border:1px solid rgba(76,194,255,0.6); display:grid; place-items:center;">
                 <canvas id="preview-wintaskbar-canvas" class="canvas-crisp" style="width:20px; height:20px;"></canvas>
                 <div style="position:absolute; bottom:-2px; width:6px; height:2px; border-radius:2px; background:#4cc2ff;"></div>
               </div>
-              <div title="Setelan Windows" style="width:24px; height:24px; border-radius:5px; display:grid; place-items:center; background:rgba(255,255,255,0.08);">
+              <div data-i18n-title="title.windowsSettings" style="width:24px; height:24px; border-radius:5px; display:grid; place-items:center; background:rgba(255,255,255,0.08);">
                 <svg width="13" height="13" fill="none" stroke="#d1d1d6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
               </div>
             </div>
@@ -792,7 +792,7 @@
     <div class="modal-box" style="max-width:520px;">
       <div style="display:flex; align-items:center; justify-content:center; position:relative; padding-bottom:10px; border-bottom:1px solid var(--border-soft);">
         <h3 style="margin:0; font-size:14px;" data-i18n="starter.title">Pick a starter icon</h3>
-        <button onclick="closeStarterModal()" class="btn btn-ghost btn-icon" style="position:absolute; right:-6px; top:-6px;" aria-label="Tutup">
+        <button onclick="closeStarterModal()" class="btn btn-ghost btn-icon" style="position:absolute; right:-6px; top:-6px;" data-i18n-aria="common.close">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
@@ -814,7 +814,7 @@
           <h3 style="margin:0; font-size:15px;" data-i18n="imp.title">Crop &amp; pixelize an image</h3>
           <p class="hint" style="margin:3px 0 0;" data-i18n="imp.sub">Pick the focus area on a HD photo/logo, then convert to blur-free pixel art</p>
         </div>
-        <button onclick="closeImageImportModal()" class="btn btn-ghost btn-icon" aria-label="Tutup">
+        <button onclick="closeImageImportModal()" class="btn btn-ghost btn-icon" data-i18n-aria="common.close">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
@@ -842,7 +842,7 @@
             <div class="crop-stage">
               <canvas id="crop-canvas" style="max-width:100%; max-height:100%; display:block; cursor:crosshair;"></canvas>
             </div>
-            <p class="hint" style="margin:6px 0 0; text-align:center;">Geser kotak untuk memilih bagian objek, tarik sudut kanan-bawah untuk ubah ukuran.</p>
+            <p class="hint" style="margin:6px 0 0; text-align:center;" data-i18n="imp.cropHint">Drag the box to pick the object area, drag the bottom-right corner to resize.</p>
 
             <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border-soft);">
               <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;" class="hint">
@@ -867,7 +867,7 @@
               <canvas id="modal-pixel-preview-canvas" class="canvas-crisp" style="width:100%; height:100%; display:block;"></canvas>
             </div>
             <div style="margin-top:10px; display:flex; align-items:center; justify-content:center; gap:2px; background:var(--surface); border:1px solid var(--border-soft); border-radius:9px; padding:2px; width:100%; flex-wrap:wrap;">
-              <span class="hint" style="padding:0 4px;">Grid:</span>
+              <span class="hint" style="padding:0 4px;" data-i18n="imp.gridLabel">Grid:</span>
               <button type="button" onclick="setImportGrid(16)" id="import-grid-16" class="seg-on">16x</button>
               <button type="button" onclick="setImportGrid(24)" id="import-grid-24" class="seg-off">24x</button>
               <button type="button" onclick="setImportGrid(32)" id="import-grid-32" class="seg-off">32x</button>
@@ -889,7 +889,7 @@
               </select>
             </div>
             <div>
-              <label class="hint" style="display:block; margin-bottom:4px;">Dithering:</label>
+              <label class="hint" style="display:block; margin-bottom:4px;" data-i18n="imp.dither">Dithering:</label>
               <select id="import-dither" onchange="processPixelizeImage()" style="width:100%;">
                 <option value="none" selected data-i18n="imp.ditherNone">No dither (solid blocks)</option>
                 <option value="floyd">Floyd-Steinberg</option>
@@ -946,6 +946,8 @@
         'app.title': 'Pixico - Store-ready pixel icons',
         'brand.sub': 'Store-ready pixel icons: Google Play, App Store & Microsoft Store',
         'hdr.grid': 'Grid', 'hdr.starters': 'Starters', 'hdr.pixelize': 'Pixelize photo',
+        'aria.gridSize': 'Pixel grid', 'aria.projectFiles': 'Project files', 'aria.lang': 'Language', 'common.close': 'Close',
+        'title.appActive': 'Your app (Active)', 'title.windowsSettings': 'Windows settings',
         'hdr.save': 'Save', 'hdr.open': 'Open', 'hdr.autosave': 'Autosave',
         'hdr.saveTip': 'Save a Pixico project file (.pixico)', 'hdr.openTip': 'Open a project file (.pixico / .json)',
         'hdr.undo': 'Undo (Ctrl+Z)', 'hdr.redo': 'Redo (Ctrl+Y)', 'hdr.clear': 'Clear canvas',
@@ -991,6 +993,7 @@
         'imp.dither': 'Dithering:', 'imp.ditherNone': 'No dither (solid blocks)', 'imp.floyd': 'Floyd-Steinberg', 'imp.bayer': 'Bayer Matrix (4x4)',
         'imp.contrast': 'Silhouette contrast:', 'imp.saturation': 'Saturation:', 'imp.removeWhite': 'Remove white/light background', 'imp.sensitivity': 'Sensitivity:',
         'imp.tip': 'Tip: drag the crop box to feature the main symbol.', 'imp.cancel': 'Cancel', 'imp.apply': 'Apply to canvas',
+        'imp.cropHint': 'Drag the box to pick the object area, drag the bottom-right corner to resize.', 'imp.gridLabel': 'Grid:', 'imp.originalSize': 'Original size: {w} x {h} px', 'imp.statLabel': '{g}x{g} \u2022 {c} colors',
         'toast.gridChanged': 'Grid changed to {s}\u00d7{s}',
         'toast.projectSaved': 'Project file (.pixico) saved!',
         'toast.projectInvalid': 'Invalid project file format',
@@ -1010,11 +1013,14 @@
         'toast.cleared': 'Canvas cleared',
         'toast.saveFailed': 'Failed to save file',
         'toast.pixelized': 'HD image converted to pixel art ({s}\u00d7{s})!',
+        'toast.starterLoaded': 'Starter "{name}" loaded!',
       },
       id: {
         'app.title': 'Pixico - Generator Ikon Store Pixel Art',
         'brand.sub': 'Ikon pixel siap rilis: Google Play, App Store & Microsoft Store',
         'hdr.grid': 'Grid', 'hdr.starters': 'Starter', 'hdr.pixelize': 'Pixelize Foto',
+        'aria.gridSize': 'Ukuran grid', 'aria.projectFiles': 'Berkas proyek', 'aria.lang': 'Bahasa', 'common.close': 'Tutup',
+        'title.appActive': 'Aplikasi Anda (Aktif)', 'title.windowsSettings': 'Setelan Windows',
         'hdr.save': 'Simpan', 'hdr.open': 'Buka', 'hdr.autosave': 'Autosave',
         'hdr.saveTip': 'Simpan berkas proyek Pixico (.pixico)', 'hdr.openTip': 'Buka berkas proyek (.pixico / .json)',
         'hdr.undo': 'Undo (Ctrl+Z)', 'hdr.redo': 'Redo (Ctrl+Y)', 'hdr.clear': 'Kosongkan Canvas',
@@ -1060,6 +1066,7 @@
         'imp.dither': 'Dithering:', 'imp.ditherNone': 'Tanpa Dither (Blok Solid)', 'imp.floyd': 'Floyd-Steinberg', 'imp.bayer': 'Bayer Matrix (4x4)',
         'imp.contrast': 'Penguat Kontras Siluet:', 'imp.saturation': 'Kepekatan Warna:', 'imp.removeWhite': 'Hapus Background Putih/Terang', 'imp.sensitivity': 'Sensitivitas:',
         'imp.tip': 'Tips: geser kotak crop untuk menonjolkan simbol utama.', 'imp.cancel': 'Batal', 'imp.apply': 'Terapkan ke Canvas',
+        'imp.cropHint': 'Geser kotak untuk memilih bagian objek, tarik sudut kanan-bawah untuk ubah ukuran.', 'imp.gridLabel': 'Grid:', 'imp.originalSize': 'Resolusi Asli: {w} x {h} px', 'imp.statLabel': '{g}x{g} \u2022 {c} warna',
         'toast.gridChanged': 'Ukuran grid Pixico diubah ke {s}x{s}',
         'toast.projectSaved': 'Berkas proyek .pixico tersimpan!',
         'toast.projectInvalid': 'Format berkas proyek tidak valid',
@@ -1079,6 +1086,7 @@
         'toast.cleared': 'Canvas Pixico telah dibersihkan',
         'toast.saveFailed': 'Gagal menyimpan berkas',
         'toast.pixelized': 'Gambar HD berhasil dikonversi ke pixel art ({s}x{s})!',
+        'toast.starterLoaded': 'Starter "{name}" berhasil dimuat!',
       }
     };
     let currentLang = 'en';
@@ -2358,7 +2366,7 @@
       pushHistory();
       updateStorePreviews();
       closeStarterModal();
-      showToast(`Starter "${starter.name}" berhasil dimuat!`);
+      showToast(t('toast.starterLoaded', { name: starter.name }));
     }
 
     let uploadedImageElement = null;
@@ -2416,7 +2424,7 @@
         img.onload = function() {
           uploadedImageElement = img;
           document.getElementById('upload-status-text').innerText = file.name;
-          document.getElementById('upload-file-details').innerText = `Resolusi Asli: ${img.width} x ${img.height} px`;
+          document.getElementById('upload-file-details').innerText = t('imp.originalSize', { w: img.width, h: img.height });
           document.getElementById('import-workspace').classList.remove('hidden');
           document.getElementById('btn-apply-pixelize').disabled = false;
 
@@ -2898,7 +2906,7 @@
 
       const statLabel = document.getElementById('import-stats-label');
       if (statLabel) {
-        statLabel.innerText = `${targetGrid}x${targetGrid} • ${colorCount} warna`;
+        statLabel.innerText = t('imp.statLabel', { g: targetGrid, c: colorCount });
       }
     }
 

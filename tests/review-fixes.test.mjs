@@ -64,3 +64,29 @@ test('#32: font monospace lewat satu kelas .mono, grid palet di CSS tanpa !impor
   assert.match(html, /#palette-swatches \{ display: grid; grid-template-columns: repeat\(8, 1fr\);/);
   assert.strictEqual(count(/#palette-swatches[^}]*!important/), 0, 'override !important untuk grid palet dihapus');
 });
+
+test('#30: 12 string hardcoded Indonesia ikut toggle bahasa (temuan #30 audit-002)', () => {
+  // Tak ada lagi atribut/literal Indonesia yang menembus kamus:
+  for (const s of [
+    /aria-label="Ukuran grid"/, /aria-label="Berkas proyek"/, /aria-label="Bahasa"/,
+    /title="Aplikasi Anda \(Aktif\)"/, /title="Setelan Windows"/, /aria-label="Tutup"/,
+    /Resolusi Asli: \$\{/, / warna`;/, /berhasil dimuat!`/,
+  ]) {
+    assert.strictEqual(count(s), 0, `masih hardcoded: ${s}`);
+  }
+  // Semua kunci baru terdaftar di kamus en dan id (masing-masing 2x):
+  for (const k of ['aria.gridSize', 'aria.projectFiles', 'aria.lang', 'common.close',
+    'title.appActive', 'title.windowsSettings', 'imp.cropHint', 'imp.gridLabel',
+    'imp.originalSize', 'imp.statLabel', 'toast.starterLoaded']) {
+    assert.strictEqual(count(new RegExp(`'${k}':`)), 2, `kunci ${k} harus ada di kamus en dan id`);
+  }
+  assert.match(html, /data-i18n="imp\.cropHint"/);
+  assert.match(html, /data-i18n="imp\.gridLabel"/);
+  assert.match(html, /data-i18n="imp\.dither"/);
+});
+
+test('#30: klaim dwibahasa kembali ke README dan kini sah', () => {
+  const readme = readFileSync(join(root, 'README.md'), 'utf8');
+  assert.match(readme, /Dwibahasa EN\|ID/);
+  assert.match(readme, /toggle bahasa/);
+});
