@@ -364,7 +364,7 @@
   <header class="topnav">
 
     <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
-      <div class="seg" role="group" data-i18n-aria="aria.gridSize">
+      <div class="seg" role="group" data-i18n-aria="aria.gridSize" data-i18n-title="hdr.grid">
         <span class="seg-label">Grid</span>
         <button onclick="setGridSize(16)" id="grid-btn-16" class="seg-on">16</button>
         <button onclick="setGridSize(24)" id="grid-btn-24" class="seg-off">24</button>
@@ -390,14 +390,14 @@
         <button id="theme-light" onclick="applyTheme('light')" class="seg-off" data-i18n-title="hdr.theme" data-i18n="hdr.themeLight">Light</button>
         <button id="theme-dark" onclick="applyTheme('dark')" class="seg-off" data-i18n-title="hdr.theme" data-i18n="hdr.themeDark">Dark</button>
       </div>
-      <div class="seg" role="group" data-i18n-aria="aria.lang" title="Language / Bahasa">
+      <div class="seg" role="group" data-i18n-aria="aria.lang" data-i18n-title="hdr.lang">
         <button id="lang-en" onclick="applyLang('en')" class="seg-on">EN</button>
         <button id="lang-id" onclick="applyLang('id')" class="seg-off">ID</button>
       </div>
-      <button onclick="undo()" id="undo-btn" title="Undo (Ctrl+Z)" class="btn btn-icon" aria-label="Undo" data-i18n-aria="hdr.undo">
+      <button onclick="undo()" id="undo-btn" data-i18n-title="hdr.undo" class="btn btn-icon" aria-label="Undo" data-i18n-aria="hdr.undo">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a5 5 0 015 5v2m0 0l-4-4m4 4l4-4M3 10l4-4m-4 4l4 4"/></svg>
       </button>
-      <button onclick="redo()" id="redo-btn" title="Redo (Ctrl+Y)" class="btn btn-icon" aria-label="Redo" data-i18n-aria="hdr.redo">
+      <button onclick="redo()" id="redo-btn" data-i18n-title="hdr.redo" class="btn btn-icon" aria-label="Redo" data-i18n-aria="hdr.redo">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a5 5 0 00-5 5v2m0 0l4-4m-4 4l-4-4m20-2l-4-4m4 4l-4 4"/></svg>
       </button>
       <button onclick="clearCanvas()" data-i18n-title="hdr.clear" class="btn btn-icon btn-danger" data-i18n-aria="hdr.clearAria">
@@ -413,7 +413,7 @@
       <div class="card">
         <h2 class="card-label" style="display:flex; justify-content:space-between; align-items:center;">
           <span data-i18n="tools.title">Draw tools</span>
-          <span style="font-weight:400; text-transform:none; letter-spacing:0;">P, E, B, I, L, R</span>
+          <span style="font-weight:400; text-transform:none; letter-spacing:0;" data-i18n="tools.shortcuts">P, E, B, I, L, R</span>
         </h2>
         <div class="tools-grid">
           <button onclick="setTool('pen')" id="tool-pen" data-i18n-title="tool.penTip" class="tool-btn seg-on">
@@ -892,8 +892,8 @@
               <label class="hint" style="display:block; margin-bottom:4px;" data-i18n="imp.dither">Dithering:</label>
               <select id="import-dither" onchange="processPixelizeImage()" style="width:100%;">
                 <option value="none" selected data-i18n="imp.ditherNone">No dither (solid blocks)</option>
-                <option value="floyd">Floyd-Steinberg</option>
-                <option value="bayer">Bayer Matrix (4x4)</option>
+                <option value="floyd" data-i18n="imp.floyd">Floyd-Steinberg</option>
+                <option value="bayer" data-i18n="imp.bayer">Bayer Matrix (4x4)</option>
               </select>
             </div>
             <div>
