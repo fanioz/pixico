@@ -67,7 +67,7 @@ test('teks sekunder memakai token --muted yang lolos WCAG AA (R-25)', () => {
 test('panel Pratinjau Store menandai angkanya sebagai data contoh (R-38/R-17)', () => {
   const playListing = block(
     '<!-- Play Store: konten demo diberi label "contoh" (kejujuran audit #2) -->',
-    'id="mockup-view-appstore"'
+    'id="preview-view-appstore"'
   );
   const hasInventedNumber = /\d/.test(playListing);
   if (hasInventedNumber) {
@@ -122,7 +122,7 @@ test('tidak ada orb blur dekoratif (R-01)', () => {
   );
 });
 
-test('gradient hanya di dalam mockup store yang disimulasikan (R-01/R-13)', () => {
+test('gradient hanya di dalam simulasi store preview (R-01/R-13)', () => {
   assert.ok(!uiChrome.includes('bg-gradient'), 'chrome Pixico pakai permukaan solid');
 });
 

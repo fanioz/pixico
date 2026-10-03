@@ -19,11 +19,11 @@ test('modal punya satu kontrak pembuka: class .open, bukan .flex (tiket #37)', (
   // .modal-overlay sudah display:none di rule dasarnya; membuka lewat .flex menang
   // hanya karena urutan penulisan CSS. Kontrak eksplisitnya: .modal-overlay.open.
   assert.match(html, /\.modal-overlay\.open \{ display: flex; \}/);
-  assert.strictEqual(count(/getElementById\('(starter|import)-modal'\)\.classList\.add\('flex'\)/), 0,
+  assert.strictEqual(count(/getElementById\('(starter|pixelize)-modal'\)\.classList\.add\('flex'\)/), 0,
     'modal dibuka lewat .flex yang bergantung urutan rule CSS');
-  assert.strictEqual(count(/getElementById\('(starter|import)-modal'\)\.classList\.add\('hidden'\)/), 0,
+  assert.strictEqual(count(/getElementById\('(starter|pixelize)-modal'\)\.classList\.add\('hidden'\)/), 0,
     'modal tidak pernah diberi .hidden di markup, jadi kontraknya cukup .open');
-  assert.strictEqual(count(/getElementById\('(starter|import)-modal'\)\.classList\.add\('open'\)/), 2,
+  assert.strictEqual(count(/getElementById\('(starter|pixelize)-modal'\)\.classList\.add\('open'\)/), 2,
     'kedua modal (starter + pixelize) dibuka lewat .open');
 });
 

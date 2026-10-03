@@ -262,10 +262,10 @@
     .mini-btn:hover { border-color: var(--fg); }
     .transform-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; width: 100%; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-soft); font-size: 11px; color: var(--muted); }
 
-    /* ---------- Store mockups (pratinjau = simulasi channel asli) ---------- */
-    .mock-tabs { display: flex; flex-wrap: wrap; gap: 2px; background: var(--surface); border-radius: 9px; padding: 2px; }
-    .mock-card { background: var(--surface-warm); border: 1px solid var(--border-soft); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; }
-    .mock-spec { font-size: 10px; color: var(--muted); text-align: center; margin: 10px 0 0; font-family: "SF Mono", ui-monospace, monospace; }
+    /* ---------- Store previews (pratinjau = simulasi channel asli) ---------- */
+    .preview-tabs { display: flex; flex-wrap: wrap; gap: 2px; background: var(--surface); border-radius: 9px; padding: 2px; }
+    .preview-card { background: var(--surface-warm); border: 1px solid var(--border-soft); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; }
+    .preview-spec { font-size: 10px; color: var(--muted); text-align: center; margin: 10px 0 0; font-family: "SF Mono", ui-monospace, monospace; }
     .sample-tag { font-size: 9px; background: var(--surface); border: 1px solid var(--border-soft); color: var(--muted); border-radius: 5px; padding: 1px 5px; }  /* label kejujuran konten demo */
     .store-pill { display: inline-block; background: var(--accent); color: #fff; font-size: 10px; font-weight: 600; border-radius: 999px; padding: 3px 12px; }
     .homescreen {
@@ -338,12 +338,12 @@
     #palette-swatches { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; padding: 6px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 10px; }
     /* ---------- Mobile: tap target >=44px (temuan verifikasi tiket #21, R-03) ---------- */
     @media (max-width: 920px) {
-      .seg > button, .btn, .mini-btn, .mock-tabs button { min-height: 44px; }
+      .seg > button, .btn, .mini-btn, .preview-tabs button { min-height: 44px; }
       .seg > button { min-width: 44px; padding: 10px 14px; }
       .btn { padding: 10px 14px; }
       .btn-icon { min-width: 44px; padding: 10px; }
       .mini-btn { min-width: 44px; padding: 8px 12px; }
-      .mock-tabs button { padding: 10px 14px; }
+      .preview-tabs button { padding: 10px 14px; }
       .check { min-height: 44px; }
       select, input[type="color"], input[type="range"] { min-height: 44px; }
       input[type="color"] { min-width: 44px; }
@@ -373,7 +373,7 @@
       </div>
 
       <button onclick="openStarterModal()" class="btn" data-i18n="hdr.starters">Starter</button>
-      <button onclick="openImageImportModal()" class="btn" data-i18n="hdr.pixelize">Pixelize photo</button>
+      <button onclick="openPixelizeModal()" class="btn" data-i18n="hdr.pixelize">Pixelize photo</button>
 
       <div class="seg" role="group" data-i18n-aria="aria.projectFiles">
         <button onclick="exportProjectFile()" class="seg-off" data-i18n="hdr.save" data-i18n-title="hdr.saveTip">Save</button>
@@ -608,17 +608,17 @@
       <div class="card">
         <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border-soft); padding-bottom:8px; margin-bottom:10px; gap:8px;">
           <h2 class="card-label" style="margin:0;" data-i18n="preview.title">Store preview</h2>
-          <div class="mock-tabs" role="tablist">
-            <button onclick="switchMockupTab('playstore')" id="tab-playstore" class="seg-on">Play</button>
-            <button onclick="switchMockupTab('appstore')" id="tab-appstore" class="seg-off">App Store</button>
-            <button onclick="switchMockupTab('msstore')" id="tab-msstore" class="seg-off">MS Store</button>
-            <button onclick="switchMockupTab('homescreen')" id="tab-homescreen" class="seg-off">Home</button>
+          <div class="preview-tabs" role="tablist">
+            <button onclick="switchPreviewTab('playstore')" id="tab-playstore" class="seg-on">Play</button>
+            <button onclick="switchPreviewTab('appstore')" id="tab-appstore" class="seg-off">App Store</button>
+            <button onclick="switchPreviewTab('msstore')" id="tab-msstore" class="seg-off">MS Store</button>
+            <button onclick="switchPreviewTab('homescreen')" id="tab-homescreen" class="seg-off">Home</button>
           </div>
         </div>
 
         <!-- Play Store: konten demo diberi label "contoh" (kejujuran audit #2) -->
-        <div id="mockup-view-playstore">
-          <div class="mock-card">
+        <div id="preview-view-playstore">
+          <div class="preview-card">
             <div style="position:relative; width:64px; height:64px; border-radius:22%; overflow:hidden; border:1px solid var(--border); flex-shrink:0;">
               <canvas id="preview-playstore-canvas" class="canvas-crisp" style="width:100%; height:100%;"></canvas>
             </div>
@@ -632,11 +632,11 @@
               </div>
             </div>
           </div>
-          <p class="mock-spec" data-i18n="spec.play">Google Play: 512 × 512 px, 32-bit PNG (max 1MB)</p>
+          <p class="preview-spec" data-i18n="spec.play">Google Play: 512 × 512 px, 32-bit PNG (max 1MB)</p>
         </div>
 
-        <div id="mockup-view-appstore" class="hidden">
-          <div class="mock-card">
+        <div id="preview-view-appstore" class="hidden">
+          <div class="preview-card">
             <div style="position:relative; width:64px; height:64px; border-radius:22.5%; overflow:hidden; border:1px solid var(--border); flex-shrink:0;">
               <canvas id="preview-appstore-canvas" class="canvas-crisp" style="width:100%; height:100%;"></canvas>
               <div id="ios-gloss-overlay" style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(255,255,255,0.2), transparent 40%, rgba(0,0,0,0.2)); pointer-events:none;"></div>
@@ -647,10 +647,10 @@
               <span class="store-pill" style="margin-top:6px;" data-i18n="sample.get">Get</span>
             </div>
           </div>
-          <p class="mock-spec" data-i18n="spec.app">App Store: 1024 × 1024 px, solid PNG (no transparency)</p>
+          <p class="preview-spec" data-i18n="spec.app">App Store: 1024 × 1024 px, solid PNG (no transparency)</p>
         </div>
 
-        <div id="mockup-view-homescreen" class="hidden">
+        <div id="preview-view-homescreen" class="hidden">
           <div class="homescreen">
             <div>
               <div style="width:44px; height:44px; border-radius:22%; overflow:hidden; border:2px solid var(--accent); margin:0 auto;">
@@ -677,11 +677,11 @@
               <div class="hs-label" data-i18n="hs.settings">Settings</div>
             </div>
           </div>
-          <p class="mock-spec" data-i18n="spec.home">Side by side with other apps</p>
+          <p class="preview-spec" data-i18n="spec.home">Side by side with other apps</p>
         </div>
 
-        <div id="mockup-view-msstore" class="hidden">
-          <div class="mock-card" style="align-items:flex-start;">
+        <div id="preview-view-msstore" class="hidden">
+          <div class="preview-card" style="align-items:flex-start;">
             <div style="position:relative; width:64px; height:64px; border-radius:12px; overflow:hidden; border:1px solid var(--border); flex-shrink:0;">
               <canvas id="preview-msstore-canvas" class="canvas-crisp" style="width:100%; height:100%;"></canvas>
             </div>
@@ -719,7 +719,7 @@
               </div>
             </div>
           </div>
-          <p class="mock-spec" data-i18n="spec.ms">Windows: 300×300 (Store), 44×44 (app list), multi-size .ICO</p>
+          <p class="preview-spec" data-i18n="spec.ms">Windows: 300×300 (Store), 44×44 (app list), multi-size .ICO</p>
         </div>
       </div>
 
@@ -806,20 +806,20 @@
   </div>
 
   <!-- Modal Crop & Pixelize -->
-  <div id="import-modal" class="modal-overlay">
+  <div id="pixelize-modal" class="modal-overlay">
     <div class="modal-box" style="max-width:1000px; max-height:94vh; overflow:hidden; display:flex; flex-direction:column; padding:16px;">
       <div style="display:flex; align-items:flex-start; justify-content:space-between; padding-bottom:10px; border-bottom:1px solid var(--border-soft); flex-shrink:0;">
         <div>
           <h3 style="margin:0; font-size:15px;" data-i18n="imp.title">Crop &amp; pixelize an image</h3>
           <p class="hint" style="margin:3px 0 0;" data-i18n="imp.sub">Pick the focus area on a HD photo/logo, then convert to blur-free pixel art</p>
         </div>
-        <button onclick="closeImageImportModal()" class="btn btn-ghost btn-icon" data-i18n-aria="common.close">
+        <button onclick="closePixelizeModal()" class="btn btn-ghost btn-icon" data-i18n-aria="common.close">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
       <div style="overflow-y:auto; padding-right:4px; margin:12px 0; flex:1;">
-        <div id="import-dropzone" class="dropzone" onclick="document.getElementById('image-upload-input').click()">
+        <div id="pixelize-dropzone" class="dropzone" onclick="document.getElementById('image-upload-input').click()">
           <input type="file" id="image-upload-input" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
           <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
             <div style="width:32px; height:32px; border-radius:8px; background:var(--surface); border:1px solid var(--border-soft); display:grid; place-items:center; color:var(--muted);">
@@ -832,7 +832,7 @@
           </div>
         </div>
 
-        <div id="import-workspace" class="hidden" style="display:grid; grid-template-columns:1fr; gap:14px; padding-top:10px; align-items:start;">
+        <div id="pixelize-workspace" class="hidden" style="display:grid; grid-template-columns:1fr; gap:14px; padding-top:10px; align-items:start;">
           <div style="display:flex; flex-direction:column; background:var(--surface-warm); padding:12px; border-radius:12px; border:1px solid var(--border-soft);">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-size:11px;">
               <span style="font-weight:700;" data-i18n="imp.focus">Focus area (1:1)</span>
@@ -860,19 +860,19 @@
           <div style="display:flex; flex-direction:column; align-items:center; background:var(--surface-warm); padding:12px; border-radius:12px; border:1px solid var(--border-soft);">
             <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
               <span class="card-label" style="margin:0;" data-i18n="imp.result">Pixel result</span>
-              <span id="import-stats-label" class="mono" style="font-size:10px; color:var(--accent);">16x16</span>
+              <span id="pixelize-stats-label" class="mono" style="font-size:10px; color:var(--accent);">16x16</span>
             </div>
             <div style="position:relative; width:150px; height:150px; border-radius:10px; overflow:hidden; border:1px solid var(--border);" class="bg-checker">
               <canvas id="modal-pixel-preview-canvas" class="canvas-crisp" style="width:100%; height:100%; display:block;"></canvas>
             </div>
             <div style="margin-top:10px; display:flex; align-items:center; justify-content:center; gap:2px; background:var(--surface); border:1px solid var(--border-soft); border-radius:9px; padding:2px; width:100%; flex-wrap:wrap;">
               <span class="hint" style="padding:0 4px;" data-i18n="imp.gridLabel">Grid:</span>
-              <button type="button" onclick="setImportGrid(16)" id="import-grid-16" class="seg-on">16x</button>
-              <button type="button" onclick="setImportGrid(24)" id="import-grid-24" class="seg-off">24x</button>
-              <button type="button" onclick="setImportGrid(32)" id="import-grid-32" class="seg-off">32x</button>
-              <button type="button" onclick="setImportGrid(48)" id="import-grid-48" class="seg-off">48x</button>
-              <button type="button" onclick="setImportGrid(64)" id="import-grid-64" class="seg-off">64x</button>
-              <input type="hidden" id="import-grid-size" value="16">
+              <button type="button" onclick="setPixelizeGrid(16)" id="pixelize-grid-16" class="seg-on">16x</button>
+              <button type="button" onclick="setPixelizeGrid(24)" id="pixelize-grid-24" class="seg-off">24x</button>
+              <button type="button" onclick="setPixelizeGrid(32)" id="pixelize-grid-32" class="seg-off">32x</button>
+              <button type="button" onclick="setPixelizeGrid(48)" id="pixelize-grid-48" class="seg-off">48x</button>
+              <button type="button" onclick="setPixelizeGrid(64)" id="pixelize-grid-64" class="seg-off">64x</button>
+              <input type="hidden" id="pixelize-grid-size" value="16">
             </div>
             <div class="hint" style="margin-top:8px; text-align:center;" data-i18n="imp.scaled">Auto-scaled to the chosen grid.</div>
           </div>
@@ -880,7 +880,7 @@
           <div style="display:flex; flex-direction:column; gap:10px; font-size:12px; background:var(--surface-warm); padding:12px; border-radius:12px; border:1px solid var(--border-soft);">
             <div>
               <label class="hint" style="display:block; margin-bottom:4px;" data-i18n="imp.colorMode">Color mode &amp; quantization:</label>
-              <select id="import-color-mode" onchange="processPixelizeImage()" style="width:100%;">
+              <select id="pixelize-color-mode" onchange="processPixelizeImage()" style="width:100%;">
                 <option value="palette" selected data-i18n="imp.palette">Match active palette</option>
                 <option value="quantize16" data-i18n="imp.q16">16-color quantize (retro)</option>
                 <option value="quantize8" data-i18n="imp.q8">8-color quantize (flat)</option>
@@ -889,7 +889,7 @@
             </div>
             <div>
               <label class="hint" style="display:block; margin-bottom:4px;" data-i18n="imp.dither">Dithering:</label>
-              <select id="import-dither" onchange="processPixelizeImage()" style="width:100%;">
+              <select id="pixelize-dither" onchange="processPixelizeImage()" style="width:100%;">
                 <option value="none" selected data-i18n="imp.ditherNone">No dither (solid blocks)</option>
                 <option value="floyd" data-i18n="imp.floyd">Floyd-Steinberg</option>
                 <option value="bayer" data-i18n="imp.bayer">Bayer Matrix (4x4)</option>
@@ -900,23 +900,23 @@
                 <span data-i18n="imp.contrast">Silhouette contrast:</span>
                 <span id="contrast-val-label" class="mono" style="color:var(--fg);">145%</span>
               </div>
-              <input type="range" id="import-contrast" min="100" max="240" value="145" oninput="document.getElementById('contrast-val-label').innerText = this.value + '%'; processPixelizeImage();">
+              <input type="range" id="pixelize-contrast" min="100" max="240" value="145" oninput="document.getElementById('contrast-val-label').innerText = this.value + '%'; processPixelizeImage();">
             </div>
             <div>
               <div style="display:flex; justify-content:space-between; margin-bottom:2px;" class="hint">
                 <span data-i18n="imp.saturation">Saturation:</span>
                 <span id="saturate-val-label" class="mono" style="color:var(--fg);">130%</span>
               </div>
-              <input type="range" id="import-saturate" min="80" max="220" value="130" oninput="document.getElementById('saturate-val-label').innerText = this.value + '%'; processPixelizeImage();">
+              <input type="range" id="pixelize-saturate" min="80" max="220" value="130" oninput="document.getElementById('saturate-val-label').innerText = this.value + '%'; processPixelizeImage();">
             </div>
             <div style="padding-top:8px; border-top:1px solid var(--border-soft);">
               <label class="check">
-                <input type="checkbox" id="import-remove-white" checked onchange="processPixelizeImage()">
+                <input type="checkbox" id="pixelize-remove-white" checked onchange="processPixelizeImage()">
                 <span data-i18n="imp.removeWhite">Remove white/light background</span>
               </label>
               <div style="display:flex; align-items:center; gap:8px; padding-left:22px; margin-top:6px;" class="hint">
                 <span style="white-space:nowrap;" data-i18n="imp.sensitivity">Sensitivity:</span>
-                <input type="range" id="import-white-threshold" min="200" max="254" value="230" oninput="processPixelizeImage()">
+                <input type="range" id="pixelize-white-threshold" min="200" max="254" value="230" oninput="processPixelizeImage()">
               </div>
             </div>
           </div>
@@ -926,7 +926,7 @@
       <div style="display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px solid var(--border-soft); flex-shrink:0;">
         <span class="hint" data-i18n="imp.tip">Tip: drag the crop box to feature the main symbol.</span>
         <div style="display:flex; gap:8px; margin-left:auto;">
-          <button onclick="closeImageImportModal()" class="btn" data-i18n="imp.cancel">Cancel</button>
+          <button onclick="closePixelizeModal()" class="btn" data-i18n="imp.cancel">Cancel</button>
           <button onclick="applyPixelizedImage()" id="btn-apply-pixelize" disabled class="btn btn-primary">
             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             <span data-i18n="imp.apply">Apply to canvas</span>
@@ -1775,12 +1775,12 @@
       document.getElementById('zoom-level-text').innerText = `${Math.round(zoomLevel * 100)}%`;
     }
 
-    function switchMockupTab(tab) {
+    function switchPreviewTab(tab) {
       const tabs = ['playstore', 'appstore', 'homescreen', 'msstore'];
       const btns = tabs.map(name => document.getElementById(`tab-${name}`));
       setSegActive(btns, btns[tabs.indexOf(tab)]);
       tabs.forEach(name => {
-        const view = document.getElementById(`mockup-view-${name}`);
+        const view = document.getElementById(`preview-view-${name}`);
         if (view) view.classList.toggle('hidden', name !== tab);
       });
       updateStorePreviews();
@@ -2380,9 +2380,9 @@
     let cropCanvasEl = null;
     let cropCtx = null;
 
-    function openImageImportModal() {
-      setImportGrid(gridSize);
-      document.getElementById('import-modal').classList.add('open');
+    function openPixelizeModal() {
+      setPixelizeGrid(gridSize);
+      document.getElementById('pixelize-modal').classList.add('open');
 
       if (!cropCanvasEl) {
         cropCanvasEl = document.getElementById('crop-canvas');
@@ -2396,15 +2396,15 @@
       }
     }
 
-    function closeImageImportModal() {
-      document.getElementById('import-modal').classList.remove('open');
+    function closePixelizeModal() {
+      document.getElementById('pixelize-modal').classList.remove('open');
     }
 
-    function setImportGrid(size) {
-      document.getElementById('import-grid-size').value = size;
+    function setPixelizeGrid(size) {
+      document.getElementById('pixelize-grid-size').value = size;
       setSegActive(
-        [16, 24, 32, 48, 64].map(s => document.getElementById(`import-grid-${s}`)),
-        document.getElementById(`import-grid-${size}`)
+        [16, 24, 32, 48, 64].map(s => document.getElementById(`pixelize-grid-${s}`)),
+        document.getElementById(`pixelize-grid-${size}`)
       );
       if (uploadedImageElement) {
         processPixelizeImage();
@@ -2422,7 +2422,7 @@
           uploadedImageElement = img;
           document.getElementById('upload-status-text').innerText = file.name;
           document.getElementById('upload-file-details').innerText = t('imp.originalSize', { w: img.width, h: img.height });
-          document.getElementById('import-workspace').classList.remove('hidden');
+          document.getElementById('pixelize-workspace').classList.remove('hidden');
           document.getElementById('btn-apply-pixelize').disabled = false;
 
           if (!cropCanvasEl) {
@@ -2725,13 +2725,13 @@
     function processPixelizeImage() {
       if (!uploadedImageElement) return;
 
-      const targetGrid = parseInt(document.getElementById('import-grid-size').value, 10);
-      const colorMode = document.getElementById('import-color-mode').value;
-      const contrastVal = parseInt(document.getElementById('import-contrast').value, 10);
-      const saturateVal = parseInt(document.getElementById('import-saturate').value, 10);
-      const removeWhite = document.getElementById('import-remove-white').checked;
-      const whiteThreshold = parseInt(document.getElementById('import-white-threshold').value, 10);
-      const ditherMode = document.getElementById('import-dither').value;
+      const targetGrid = parseInt(document.getElementById('pixelize-grid-size').value, 10);
+      const colorMode = document.getElementById('pixelize-color-mode').value;
+      const contrastVal = parseInt(document.getElementById('pixelize-contrast').value, 10);
+      const saturateVal = parseInt(document.getElementById('pixelize-saturate').value, 10);
+      const removeWhite = document.getElementById('pixelize-remove-white').checked;
+      const whiteThreshold = parseInt(document.getElementById('pixelize-white-threshold').value, 10);
+      const ditherMode = document.getElementById('pixelize-dither').value;
 
       // Stage 1: High-quality intermediate rendering strictly from cropBox coordinates
       const intermediateCanvas = document.createElement('canvas');
@@ -2901,7 +2901,7 @@
         }
       }
 
-      const statLabel = document.getElementById('import-stats-label');
+      const statLabel = document.getElementById('pixelize-stats-label');
       if (statLabel) {
         statLabel.innerText = t('imp.statLabel', { g: targetGrid, c: colorCount });
       }
@@ -2910,7 +2910,7 @@
     function applyPixelizedImage() {
       if (!uploadedImageElement || !pixelizedResultGrid) return;
 
-      const targetGrid = parseInt(document.getElementById('import-grid-size').value, 10);
+      const targetGrid = parseInt(document.getElementById('pixelize-grid-size').value, 10);
       if (gridSize !== targetGrid) {
         setGridSize(targetGrid);
       }
@@ -2919,7 +2919,7 @@
       redrawMainCanvas();
       pushHistory();
       updateStorePreviews();
-      closeImageImportModal();
+      closePixelizeModal();
       showToast(t('toast.pixelized', { s: targetGrid }));
     }
 
