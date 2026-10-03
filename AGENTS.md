@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Pixico — a single-file HTML app (`src/index.html`) that generates and converts pixel-art icons ready for app-store release (Google Play 512×512, Apple App Store 1024×1024, Microsoft Store / MSIX). It ships as a desktop app: `src/` is the Tauri frontend (with Tailwind, JSZip, and fonts vendored for full offline use) and `src-tauri/` is the Tauri v2 wrapper. Build with `npx tauri build`.
+Pixico is a single-file HTML app (`src/index.html`) that generates and converts pixel-art icons ready for app-store release (Google Play 512×512, Apple App Store 1024×1024, Microsoft Store / MSIX). It ships as a desktop app: `src/` is the Tauri frontend (vendored for full offline use, see CONTEXT.md under Aset ter-vendor) and `src-tauri/` is the Tauri v2 wrapper. Build with `npx tauri build`.
 
 ## Agent skills
 

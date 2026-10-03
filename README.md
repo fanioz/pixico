@@ -1,53 +1,45 @@
 # Pixico
 
+<p align="center"><img src="icon-source.png" alt="Ikon Pixico" width="120"></p>
+
+[![release](https://github.com/fanioz/pixico/actions/workflows/release.yml/badge.svg)](https://github.com/fanioz/pixico/actions/workflows/release.yml)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-A pixel-art icon generator for app stores — offline-first, store-ready exports.
+Editor dan generator ikon pixel-art siap rilis ke Google Play, App Store, dan Microsoft Store.
 
-Pixico is a single-file web app wrapped as a cross-platform desktop application using Tauri v2. Create pixel icons at 16×16, 24×24, or 32×32 resolution and export them ready for Google Play (512×512), Apple App Store (1024×1024), and Microsoft Store (MSIX). Works completely offline with vendored dependencies.
+Pixico adalah aplikasi desktop lintas platform (Windows, macOS, Linux) yang dibungkus Tauri v2 di atas sebuah web app satu file (`src/index.html`). Seluruh styling dan logika hidup di satu berkas HTML: CSS ditulis inline, font memakai font sistem, dan satu-satunya dependensi eksternal (JSZip) ter-vendor di `src/vendor/`, sehingga aplikasi berjalan **offline penuh**, tanpa satu pun panggilan jaringan saat runtime. Canvas, gambar, dan proyek pengguna diproses lokal di perangkat. Antarmuka tersedia dwibahasa (EN|ID) lewat toggle bahasa di header. Saat ini versi 0.1.0 (pra-rilis) dan gratis.
 
-## Table of Contents
+## Latar Belakang
 
-- [Background](#background)
-- [Install](#install)
-- [Usage](#usage)
-- [Features](#features)
-- [Contributing](#contributing)
-- [License](#license)
+Pixico dimulai sebagai halaman HTML tunggal untuk kebutuhan ikon sendiri, lalu disiapkan menjadi aplikasi desktop gratis yang didistribusikan lewat Microsoft Store dan unduhan langsung. Wrapper Tauri v2 dipilih agar aplikasi HTML eksisting tidak perlu ditulis ulang; paket MSIX untuk Microsoft Store dibuat lewat winapp CLI: MSIX di-upload unsigned ke Partner Center dan di-re-sign oleh Store, tanpa sertifikat Authenticode berbayar.
 
-## Background
+Keputusan arsitektur dan identitas visual didokumentasikan sebagai ADR:
 
-Pixico was built for designers and developers who need pixel-perfect icons for app store submissions. Instead of configuring export pipelines or remembering store requirements, Pixico provides:
+- [ADR 0001: Wrapper Tauri v2 + packaging Microsoft Store lewat winapp CLI](docs/adr/0001-tauri-winapp-msix.md)
+- [ADR 0002: Identitas app `io.github.fanioz.pixico`](docs/adr/0002-app-identifier.md)
+- [ADR 0003: Rebuild identitas visual mengikuti DESIGN.md](docs/adr/0003-rebuild-design-md.md)
 
-- Pre-tuned grid sizes (16/24/32px)
-- Curated pixel palettes (Sweetie-16, PICO-8, Milk Tea, Game Boy)
-- One-tap export to store-required dimensions
-- Full offline operation with zero CDN dependencies
-
-The app is distributed via Microsoft Store (Windows) and GitHub Releases (macOS DMG, Linux AppImage/deb).
-
-## Install
+## Instalasi
 
 ### Windows
 
-Install from the Microsoft Store: *[pending Store approval — will be linked after #9]*
+Pasang dari Microsoft Store: *[menunggu persetujuan Store — tautan disematkan setelah submit #9 live]*
 
 ### macOS
 
-Download the latest `.dmg` from [GitHub Releases](https://github.com/fanioz/pixico/releases):
+Unduh `.dmg` terbaru dari [GitHub Releases](https://github.com/fanioz/pixico/releases), lalu seret Pixico.app ke folder Applications:
 
 ```sh
-# Download the DMG, then drag Pixico.app to Applications
 open Pixico_0.1.0_aarch64.dmg  # Apple Silicon
-# or
+# atau
 open Pixico_0.1.0_x64.dmg      # Intel
 ```
 
-*Note: Notarized DMG requires Apple Developer Program membership (#5). Current builds use ad-hoc signing.*
+*Catatan: DMG ternotarisasi menunggu keanggotaan Apple Developer Program (#5); build saat ini memakai ad-hoc signing.*
 
 ### Linux
 
-Download the AppImage or `.deb` from [GitHub Releases](https://github.com/fanioz/pixico/releases):
+Unduh AppImage atau `.deb` dari [GitHub Releases](https://github.com/fanioz/pixico/releases):
 
 ```sh
 # AppImage (universal)
@@ -58,52 +50,77 @@ chmod +x Pixico_0.1.0_amd64.AppImage
 sudo dpkg -i Pixico_0.1.0_amd64.deb
 ```
 
-### Build from Source
+### Build dari source
 
-Requires [Rust](https://rustup.rs/) and Node.js.
+Prasyarat: Node.js (LTS), Rust toolchain, dan dependensi Tauri untuk OS masing-masing, lihat [prasyarat Tauri](https://tauri.app/start/prerequisites/).
 
 ```sh
 git clone https://github.com/fanioz/pixico.git
 cd pixico
 npm install
-npx tauri build
+npm run tauri dev
 ```
 
-Built binaries will be in `src-tauri/target/release/`.
+`npm install` hanya memasang CLI Tauri; aset frontend tidak diunduh dari internet karena JSZip sudah ter-vendor dan sisanya inline di `src/index.html`.
 
-## Usage
+## Penggunaan
 
-1. **Draw** — Choose a grid size (16/24/32px), pick a palette, and draw with pen/fill/shade tools
-2. **Preview** — See live previews at Google Play (512×512), App Store (1024×1024), and home screen sizes
-3. **Export** — Click "Download PNG" to save a 512×512 store-ready icon with 10% padding
+```sh
+npm run tauri dev    # jalankan app desktop dalam mode dev
+npx tauri build      # build rilis (.msi/.nsis, .dmg/.app, .deb/.AppImage)
+npm test             # uji audit (node --test)
+```
 
-The canvas supports:
-- Click-drag to paint
-- Right-click to erase
-- Mirror mode for symmetrical designs
-- Undo/redo (40-step history)
-- Flood fill and shade darkening
+Rilis dipicu tag `app-v*` dan dibangun otomatis untuk macOS (Apple Silicon + Intel), Linux, dan Windows oleh GitHub Actions (`.github/workflows/release.yml`).
 
-All work autosaves locally during the session.
+Alur kerja di dalam app:
 
-## Features
+1. Pilih ukuran grid (16/24/32/48/64) atau mulai dari starter yang tersedia.
+2. Gambar langsung di canvas, atau **Pixelize** gambar HD menjadi pixel art (crop fokus + kuantisasi + dithering).
+3. Periksa tampilan lewat store preview: Google Play, App Store, Microsoft Store, dan home screen.
+4. **Export** ke PNG/ICO/ZIP sesuai target store lewat dialog simpan native.
 
-- **Store-true export** — One click generates Google Play 512×512, App Store 1024×1024, or Windows ICO
-- **Pastel-first palettes** — Sweetie-16, Milk Tea, PICO-8, Game Boy palettes pre-loaded
-- **Offline-first** — All dependencies (Tailwind, JSZip, fonts) are vendored; no network calls at runtime
-- **Cross-platform** — Single codebase builds for Windows, macOS (arm64 + Intel), and Linux
-- **Lightweight** — ~3–10 MB bundle size (Tauri v2 native webview)
+Proyek terakhir otomatis dipulihkan lewat autosave (localStorage) saat app dibuka lagi.
 
-## Contributing
+## Fitur
 
-Issues and pull requests are welcome. For questions or feature requests, [open an issue](https://github.com/fanioz/pixico/issues/new).
+- **Grid 16/24/32/48/64**: satu canvas = satu grid, dirender di atas stage gelap ber-checker transparansi.
+- **Pixelize**: konversi gambar HD menjadi pixel art (crop fokus, kuantisasi, dithering).
+- **Starter**: ikon contoh siap pakai untuk memulai.
+- **Store preview**: simulasi ikon di channel asli (konten demo berlabel sample/contoh).
+- **Export siap store**: PNG, ICO, dan ZIP lewat dialog simpan native; membatalkan dialog berarti tidak ada berkas.
+- **Ukuran target store**: Google Play 512×512, Apple App Store 1024×1024, Microsoft Store/MSIX.
+- **Autosave**: pemulihan otomatis proyek dari localStorage.
+- **Dwibahasa EN|ID**: seluruh teks antarmuka mengikuti toggle bahasa di header, tanpa reload.
+- **Offline penuh**: tanpa panggilan jaringan saat runtime.
 
-Before submitting a PR:
-- Run `npx tauri build` to verify the build succeeds
-- Test the app on your platform
+## Struktur
 
-See the [wayfinder map (#1)](https://github.com/fanioz/pixico/issues/1) for current development focus.
+| Jalur | Isi |
+| --- | --- |
+| `src/index.html` | Seluruh aplikasi (satu berkas HTML) |
+| `src/vendor/` | Dependensi ter-vendor (JSZip) |
+| `src-tauri/` | Wrapper Tauri v2 (Rust) + konfigurasi bundle |
+| `docs/adr/` | Keputusan arsitektur |
+| `tests/` | Uji audit (`npm test`) |
 
-## License
+## Privasi
 
-UNLICENSED — no license file present in this repository.
+Pixico tidak mengumpulkan apa pun: berjalan sepenuhnya di perangkat, offline, tanpa akun, telemetri, iklan, maupun pelacakan. Lihat [privacy-policy.md](privacy-policy.md).
+
+## Maintainer
+
+[@fanioz](https://github.com/fanioz)
+
+## Terima Kasih
+
+- [Tauri](https://tauri.app): wrapper desktop dan plugin dialog/fs-nya.
+- [JSZip](https://stuk.github.io/jszip/): pembuatan arsip ZIP pada export.
+
+## Kontribusi
+
+Repo ini privat; diskusi dan pelaporan bug tetap terpusat di [GitHub Issues](https://github.com/fanioz/pixico/issues). PR diterima: jalankan `npm test` sebelum mengirim, dan pastikan `npx tauri build` sukses untuk perubahan yang menyentuh app atau wrapper. Fokus pengembangan berjalan tercatat di [wayfinder map #1](https://github.com/fanioz/pixico/issues/1).
+
+## Lisensi
+
+UNLICENSED: proyek privat, semua hak dilindungi. © 2026 [fanioz](https://github.com/fanioz).
