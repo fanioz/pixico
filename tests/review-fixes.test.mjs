@@ -45,7 +45,12 @@ test('#31: toggle seg-on/seg-off lewat satu helper setSegActive', () => {
   assert.match(html, /function setSegActive\(/);
   assert.strictEqual(count(/className\s*=\s*[^;\n]*seg-(on|off)/), 0, 'tidak ada lagi assignment className manual');
   assert.strictEqual(count(/classList\.remove\('seg-(on|off)'\)/), 0, 'tidak ada lagi pola remove/add manual');
-  assert.ok(count(/setSegActive\(/) >= 8, 'helper terpakai di semua lokasi (definisi + 7 situs)');
+  // Refactor tiket #38: segmen ukuran grid (canvas & pixelize) melalui
+  // activateSegGroup di atas setSegActive, jadi pemanggil langsung menipis.
+  // Yang tersisa: definisi + applyLang, setTool, switchPreviewTab, applyTheme,
+  // dan activateSegGroup (yang kini melayani tiga jalur ukuran grid).
+  assert.match(html, /function activateSegGroup\(/);
+  assert.ok(count(/setSegActive\(/) >= 6, 'helper terpakai di semua lokasi toggle segmen');
 });
 
 test('#33: identifier memakai istilah Starter, bukan template', () => {
