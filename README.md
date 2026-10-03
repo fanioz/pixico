@@ -23,7 +23,7 @@ Keputusan arsitektur dan identitas visual didokumentasikan sebagai ADR:
 
 ### Windows
 
-Pasang dari Microsoft Store: *[menunggu persetujuan Store — tautan disematkan setelah submit #9 live]*
+Pasang dari Microsoft Store: *[menunggu persetujuan Store: tautan disematkan setelah submit #9 live]*
 
 ### macOS
 
