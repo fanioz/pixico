@@ -195,7 +195,9 @@
       color: var(--muted); margin: 0 0 10px;
     }
     .hint { font-size: 11px; color: var(--muted); line-height: 1.5; }
-    /* Kelas layout bersama: pengganti pola flex inline yang identik dan berulang (tiket #38) */
+    /* Kelas layout bersama: pengganti pola flex inline yang identik dan berulang (tiket #38).
+       .row-xs sengaja tanpa align-items (perilaku inline aslinya stretch); .split-sm
+       membawa margin-bottom:2px milik baris label kontras/saturasi. */
     .row { display: flex; align-items: center; gap: 8px; }
     .row-sm { display: flex; align-items: center; gap: 6px; }
     .row-xs { display: flex; gap: 4px; }
@@ -368,8 +370,8 @@
   <header class="topnav">
 
     <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
-      <div class="seg" role="group" data-i18n-aria="aria.gridSize" data-i18n-title="hdr.grid">
-        <span class="seg-label">Grid</span>
+      <div class="seg" role="group" data-i18n-aria="aria.gridSize">
+        <span class="seg-label" data-i18n="hdr.grid">Grid</span>
         <button onclick="setGridSize(16)" id="grid-btn-16" class="seg-on">16</button>
         <button onclick="setGridSize(24)" id="grid-btn-24" class="seg-off">24</button>
         <button onclick="setGridSize(32)" id="grid-btn-32" class="seg-off">32</button>

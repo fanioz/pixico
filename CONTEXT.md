@@ -2,6 +2,8 @@
 
 Aplikasi editor dan generator ikon pixel-art siap rilis ke store: web app satu file yang dibungkus menjadi aplikasi desktop lintas platform.
 
+Glosarium mengatur copy pengguna **dan** identifier kode (nama fungsi, ID elemen, kelas CSS); keputusan cakupannya tercatat di tiket #36.
+
 ## Language
 
 **Pixico**:

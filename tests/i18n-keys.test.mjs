@@ -55,5 +55,6 @@ test('title hardcoded di pasangan Undo/Redo/Language ikut kamus (tiket #35)', ()
   assert.match(html, /value="floyd" data-i18n="imp\.floyd"/);
   assert.match(html, /value="bayer" data-i18n="imp\.bayer"/);
   assert.match(html, /data-i18n="tools\.shortcuts"/);
-  assert.match(html, /data-i18n-title="hdr\.grid"/);
+  // Hasil review: kunci hdr.grid pada label Grid yang terlihat, bukan tooltip grup.
+  assert.match(html, /<span class="seg-label" data-i18n="hdr\.grid">Grid<\/span>/);
 });
