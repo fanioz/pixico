@@ -19,7 +19,9 @@
   dengan tauri.conf.json setiap rilis.
 -->
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10">
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         IgnorableNamespaces="uap rescap">
 
   <Identity Name="Pixico.Fanioz"
             Publisher="CN=BA000000-0000-0000-0000-000000000000"
@@ -53,5 +55,11 @@
                           BackgroundColor="#0f172a" />
     </Application>
   </Applications>
+
+  <!-- runFullTrust wajib untuk semua app Win32/desktop yang pakai
+       EntryPoint="Windows.FullTrustApplication" (MakeAppx error 80080204) -->
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
 
 </Package>
