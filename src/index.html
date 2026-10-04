@@ -258,6 +258,7 @@
     .canvas-crisp { image-rendering: pixelated; }
     #canvas-wrapper, #pixelCanvas { max-width: 100%; }   /* alasan: SCREEN_CANVAS_SIZE 384px tetap; di layar sempit + scrollbar lebar tersisa 382, jadi wajib di-cap (tiket #21) */
     #canvas-wrapper {
+      position: relative;   /* alasan: kandang #gridCanvas (absolute); tanpa ini overlay-nya lolos ke viewport dan menggambar grid hantu di seluruh halaman dark */
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);   /* alasan: angkat Canvas di atas stage gelap */
       border-radius: 4px; cursor: crosshair; user-select: none;
       transition: transform 75ms var(--ease-standard); transform-origin: center;
@@ -1293,7 +1294,7 @@
       // If symmetry active, draw center axis highlight
       if (symmetry) {
         gridCtx.beginPath();
-        gridCtx.strokeStyle = 'rgba(168, 85, 247, 0.6)';
+        gridCtx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
         gridCtx.lineWidth = 2;
         const mid = (gridSize / 2) * cellSize;
         gridCtx.moveTo(mid, 0);
